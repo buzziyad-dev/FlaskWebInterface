@@ -10,6 +10,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False)
+    ban_reason = db.Column(db.Text)
     reputation_score = db.Column(db.Integer, default=0)
     badge = db.Column(db.String(50))
     

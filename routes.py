@@ -47,6 +47,10 @@ def login():
         # Try to find user by username or email
         user = User.query.filter((User.username == user_input) | (User.email == user_input)).first()
         if user and user.check_password(form.password.data):
+            # Check if user is banned
+            if user.is_banned:
+                flash('Your account has been banned.', 'danger')
+                return redirect(url_for('banned', username=user.username))
             login_user(user)
             next_page = request.args.get('next')
             flash(f'Welcome back, {user.username}!', 'success')
@@ -54,6 +58,13 @@ def login():
         else:
             flash('Login failed. Please check your username/email and password.', 'danger')
     return render_template('login.html', form=form)
+
+@app.route('/banned/<username>')
+def banned(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if not user.is_banned:
+        return redirect(url_for('index'))
+    return render_template('banned.html', user=user)
 
 @app.route('/logout')
 @login_required
@@ -301,6 +312,8 @@ def admin_api_data():
             'username': u.username,
             'email': u.email,
             'is_admin': u.is_admin,
+            'is_banned': u.is_banned,
+            'ban_reason': u.ban_reason,
             'reputation_score': u.reputation_score or u.calculate_reputation(),
             'review_count': u.review_count(),
             'created_at': u.created_at.strftime('%b %d, %Y')
@@ -417,6 +430,15 @@ def manage_user(id):
         Review.query.filter_by(user_id=id).update({'user_id': None})
         db.session.delete(user)
         flash(f'{username} has been deleted.', 'success')
+    elif action == 'ban':
+        ban_reason = request.form.get('ban_reason', 'No reason provided')
+        user.is_banned = True
+        user.ban_reason = ban_reason
+        flash(f'{user.username} has been banned.', 'success')
+    elif action == 'unban':
+        user.is_banned = False
+        user.ban_reason = None
+        flash(f'{user.username} has been unbanned.', 'success')
     
     db.session.commit()
     return redirect(url_for('admin_dashboard', tab='users'))

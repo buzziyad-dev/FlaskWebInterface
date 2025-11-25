@@ -37,6 +37,36 @@
         </div>
     </div>
 
+    <!-- Ban User Modal -->
+    <div class="modal fade" id="banUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ban User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" id="banUserForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="ban">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="banReason" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="banUsername" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="banReason" class="form-label">Ban Reason</label>
+                            <textarea class="form-control" id="banReason" name="ban_reason" rows="4" placeholder="Enter the reason for banning this user..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Ban User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4" role="tablist" id="adminTabs">
         <li class="nav-item" role="presentation">
@@ -287,6 +317,7 @@ function renderUsersTab() {
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Status</th>
                             <th>Reputation</th>
                             <th>Reviews</th>
                             <th>Joined</th>
@@ -305,6 +336,9 @@ function renderUsersTab() {
                             <td>
                                 ${u.is_admin ? '<span class="badge bg-danger">Admin</span>' : '<span class="badge bg-secondary">User</span>'}
                             </td>
+                            <td>
+                                ${u.is_banned ? '<span class="badge bg-danger">🚫 Banned</span>' : '<span class="badge bg-success">✓ Active</span>'}
+                            </td>
                             <td><span class="badge bg-info">${u.reputation_score}</span></td>
                             <td>${u.review_count}</td>
                             <td><small>${u.created_at}</small></td>
@@ -316,6 +350,15 @@ function renderUsersTab() {
                                         ${u.is_admin ? 'Demote' : 'Promote'}
                                     </button>
                                 </form>
+                                ${u.is_banned ? `
+                                <form method="POST" action="{{ url_for('manage_user', id=0) }}" style="display: inline;" data-id="${u.id}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="action" value="unban">
+                                    <button type="submit" class="btn btn-sm btn-outline-success unban-user-btn" data-id="${u.id}">Unban</button>
+                                </form>
+                                ` : `
+                                <button type="button" class="btn btn-sm btn-outline-danger ban-user-btn" data-id="${u.id}" data-username="${u.username}">Ban</button>
+                                `}
                                 <form method="POST" action="{{ url_for('manage_user', id=0) }}" style="display: inline;" data-id="${u.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="action" value="delete">
@@ -453,6 +496,20 @@ function attachEventListeners() {
     document.querySelectorAll('a[data-username]').forEach(link => {
         const username = link.dataset.username;
         link.href = `{{ url_for('profile', username='') }}${username}`;
+    });
+    
+    // Ban user button handler
+    document.querySelectorAll('.ban-user-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const username = this.dataset.username;
+            const userId = this.dataset.id;
+            document.getElementById('banUsername').value = username;
+            document.getElementById('banReason').value = '';
+            const banUserForm = document.getElementById('banUserForm');
+            banUserForm.action = `{{ url_for('manage_user', id=0) }}`.replace('/0', `/${userId}`);
+            const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
+            modal.show();
+        });
     });
 }
 

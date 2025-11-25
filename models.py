@@ -18,7 +18,6 @@ class User(UserMixin, db.Model):
     profile_picture = db.Column(db.LargeBinary)
     
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
-    tags = db.relationship('UserTag', backref='user', lazy='dynamic', cascade='all, delete-orphan', foreign_keys='UserTag.user_id')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -145,22 +144,3 @@ class FeatureToggle(db.Model):
     def get_feature_status(feature_name):
         toggle = FeatureToggle.query.filter_by(feature_name=feature_name).first()
         return toggle.is_enabled if toggle else True
-
-class Tag(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False, index=True)
-    color = db.Column(db.String(7), default='#007bff')  # Hex color
-    description = db.Column(db.String(255), default='')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    
-    user_tags = db.relationship('UserTag', backref='tag', lazy='dynamic', cascade='all, delete-orphan')
-
-class UserTag(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'), nullable=False, index=True)
-    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
-    assigned_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    
-    __table_args__ = (db.UniqueConstraint('user_id', 'tag_id', name='uq_user_tag'),)

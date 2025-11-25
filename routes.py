@@ -517,7 +517,6 @@ def admin_api_data():
         }
     
     def format_user(u):
-        user_tags = [{'id': ut.tag_id, 'name': ut.tag.name, 'color': ut.tag.color} for ut in u.tags.all()]
         return {
             'id': u.id,
             'username': u.username,
@@ -527,8 +526,7 @@ def admin_api_data():
             'ban_reason': u.ban_reason,
             'reputation_score': u.reputation_score or u.calculate_reputation(),
             'review_count': u.review_count(),
-            'created_at': u.created_at.strftime('%b %d, %Y'),
-            'tags': user_tags
+            'created_at': u.created_at.strftime('%b %d, %Y')
         }
     
     def format_review(r):
@@ -550,24 +548,12 @@ def admin_api_data():
             'name': c.name
         }
     
-    def format_tag(t):
-        return {
-            'id': t.id,
-            'name': t.name,
-            'color': t.color,
-            'description': t.description,
-            'created_at': t.created_at.strftime('%b %d, %Y')
-        }
-    
-    all_tags = Tag.query.all()
-    
     return jsonify({
         'pending': [format_restaurant(r) for r in data['pending']],
         'approved': [format_restaurant(r) for r in data['approved']],
         'all_users': [format_user(u) for u in data['all_users']],
         'all_reviews': [format_review(r) for r in data['all_reviews']],
         'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
-        'all_tags': [format_tag(t) for t in all_tags],
         'total_users': data['total_users'],
         'total_reviews': data['total_reviews'],
         'feature_toggles': data['feature_toggles']
@@ -917,113 +903,6 @@ def toggle_feature(feature_name):
     db.session.commit()
     
     return jsonify({'success': True, 'feature_name': feature_name, 'is_enabled': feature.is_enabled})
-
-# Tag Management Routes
-@app.route('/admin/create-tag', methods=['POST'])
-@login_required
-def create_tag():
-    if not current_user.is_admin:
-        flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    name = request.form.get('tag_name', '').strip()
-    color = request.form.get('tag_color', '#007bff')
-    description = request.form.get('tag_description', '').strip()
-    
-    if not name:
-        flash('Please enter a tag name.', 'danger')
-        return redirect(url_for('admin_dashboard', tab='tags'))
-    
-    # Check if tag already exists
-    existing_tag = Tag.query.filter_by(name=name).first()
-    if existing_tag:
-        flash(f'Tag "{name}" already exists.', 'warning')
-        return redirect(url_for('admin_dashboard', tab='tags'))
-    
-    tag = Tag(name=name, color=color, description=description, created_by=current_user.id)
-    db.session.add(tag)
-    db.session.commit()
-    
-    flash(f'Tag "{name}" has been created successfully!', 'success')
-    return redirect(url_for('admin_dashboard', tab='tags'))
-
-@app.route('/admin/delete-tag/<int:id>', methods=['POST'])
-@login_required
-def delete_tag(id):
-    if not current_user.is_admin:
-        flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    tag = Tag.query.get_or_404(id)
-    tag_name = tag.name
-    
-    db.session.delete(tag)
-    db.session.commit()
-    
-    flash(f'Tag "{tag_name}" has been deleted.', 'success')
-    return redirect(url_for('admin_dashboard', tab='tags'))
-
-@app.route('/admin/assign-tag/<int:user_id>/<int:tag_id>', methods=['POST'])
-@login_required
-def assign_tag(user_id, tag_id):
-    if not current_user.is_admin:
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    user = User.query.get_or_404(user_id)
-    tag = Tag.query.get_or_404(tag_id)
-    
-    # Check if tag is already assigned
-    existing = UserTag.query.filter_by(user_id=user_id, tag_id=tag_id).first()
-    if existing:
-        return jsonify({'error': 'Tag already assigned to this user'}), 400
-    
-    user_tag = UserTag(user_id=user_id, tag_id=tag_id, assigned_by=current_user.id)
-    db.session.add(user_tag)
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': f'Tag "{tag.name}" assigned to {user.username}'})
-
-@app.route('/admin/remove-tag/<int:user_id>/<int:tag_id>', methods=['POST'])
-@login_required
-def remove_tag(user_id, tag_id):
-    if not current_user.is_admin:
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    user_tag = UserTag.query.filter_by(user_id=user_id, tag_id=tag_id).first_or_404()
-    
-    db.session.delete(user_tag)
-    db.session.commit()
-    
-    tag = Tag.query.get(tag_id)
-    return jsonify({'success': True, 'message': f'Tag "{tag.name}" removed from user'})
-
-@app.route('/admin/edit-tag/<int:id>', methods=['POST'])
-@login_required
-def edit_tag(id):
-    if not current_user.is_admin:
-        flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    tag = Tag.query.get_or_404(id)
-    
-    name = request.form.get('tag_name', tag.name).strip()
-    color = request.form.get('tag_color', tag.color)
-    description = request.form.get('tag_description', tag.description).strip()
-    
-    # Check if new name is unique (excluding current tag)
-    if name != tag.name:
-        existing = Tag.query.filter_by(name=name).first()
-        if existing:
-            flash('Tag name already exists.', 'danger')
-            return redirect(url_for('admin_dashboard', tab='tags'))
-    
-    tag.name = name
-    tag.color = color
-    tag.description = description
-    db.session.commit()
-    
-    flash(f'Tag has been updated successfully!', 'success')
-    return redirect(url_for('admin_dashboard', tab='tags'))
 
 # Error Handlers
 @app.errorhandler(404)

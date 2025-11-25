@@ -103,62 +103,6 @@
         </div>
     </div>
 
-    <!-- Create Tag Modal -->
-    <div class="modal fade" id="createTagModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create New Tag</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="{{ url_for('create_tag') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Tag Name</label>
-                            <input type="text" class="form-control" name="tag_name" placeholder="e.g., Verified User" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tag Color</label>
-                            <div class="d-flex gap-2">
-                                <input type="color" class="form-control" id="tagColorPicker" name="tag_color" value="#007bff" style="max-width: 80px;">
-                                <input type="text" class="form-control" id="tagColorValue" value="#007bff" readonly>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" name="tag_description" placeholder="Optional tag description..." rows="2"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Create Tag</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Assign Tags Modal -->
-    <div class="modal fade" id="assignTagsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Assign Tags to User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6 id="assignTagsUsername" class="fw-bold"></h6>
-                        <div id="tagsList" class="d-flex flex-wrap gap-2">
-                            <!-- Tags will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Edit Cuisine Modal -->
     <div class="modal fade" id="editCuisineModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -287,11 +231,6 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tags-tab" data-tab="tags" type="button" role="tab">
-                🏷️ Tags
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
             <button class="nav-link" id="settings-tab" data-tab="settings" type="button" role="tab">
                 ⚙️ Settings
             </button>
@@ -345,8 +284,6 @@ function renderTab(tabName) {
         html = renderCuisinesTab();
     } else if (tabName === 'news') {
         html = renderNewsTab();
-    } else if (tabName === 'tags') {
-        html = renderTagsTab();
     } else if (tabName === 'settings') {
         html = renderSettingsTab();
     }
@@ -622,7 +559,6 @@ function renderUsersTab() {
                                     <input type="hidden" name="action" value="delete">
                                     <button type="submit" class="btn btn-sm btn-danger delete-user-btn" data-id="${u.id}">Delete</button>
                                 </form>
-                                <button type="button" class="btn btn-sm btn-warning assign-tags-btn" data-id="${u.id}" data-username="${u.username}" data-bs-toggle="modal" data-bs-target="#assignTagsModal">Tags</button>
                             </td>
                         </tr>
                         `).join('')}
@@ -1130,44 +1066,6 @@ function renderNewsTab() {
     `;
 }
 
-function renderTagsTab() {
-    const tags = adminData.all_tags || [];
-    
-    let tagsHtml = tags.map(tag => `
-        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-            <div class="d-flex align-items-center gap-3">
-                <div style="width: 25px; height: 25px; background-color: ${tag.color}; border-radius: 4px;"></div>
-                <div>
-                    <h6 class="mb-0 fw-bold">${tag.name}</h6>
-                    <p class="text-muted small mb-0">${tag.description || 'No description'}</p>
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <form method="POST" action="{{ url_for('delete_tag', id=0) }}" style="display: inline;" data-id="${tag.id}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-sm btn-danger delete-tag-btn" data-id="${tag.id}">Delete</button>
-                </form>
-            </div>
-        </div>
-    `).join('');
-    
-    return `
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-bold">🏷️ Manage Tags</h4>
-                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createTagModal">
-                    + Create Tag
-                </button>
-            </div>
-        </div>
-        <div class="card-body">
-            ${tags.length > 0 ? `<div class="list-group">${tagsHtml}</div>` : '<p class="text-center text-muted py-4">No tags created yet. Create one to start tagging users!</p>'}
-        </div>
-    </div>
-    `;
-}
-
 function renderSettingsTab() {
     const toggles = adminData.feature_toggles || {};
     
@@ -1287,61 +1185,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Assign tags to user
-document.addEventListener('DOMContentLoaded', () => {
-    // Delegate for assign tags button
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('assign-tags-btn')) {
-            const userId = e.target.dataset.id;
-            const username = e.target.dataset.username;
-            document.getElementById('assignTagsUsername').textContent = `Assign tags to: ${username}`;
-            
-            const tagsContainer = document.getElementById('tagsList');
-            const allTags = adminData?.all_tags || [];
-            const user = adminData?.all_users?.find(u => u.id == userId);
-            const userTagIds = (user?.tags || []).map(t => t.id);
-            
-            tagsContainer.innerHTML = allTags.map(tag => {
-                const isAssigned = userTagIds.includes(tag.id);
-                return `
-                    <button type="button" class="btn btn-sm tag-toggle-btn" 
-                            style="background-color: ${tag.color}; color: white; opacity: ${isAssigned ? '1' : '0.5'};"
-                            onclick="toggleUserTag(${userId}, ${tag.id}, ${!isAssigned})"
-                            title="${tag.description || tag.name}">
-                        ${tag.name} ${isAssigned ? '✓' : ''}
-                    </button>
-                `;
-            }).join('');
-        }
-    });
-    
-    // Color picker sync
-    const tagColorPicker = document.getElementById('tagColorPicker');
-    const tagColorValue = document.getElementById('tagColorValue');
-    if (tagColorPicker && tagColorValue) {
-        tagColorPicker.addEventListener('change', function() {
-            tagColorValue.value = this.value;
-        });
-    }
-});
-
-async function toggleUserTag(userId, tagId, assign) {
-    const baseUrl = assign ? 
-        `{{ url_for('assign_tag', user_id=0, tag_id=0) }}`.replace('/0/0', `/${userId}/${tagId}`) :
-        `{{ url_for('remove_tag', user_id=0, tag_id=0) }}`.replace('/0/0', `/${userId}/${tagId}`);
-    
-    try {
-        const response = await fetch(baseUrl, { method: 'POST' });
-        const data = await response.json();
-        if (response.ok) {
-            await loadAdminData();
-        } else {
-            alert('Error: ' + (data.error || 'Failed to toggle tag'));
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
-    }
-}
 </script>
 {% endblock %}

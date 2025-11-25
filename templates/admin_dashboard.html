@@ -3,6 +3,8 @@
 {% block title %}Admin Dashboard - Yalla{% endblock %}
 
 {% block content %}
+<!-- CSRF Token for AJAX -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="bg-primary text-white py-4">
     <div class="container d-flex justify-content-between align-items-center">
         <h2 class="fw-bold mb-0">🔧 Admin Control Panel</h2>
@@ -1123,11 +1125,13 @@ function renderSettingsTab() {
 async function toggleFeature(featureName) {
     try {
         const url = '{{ url_for("toggle_feature", feature_name="PLACEHOLDER") }}'.replace('PLACEHOLDER', featureName);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             credentials: 'same-origin'
         });

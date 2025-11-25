@@ -12,7 +12,7 @@
                 <div class="profile-picture-container">
                     <div class="profile-picture-display {% if not user.profile_picture %}no-picture{% endif %}">
                         {% if user.profile_picture %}
-                            <img src="data:image/png;base64,{{ user.profile_picture|b64encode|decode }}" alt="{{ user.username }}">
+                            <img src="data:image/png;base64,{{ user.profile_picture|b64encode }}" alt="{{ user.username }}">
                         {% else %}
                             {{ user.username[0].upper() }}
                         {% endif %}

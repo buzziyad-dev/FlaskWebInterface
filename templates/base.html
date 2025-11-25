@@ -113,6 +113,76 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        // Carousel auto-scroll configuration
+        const carouselAutoScroll = {
+            'promoted-carousel': null,
+            'recent-carousel': null
+        };
+
+        // Function to scroll carousel
+        function scrollCarousel(carouselType, distance) {
+            const carouselId = carouselType === 'promoted' ? 'promoted-carousel' : 'recent-carousel';
+            const carousel = document.getElementById(carouselId);
+            if (carousel) {
+                carousel.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+                // Reset auto-scroll timer when user clicks
+                resetAutoScroll(carouselId);
+            }
+        }
+
+        // Function to auto-scroll carousel
+        function autoScroll(carouselId) {
+            const carousel = document.getElementById(carouselId);
+            if (carousel) {
+                const itemWidth = 320 + 24; // Card width + gap
+                carousel.scrollBy({
+                    left: itemWidth,
+                    behavior: 'smooth'
+                });
+                // Reset timer
+                resetAutoScroll(carouselId);
+            }
+        }
+
+        // Function to reset auto-scroll timer
+        function resetAutoScroll(carouselId) {
+            // Clear existing timer
+            if (carouselAutoScroll[carouselId]) {
+                clearInterval(carouselAutoScroll[carouselId]);
+            }
+            // Set new timer (5 seconds)
+            carouselAutoScroll[carouselId] = setInterval(() => {
+                autoScroll(carouselId);
+            }, 5000);
+        }
+
+        // Initialize auto-scroll for both carousels when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start auto-scroll for promoted carousel
+            resetAutoScroll('promoted-carousel');
+            // Start auto-scroll for recent carousel
+            resetAutoScroll('recent-carousel');
+
+            // Handle scroll end - loop back to beginning if reached end
+            const carousels = ['promoted-carousel', 'recent-carousel'];
+            carousels.forEach(carouselId => {
+                const carousel = document.getElementById(carouselId);
+                if (carousel) {
+                    carousel.addEventListener('scroll', function() {
+                        // Check if at end
+                        if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10) {
+                            // Loop back to beginning
+                            carousel.scrollTo({ left: 0, behavior: 'smooth' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

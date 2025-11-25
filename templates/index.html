@@ -29,39 +29,45 @@
                 <p class="text-muted">Explore our top promoted dining destinations</p>
             </div>
         </div>
-        <div class="horizontal-scroll animate-fade-in">
-            {% for restaurant in promoted %}
-            <div class="horizontal-scroll-item">
-                <div class="card restaurant-card shadow">
-                    <div class="promoted-badge">Promoted</div>
-                    <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
-                        {% if restaurant.is_small_business %}
-                        <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
-                        {% endif %}
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
-                        <p class="text-muted small mb-2">
-                            <span class="badge bg-primary">{{ restaurant.cuisine.name }}</span>
-                            <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
-                        </p>
-                        <div class="rating mb-2">
-                            {% set rating = restaurant.avg_rating() %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}
-                                <span class="star filled">★</span>
-                                {% else %}
-                                <span class="star">☆</span>
+        <div class="d-flex justify-content-center">
+            <div class="carousel-wrapper animate-fade-in">
+                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('promoted', -320)" aria-label="Previous">‹</button>
+                <div class="horizontal-scroll" id="promoted-carousel">
+                    {% for restaurant in promoted %}
+                    <div class="horizontal-scroll-item">
+                        <div class="card restaurant-card shadow">
+                            <div class="promoted-badge">Promoted</div>
+                            <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
+                                {% if restaurant.is_small_business %}
+                                <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
                                 {% endif %}
-                            {% endfor %}
-                            <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
+                                <p class="text-muted small mb-2">
+                                    <span class="badge bg-primary">{{ restaurant.cuisine.name }}</span>
+                                    <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
+                                </p>
+                                <div class="rating mb-2">
+                                    {% set rating = restaurant.avg_rating() %}
+                                    {% for i in range(5) %}
+                                        {% if i < rating %}
+                                        <span class="star filled">★</span>
+                                        {% else %}
+                                        <span class="star">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                                </div>
+                                <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                            </div>
                         </div>
-                        <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
-                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm">View Details</a>
                     </div>
+                    {% endfor %}
                 </div>
+                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('promoted', 320)" aria-label="Next">›</button>
             </div>
-            {% endfor %}
         </div>
     </div>
 </section>
@@ -75,38 +81,44 @@
                 <p class="text-muted">Discover the best dining experiences in Jeddah</p>
             </div>
         </div>
-        <div class="horizontal-scroll animate-fade-in">
-            {% for restaurant in restaurants %}
-            <div class="horizontal-scroll-item">
-                <div class="card restaurant-card shadow-sm">
-                    <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
-                        {% if restaurant.is_small_business %}
-                        <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
-                        {% endif %}
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
-                        <p class="text-muted small mb-2">
-                            <span class="badge bg-light text-dark">{{ restaurant.cuisine.name }}</span>
-                            <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
-                        </p>
-                        <div class="rating mb-2">
-                            {% set rating = restaurant.avg_rating() %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}
-                                <span class="star filled">★</span>
-                                {% else %}
-                                <span class="star">☆</span>
+        <div class="d-flex justify-content-center">
+            <div class="carousel-wrapper animate-fade-in">
+                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('recent', -320)" aria-label="Previous">‹</button>
+                <div class="horizontal-scroll" id="recent-carousel">
+                    {% for restaurant in restaurants %}
+                    <div class="horizontal-scroll-item">
+                        <div class="card restaurant-card shadow-sm">
+                            <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
+                                {% if restaurant.is_small_business %}
+                                <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
                                 {% endif %}
-                            {% endfor %}
-                            <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
+                                <p class="text-muted small mb-2">
+                                    <span class="badge bg-light text-dark">{{ restaurant.cuisine.name }}</span>
+                                    <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
+                                </p>
+                                <div class="rating mb-2">
+                                    {% set rating = restaurant.avg_rating() %}
+                                    {% for i in range(5) %}
+                                        {% if i < rating %}
+                                        <span class="star filled">★</span>
+                                        {% else %}
+                                        <span class="star">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                                </div>
+                                <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                            </div>
                         </div>
-                        <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
-                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
                     </div>
+                    {% endfor %}
                 </div>
+                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('recent', 320)" aria-label="Next">›</button>
             </div>
-            {% endfor %}
         </div>
         <div class="text-center mt-4">
             <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg">Browse All Restaurants</a>

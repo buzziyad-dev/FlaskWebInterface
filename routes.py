@@ -144,27 +144,40 @@ def upload_restaurant_photo(id):
         flash('No selected file', 'danger')
         return redirect(url_for('restaurant_detail', id=id))
     
-    if file and file.content_type.startswith('image/'):
-        try:
-            photo_data = file.read()
-            encoded_photo = base64.b64encode(photo_data).decode('utf-8')
-            
-            if not restaurant.photos:
-                restaurant.photos = []
-            
-            restaurant.photos.append({
-                'data': encoded_photo,
-                'content_type': file.content_type,
-                'uploaded_by': current_user.username,
-                'uploaded_at': datetime.utcnow().isoformat()
-            })
-            
-            db.session.commit()
-            flash('Photo uploaded successfully!', 'success')
-        except Exception as e:
-            flash(f'Error uploading photo: {str(e)}', 'danger')
+    # Validate file upload more strictly
+    ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+    
+    if file and file.filename:
+        # Validate MIME type
+        if file.content_type not in ALLOWED_MIME_TYPES:
+            flash('Only JPEG, PNG, GIF, and WebP images are allowed', 'danger')
+        else:
+            try:
+                photo_data = file.read()
+                
+                # Validate file size
+                if len(photo_data) > MAX_FILE_SIZE:
+                    flash('File size exceeds 5MB limit', 'danger')
+                else:
+                    encoded_photo = base64.b64encode(photo_data).decode('utf-8')
+                    
+                    if not restaurant.photos:
+                        restaurant.photos = []
+                    
+                    restaurant.photos.append({
+                        'data': encoded_photo,
+                        'content_type': file.content_type,
+                        'uploaded_by': current_user.username,
+                        'uploaded_at': datetime.utcnow().isoformat()
+                    })
+                    
+                    db.session.commit()
+                    flash('Photo uploaded successfully!', 'success')
+            except Exception as e:
+                flash('Error uploading photo. Please try again.', 'danger')
     else:
-        flash('Only image files are allowed', 'danger')
+        flash('Please select a file to upload', 'danger')
     
     return redirect(url_for('restaurant_detail', id=id))
 
@@ -441,19 +454,43 @@ def manage_user(id):
         db.session.delete(user)
         flash(f'{username} has been deleted.', 'success')
     elif action == 'ban':
-        ban_reason = request.form.get('ban_reason', 'No reason provided')
+        ban_reason = request.form.get('ban_reason', '').strip()[:500]  # Limit length & strip whitespace
         user.is_banned = True
-        user.ban_reason = ban_reason
+        user.ban_reason = ban_reason if ban_reason else 'No reason provided'
         flash(f'{user.username} has been banned.', 'success')
     elif action == 'unban':
         user.is_banned = False
         user.ban_reason = None
         flash(f'{user.username} has been unbanned.', 'success')
     elif action == 'edit':
-        user.username = request.form.get('username', user.username)
-        user.email = request.form.get('email', user.email)
-        user.reputation_score = int(request.form.get('reputation_score', user.reputation_score))
-        flash(f'{user.username} has been updated.', 'success')
+        new_username = request.form.get('username', '').strip()
+        new_email = request.form.get('email', '').strip()
+        
+        # Validate new username uniqueness (excluding current user)
+        if new_username and new_username != user.username:
+            existing = User.query.filter_by(username=new_username).first()
+            if existing:
+                flash('Username already taken.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='users'))
+        
+        # Validate new email uniqueness (excluding current user)
+        if new_email and new_email != user.email:
+            existing = User.query.filter_by(email=new_email).first()
+            if existing:
+                flash('Email already registered.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='users'))
+        
+        # Update fields
+        if new_username:
+            user.username = new_username
+        if new_email:
+            user.email = new_email
+        try:
+            user.reputation_score = int(request.form.get('reputation_score', user.reputation_score))
+        except (ValueError, TypeError):
+            user.reputation_score = user.reputation_score
+        
+        flash(f'User has been updated.', 'success')
     
     db.session.commit()
     return redirect(url_for('admin_dashboard', tab='users'))
@@ -467,21 +504,38 @@ def edit_restaurant(id):
     
     restaurant = Restaurant.query.get_or_404(id)
     
-    restaurant.name = request.form.get('name', restaurant.name)
-    restaurant.description = request.form.get('description', restaurant.description)
-    restaurant.address = request.form.get('address', restaurant.address)
-    restaurant.phone = request.form.get('phone', restaurant.phone)
-    restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours)
-    restaurant.price_range = int(request.form.get('price_range', restaurant.price_range))
-    restaurant.cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
-    restaurant.is_small_business = request.form.get('is_small_business') == 'on'
-    restaurant.has_vegetarian = request.form.get('has_vegetarian') == 'on'
-    restaurant.has_vegan = request.form.get('has_vegan') == 'on'
-    restaurant.is_halal = request.form.get('is_halal') == 'on'
-    restaurant.has_gluten_free = request.form.get('has_gluten_free') == 'on'
+    # Validate and sanitize inputs
+    try:
+        restaurant.name = request.form.get('name', restaurant.name).strip()[:100] or restaurant.name
+        restaurant.description = request.form.get('description', restaurant.description).strip()[:1000] or restaurant.description
+        restaurant.address = request.form.get('address', restaurant.address).strip()[:200] or restaurant.address
+        restaurant.phone = request.form.get('phone', restaurant.phone).strip()[:20] or restaurant.phone
+        restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours).strip()[:100] or restaurant.working_hours
+        
+        # Validate cuisine exists
+        cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
+        if not Cuisine.query.get(cuisine_id):
+            flash('Invalid cuisine selected.', 'danger')
+            return redirect(url_for('admin_dashboard', tab='restaurants'))
+        restaurant.cuisine_id = cuisine_id
+        
+        # Validate price range
+        price_range = int(request.form.get('price_range', restaurant.price_range))
+        if price_range not in [1, 2, 3, 4]:
+            price_range = restaurant.price_range
+        restaurant.price_range = price_range
+        
+        restaurant.is_small_business = request.form.get('is_small_business') == 'on'
+        restaurant.has_vegetarian = request.form.get('has_vegetarian') == 'on'
+        restaurant.has_vegan = request.form.get('has_vegan') == 'on'
+        restaurant.is_halal = request.form.get('is_halal') == 'on'
+        restaurant.has_gluten_free = request.form.get('has_gluten_free') == 'on'
+        
+        db.session.commit()
+        flash(f'{restaurant.name} has been updated.', 'success')
+    except (ValueError, TypeError) as e:
+        flash('Error updating restaurant. Please check your input.', 'danger')
     
-    db.session.commit()
-    flash(f'{restaurant.name} has been updated.', 'success')
     return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 @app.route('/admin/bulk-delete', methods=['POST'])
@@ -492,6 +546,11 @@ def bulk_delete():
     
     item_type = request.form.get('type')
     ids = request.form.getlist('ids[]')
+    
+    # Validate item_type to prevent errors
+    if not item_type or item_type not in ['user', 'restaurant', 'review', 'cuisine']:
+        flash('Invalid item type.', 'danger')
+        return redirect(url_for('admin_dashboard'))
     
     if item_type == 'user':
         for user_id in ids:
@@ -510,7 +569,7 @@ def bulk_delete():
     
     db.session.commit()
     tab_mapping = {'review': 'reviews', 'cuisine': 'cuisines', 'user': 'users', 'restaurant': 'restaurants'}
-    return redirect(url_for('admin_dashboard', tab=tab_mapping.get(item_type, item_type + 's')))
+    return redirect(url_for('admin_dashboard', tab=tab_mapping.get(item_type, 'overview')))
 
 @app.route('/admin/delete-review/<int:id>', methods=['POST'])
 @login_required

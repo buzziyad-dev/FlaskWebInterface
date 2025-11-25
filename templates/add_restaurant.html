@@ -101,7 +101,36 @@
                 title: 'Remove this item'
             }
         },
-        placeholder: 'Select food categories...'
+        placeholder: 'Select food categories...',
+        create: true,
+        createOnBlur: true,
+        onItemAdd: function(value) {
+            // When a new item is created (not from existing options)
+            const existingOption = Array.from(document.getElementById('foodCategories').options).find(opt => opt.value === value);
+            if (!existingOption) {
+                // This is a new item - send to backend to create it
+                fetch('/create-food-category', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update Tom Select to use the new ID
+                        const tomSelect = document.getElementById('foodCategories').tomselect;
+                        // Remove the old temporary value
+                        tomSelect.removeOption(value);
+                        // Add with the new ID from backend
+                        tomSelect.addOption({ value: data.id, text: data.name });
+                        tomSelect.addItem(data.id);
+                    }
+                })
+                .catch(error => console.error('Error creating category:', error));
+            }
+        }
     });
 </script>
 {% endblock %}

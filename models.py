@@ -64,6 +64,11 @@ class Cuisine(db.Model):
     
     restaurants = db.relationship('Restaurant', backref='cuisine', lazy='dynamic')
 
+class FoodCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, index=True)

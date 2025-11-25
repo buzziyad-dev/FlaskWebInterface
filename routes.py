@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import app, db, login_manager
-from models import User, Restaurant, Review, Cuisine, News
+from models import User, Restaurant, Review, Cuisine, News, FoodCategory
 from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm
 import base64
 import os
@@ -212,14 +212,21 @@ def add_review(id):
 def add_restaurant():
     form = RestaurantForm()
     form.cuisine_id.choices = [(c.id, c.name) for c in Cuisine.query.all()]
-    # Populate food categories as dropdown - create some default categories
-    default_categories = ['Appetizers', 'Main Courses', 'Desserts', 'Beverages', 'Salads', 'Soups', 'Sides', 'Breakfast', 'Lunch', 'Dinner', 'Vegetarian', 'Seafood', 'Meat']
-    form.food_categories.choices = [(i, cat) for i, cat in enumerate(default_categories)]
+    
+    # Load food categories from database
+    food_categories = FoodCategory.query.order_by(FoodCategory.name).all()
+    # Create choices with category ID and name
+    form.food_categories.choices = [(c.id, c.name) for c in food_categories]
     
     if form.validate_on_submit():
-        # Get selected food categories (multiple)
-        selected_indices = [int(idx) for idx in form.food_categories.data]
-        selected_categories = [default_categories[idx] for idx in selected_indices if idx < len(default_categories)]
+        # Get selected food categories
+        selected_category_ids = [int(idx) for idx in form.food_categories.data]
+        selected_categories = []
+        
+        for cat_id in selected_category_ids:
+            category = FoodCategory.query.get(cat_id)
+            if category:
+                selected_categories.append(category.name)
         
         restaurant = Restaurant(
             name=form.name.data,
@@ -241,6 +248,27 @@ def add_restaurant():
         return redirect(url_for('restaurants'))
     
     return render_template('add_restaurant.html', form=form)
+
+@app.route('/create-food-category', methods=['POST'])
+@login_required
+def create_food_category():
+    data = request.get_json()
+    category_name = data.get('name', '').strip()
+    
+    if not category_name or len(category_name) < 2 or len(category_name) > 50:
+        return jsonify({'success': False, 'error': 'Category name must be between 2 and 50 characters'}), 400
+    
+    # Check if category already exists
+    existing = FoodCategory.query.filter_by(name=category_name).first()
+    if existing:
+        return jsonify({'success': True, 'id': existing.id, 'name': existing.name})
+    
+    # Create new category
+    new_category = FoodCategory(name=category_name)
+    db.session.add(new_category)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'id': new_category.id, 'name': new_category.name})
 
 @app.route('/profile/<username>')
 def profile(username):

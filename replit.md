@@ -131,6 +131,14 @@ Admins can temporarily disable the following features via the Settings tab in th
 
 ## Recent Changes (Latest Session)
 
+### User Tagging System (NEW - COMPLETED)
+- New Tag and UserTag models for flexible user labeling
+- Admins can create custom tags with colors and descriptions
+- Tag management in new "Tags" tab in admin dashboard
+- Assign/remove tags from users via UI with color-coded tags
+- Tags displayed in admin users table for quick identification
+- Use cases: Verified users, Trusted reviewers, Moderators, Premium members, etc.
+
 ### Photo Upload System
 - Fixed SQLAlchemy JSON mutation tracking using `flag_modified()` for multiple photo uploads
 - Users can now upload multiple photos per restaurant

@@ -278,8 +278,6 @@ def add_restaurant():
             is_approved=False
         )
         
-        restaurant.photos = [image_url] if image_url else []
-        
         db.session.add(restaurant)
         db.session.commit()
         flash('Restaurant submitted for review! An admin will approve it shortly.', 'success')

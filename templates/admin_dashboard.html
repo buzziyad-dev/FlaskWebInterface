@@ -45,7 +45,7 @@
                     <h5 class="modal-title">Ban User</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" id="banUserForm">
+                <form method="POST" id="banUserForm" action="{{ url_for('manage_user', id=0) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="action" value="ban">
                     <div class="modal-body">
@@ -509,17 +509,11 @@ function attachEventListeners() {
             document.getElementById('banUsername').value = username;
             document.getElementById('banReason').value = '';
             const banUserForm = document.getElementById('banUserForm');
-            banUserForm.dataset.userId = userId;
+            const baseUrl = `{{ url_for('manage_user', id=0) }}`;
+            banUserForm.action = baseUrl.replace('/0', `/${userId}`);
             const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
             modal.show();
         });
-    });
-    
-    // Ban user form submission
-    document.getElementById('banUserForm').addEventListener('submit', function(e) {
-        const userId = this.dataset.userId;
-        const baseUrl = `{{ url_for('manage_user', id=0) }}`;
-        this.action = baseUrl.replace('/0', `/${userId}`);
     });
 }
 

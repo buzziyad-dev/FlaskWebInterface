@@ -527,7 +527,8 @@ def admin_api_data():
         'all_reviews': [format_review(r) for r in data['all_reviews']],
         'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
         'total_users': data['total_users'],
-        'total_reviews': data['total_reviews']
+        'total_reviews': data['total_reviews'],
+        'feature_toggles': data['feature_toggles']
     })
 
 @app.route('/admin/approve/<int:id>', methods=['POST'])

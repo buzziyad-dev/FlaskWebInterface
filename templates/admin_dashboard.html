@@ -228,6 +228,11 @@
                 📰 News
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="settings-tab" data-tab="settings" type="button" role="tab">
+                ⚙️ Settings
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Content Container -->
@@ -277,6 +282,8 @@ function renderTab(tabName) {
         html = renderCuisinesTab();
     } else if (tabName === 'news') {
         html = renderNewsTab();
+    } else if (tabName === 'settings') {
+        html = renderSettingsTab();
     }
     
     container.innerHTML = html;
@@ -1055,6 +1062,76 @@ function renderNewsTab() {
         </div>
     </div>
     `;
+}
+
+function renderSettingsTab() {
+    const toggles = adminData.feature_toggles || {};
+    
+    let togglesHtml = '';
+    for (const [featureName, featureData] of Object.entries(toggles)) {
+        const displayName = featureName === 'restaurants_enabled' ? 'Allow Adding Restaurants' : 
+                           featureName === 'reviews_enabled' ? 'Allow Posting Reviews' : featureName;
+        const statusBadge = featureData.is_enabled ? 
+            '<span class="badge bg-success">Enabled</span>' : 
+            '<span class="badge bg-danger">Disabled</span>';
+        
+        togglesHtml += `
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div>
+                    <h6 class="mb-1 fw-bold">${displayName}</h6>
+                    <p class="text-muted small mb-0">${featureData.description || ''}</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    ${statusBadge}
+                    <button class="btn btn-sm ${featureData.is_enabled ? 'btn-danger' : 'btn-success'}" 
+                            onclick="toggleFeature('${featureName}')">
+                        ${featureData.is_enabled ? 'Disable' : 'Enable'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    return `
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0 fw-bold">⚙️ Website Settings</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3 alert alert-info">
+                <strong>ℹ️ Feature Control</strong>
+                <p class="mb-0 small">Temporarily disable website features to perform maintenance or manage user activity.</p>
+            </div>
+            <div class="list-group">
+                ${togglesHtml || '<p class="text-muted">No features available</p>'}
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+async function toggleFeature(featureName) {
+    try {
+        const response = await fetch('{{ url_for("toggle_feature", feature_name="PLACEHOLDER") }}'.replace('PLACEHOLDER', featureName), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrf_token]')?.value || ''
+            }
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            // Reload data and refresh the settings tab
+            await loadAdminData();
+            renderTab('settings');
+        } else {
+            alert('Failed to toggle feature');
+        }
+    } catch (error) {
+        console.error('Error toggling feature:', error);
+        alert('Error toggling feature');
+    }
 }
 
 // Set up auto-refresh

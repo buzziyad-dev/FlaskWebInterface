@@ -117,7 +117,6 @@ class Review(db.Model):
         return self.created_at.strftime('%B %d, %Y')
     
     def formatted_datetime_ksa(self):
-        # Convert to KSA timezone (UTC+3)
         ksa_tz = timezone(timedelta(hours=3))
         ksa_time = self.created_at.replace(tzinfo=timezone.utc).astimezone(ksa_tz)
         return f"{ksa_time.strftime('%B %d, %Y')} at {ksa_time.strftime('%I:%M %p')} (KSA)"
@@ -133,3 +132,15 @@ class News(db.Model):
     
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')
+
+class FeatureToggle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    feature_name = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    is_enabled = db.Column(db.Boolean, default=True)
+    description = db.Column(db.String(255))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    @staticmethod
+    def get_feature_status(feature_name):
+        toggle = FeatureToggle.query.filter_by(feature_name=feature_name).first()
+        return toggle.is_enabled if toggle else True

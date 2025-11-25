@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import app, db, login_manager
-from models import User, Restaurant, Review, Cuisine, News, FoodCategory
+from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle
 from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm
 import base64
 import os
@@ -185,6 +185,10 @@ def upload_restaurant_photo(id):
 @app.route('/restaurant/<int:id>/review', methods=['GET', 'POST'])
 @login_required
 def add_review(id):
+    if not FeatureToggle.get_feature_status('reviews_enabled'):
+        flash('Reviews are currently disabled by administrators.', 'warning')
+        return redirect(url_for('restaurant_detail', id=id))
+    
     restaurant = Restaurant.query.get_or_404(id)
     
     existing_review = Review.query.filter_by(user_id=current_user.id, restaurant_id=id).first()
@@ -219,6 +223,10 @@ def add_review(id):
 @app.route('/add-restaurant', methods=['GET', 'POST'])
 @login_required
 def add_restaurant():
+    if not FeatureToggle.get_feature_status('restaurants_enabled'):
+        flash('Adding restaurants is currently disabled by administrators.', 'warning')
+        return redirect(url_for('restaurants'))
+    
     form = RestaurantForm()
     form.cuisine_id.choices = [(c.id, c.name) for c in Cuisine.query.all()]
     
@@ -401,6 +409,24 @@ def get_admin_data():
     all_reviews = Review.query.order_by(Review.created_at.desc()).all()
     all_cuisines = Cuisine.query.all()
     
+    # Get or create feature toggles
+    feature_toggles = FeatureToggle.query.all()
+    toggle_dict = {t.feature_name: {'is_enabled': t.is_enabled, 'description': t.description} for t in feature_toggles}
+    
+    # Ensure default toggles exist
+    default_toggles = {
+        'restaurants_enabled': 'Allow users to add new restaurants',
+        'reviews_enabled': 'Allow users to post reviews'
+    }
+    
+    for feature_name, description in default_toggles.items():
+        if feature_name not in toggle_dict:
+            new_toggle = FeatureToggle(feature_name=feature_name, is_enabled=True, description=description)
+            db.session.add(new_toggle)
+            toggle_dict[feature_name] = {'is_enabled': True, 'description': description}
+    
+    db.session.commit()
+    
     return {
         'pending': pending_restaurants,
         'approved': approved_restaurants,
@@ -408,7 +434,8 @@ def get_admin_data():
         'all_reviews': all_reviews,
         'all_cuisines': all_cuisines,
         'total_users': len(all_users),
-        'total_reviews': len(all_reviews)
+        'total_reviews': len(all_reviews),
+        'feature_toggles': toggle_dict
     }
 
 @app.route('/admin')
@@ -814,6 +841,24 @@ def post_news():
         return redirect(url_for('news'))
     
     return render_template('post_news.html', form=form)
+
+@app.route('/admin/toggle-feature/<feature_name>', methods=['POST'])
+@login_required
+def toggle_feature(feature_name):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    feature = FeatureToggle.query.filter_by(feature_name=feature_name).first()
+    
+    if not feature:
+        feature = FeatureToggle(feature_name=feature_name, is_enabled=False)
+        db.session.add(feature)
+    else:
+        feature.is_enabled = not feature.is_enabled
+    
+    db.session.commit()
+    
+    return jsonify({'success': True, 'feature_name': feature_name, 'is_enabled': feature.is_enabled})
 
 # Error Handlers
 @app.errorhandler(404)

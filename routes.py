@@ -297,13 +297,17 @@ def edit_profile(username):
                 from PIL import Image
                 from io import BytesIO
                 
-                img = Image.open(file)
-                img.thumbnail((200, 200), Image.Resampling.LANCZOS)
-                
-                img_io = BytesIO()
-                img.save(img_io, 'PNG')
-                img_io.seek(0)
-                user.profile_picture = img_io.getvalue()
+                try:
+                    img = Image.open(file)
+                    img.thumbnail((200, 200), Image.Resampling.LANCZOS)
+                    
+                    img_io = BytesIO()
+                    img.save(img_io, 'PNG')
+                    img_io.seek(0)
+                    user.profile_picture = img_io.getvalue()
+                except Exception as e:
+                    flash('Invalid image file. Please upload a valid PNG or JPG.', 'danger')
+                    return redirect(url_for('edit_profile', username=user.username))
         
         db.session.commit()
         flash('Profile updated successfully!', 'success')

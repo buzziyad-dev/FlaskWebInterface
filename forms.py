@@ -50,3 +50,10 @@ class NewsForm(FlaskForm):
 class ProfileEditForm(FlaskForm):
     bio = TextAreaField('Bio', validators=[Length(max=500)])
     profile_picture = FileField('Profile Picture')
+    
+    def validate_profile_picture(self, profile_picture):
+        if profile_picture.data and profile_picture.data.filename:
+            allowed_extensions = {'png', 'jpg', 'jpeg'}
+            filename = profile_picture.data.filename.lower()
+            if not any(filename.endswith('.' + ext) for ext in allowed_extensions):
+                raise ValidationError('Only PNG and JPG files are allowed.')

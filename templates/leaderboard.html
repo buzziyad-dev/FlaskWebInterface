@@ -31,9 +31,15 @@
                             <h3 class="fw-bold mb-2">
                                 {{ user.username }}
                                 {% if user.is_admin %}
-                                <span class="badge bg-danger ms-2" title="This user is an Admin">Admin</span>
+                                <span class="badge bg-danger ms-2 badge-with-tooltip admin-badge">
+                                    Admin
+                                    <span class="badge-tooltip">This user is an Admin</span>
+                                </span>
                                 {% else %}
-                                <span class="badge bg-gradient ms-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="This user is a {{ user.get_badge() }}">{{ user.get_badge() }}</span>
+                                <span class="badge bg-gradient ms-2 badge-with-tooltip user-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    {{ user.get_badge() }}
+                                    <span class="badge-tooltip">This user is a {{ user.get_badge() }}</span>
+                                </span>
                                 {% endif %}
                             </h3>
                             <div class="row">
@@ -90,9 +96,15 @@
                                     </td>
                                     <td>
                                         {% if user.is_admin %}
-                                        <span class="badge bg-danger" title="This user is an Admin">Admin</span>
+                                        <span class="badge bg-danger badge-with-tooltip admin-badge">
+                                            Admin
+                                            <span class="badge-tooltip">This user is an Admin</span>
+                                        </span>
                                         {% else %}
-                                        <span class="badge bg-light text-dark" title="This user is a {{ user.get_badge() }}">{{ user.get_badge() }}</span>
+                                        <span class="badge bg-light text-dark badge-with-tooltip user-badge">
+                                            {{ user.get_badge() }}
+                                            <span class="badge-tooltip">This user is a {{ user.get_badge() }}</span>
+                                        </span>
                                         {% endif %}
                                     </td>
                                     <td class="fw-bold text-primary">{{ user.reputation_score }}</td>

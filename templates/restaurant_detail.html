@@ -109,9 +109,15 @@
                                                 {% if review.author %}
                                                     {{ review.author.username }}
                                                     {% if review.author.is_admin %}
-                                                    <span class="badge bg-danger small ms-2" title="This user is an Admin">Admin</span>
+                                                    <span class="badge bg-danger small ms-2 badge-with-tooltip admin-badge">
+                                                        Admin
+                                                        <span class="badge-tooltip">This user is an Admin</span>
+                                                    </span>
                                                     {% else %}
-                                                    <span class="badge bg-light text-dark small ms-2" title="This user is a {{ review.author.get_badge() }}">{{ review.author.get_badge() }}</span>
+                                                    <span class="badge bg-light text-dark small ms-2 badge-with-tooltip user-badge">
+                                                        {{ review.author.get_badge() }}
+                                                        <span class="badge-tooltip">This user is a {{ review.author.get_badge() }}</span>
+                                                    </span>
                                                     {% endif %}
                                                 {% else %}
                                                     <span class="text-muted">Deleted User</span>

@@ -399,9 +399,12 @@ def reject_restaurant(id):
 
 @app.route('/leaderboard')
 def leaderboard():
-    # Only show users who have written at least one review
-    all_users = User.query.all()
-    all_users = [u for u in all_users if u.review_count() > 0]
+    # Only show users who have written at least one review - using optimized query with eager loading
+    from sqlalchemy import func, and_
+    all_users = User.query.join(Review).group_by(User.id).having(
+        func.count(Review.id) > 0
+    ).all()
+    # Sort by reputation score in memory
     all_users.sort(key=lambda u: u.reputation_score or u.calculate_reputation(), reverse=True)
     return render_template('leaderboard.html', users=all_users)
 

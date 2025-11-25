@@ -117,7 +117,9 @@ def restaurants():
 @app.route('/restaurant/<int:id>')
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
-    reviews = restaurant.reviews.order_by(Review.created_at.desc()).all()
+    # Sort reviews: admin reviews first, then by date (newest first)
+    reviews = restaurant.reviews.all()
+    reviews = sorted(reviews, key=lambda r: (not (r.author and r.author.is_admin), -r.created_at.timestamp()))
     photo_form = PhotoUploadForm()
     return render_template('restaurant_detail.html', restaurant=restaurant, reviews=reviews, photo_form=photo_form)
 

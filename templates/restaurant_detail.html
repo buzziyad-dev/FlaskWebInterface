@@ -108,7 +108,11 @@
                                             <h6 class="fw-bold mb-0">
                                                 {% if review.author %}
                                                     {{ review.author.username }}
-                                                    <span class="badge bg-light text-dark small ms-2">{{ review.author.get_badge() }}</span>
+                                                    {% if review.author.is_admin %}
+                                                    <span class="badge bg-danger small ms-2" title="This user is an Admin">Admin</span>
+                                                    {% else %}
+                                                    <span class="badge bg-light text-dark small ms-2" title="This user is a {{ review.author.get_badge() }}">{{ review.author.get_badge() }}</span>
+                                                    {% endif %}
                                                 {% else %}
                                                     <span class="text-muted">Deleted User</span>
                                                 {% endif %}
@@ -123,7 +127,7 @@
                                                 {% endfor %}
                                             </div>
                                         </div>
-                                        <small class="text-muted">{{ review.formatted_date() }}</small>
+                                        <small class="text-muted">{{ review.formatted_date() }} at {{ review.created_at.strftime('%I:%M %p') }}</small>
                                     </div>
                                     {% if review.title %}
                                     <h6 class="fw-bold">{{ review.title }}</h6>

@@ -171,15 +171,23 @@
             }
         }
 
-        // Function to auto-scroll carousel
+        // Function to auto-scroll carousel with infinite loop
         function autoScroll(carouselId) {
             const carousel = document.getElementById(carouselId);
             if (carousel) {
                 const itemWidth = 320 + 24; // Card width + gap
-                carousel.scrollBy({
-                    left: itemWidth,
-                    behavior: 'smooth'
-                });
+                const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                const nextScroll = carousel.scrollLeft + itemWidth;
+                
+                // Check if we're near the end - if so, loop back to start
+                if (nextScroll >= maxScroll - 50) {
+                    carousel.scrollLeft = 0;
+                } else {
+                    carousel.scrollBy({
+                        left: itemWidth,
+                        behavior: 'smooth'
+                    });
+                }
                 // Reset timer
                 resetAutoScroll(carouselId);
             }
@@ -195,6 +203,17 @@
             carouselAutoScroll[carouselId] = setInterval(() => {
                 autoScroll(carouselId);
             }, 5000);
+        }
+        
+        // Function to handle scroll wrapping for infinite loop
+        function handleInfiniteScroll(carousel) {
+            const itemWidth = 320 + 24; // Card width + gap
+            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+            
+            // If we scroll past the end, loop back
+            if (carousel.scrollLeft >= maxScroll - 10) {
+                carousel.scrollLeft = 0;
+            }
         }
 
         // Initialize auto-scroll for both carousels when page loads
@@ -218,9 +237,10 @@
                         updatePeekEffect(carouselId);
                     }, 50);
                     
-                    // Update peek effect on scroll
+                    // Update peek effect on scroll and handle infinite loop
                     carousel.addEventListener('scroll', function() {
                         updatePeekEffect(carouselId);
+                        handleInfiniteScroll(carousel);
                     });
                     
                     // Start auto-scroll

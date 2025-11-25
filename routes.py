@@ -84,6 +84,10 @@ def logout():
 
 @app.route('/restaurants')
 def restaurants():
+    if not FeatureToggle.get_feature_status('restaurant_filtering_enabled'):
+        flash('Restaurant browsing is temporarily disabled.', 'warning')
+        return redirect(url_for('index'))
+    
     from sqlalchemy import func
     
     cuisine_filter = request.args.get('cuisine', type=int)
@@ -126,6 +130,10 @@ def restaurant_detail(id):
 @app.route('/restaurant/<int:id>/upload-photo', methods=['POST'])
 @login_required
 def upload_restaurant_photo(id):
+    if not FeatureToggle.get_feature_status('photo_uploads_enabled'):
+        flash('Photo uploads are currently disabled.', 'warning')
+        return redirect(url_for('restaurant_detail', id=id))
+    
     from datetime import datetime
     restaurant = Restaurant.query.get_or_404(id)
     
@@ -323,6 +331,10 @@ def create_food_category():
 
 @app.route('/profile/<username>')
 def profile(username):
+    if not FeatureToggle.get_feature_status('profiles_enabled'):
+        flash('User profiles are temporarily disabled.', 'warning')
+        return redirect(url_for('index'))
+    
     user = User.query.filter_by(username=username).first_or_404()
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
@@ -369,6 +381,10 @@ def edit_profile(username):
 
 @app.route('/search')
 def search():
+    if not FeatureToggle.get_feature_status('search_enabled'):
+        flash('Search is temporarily disabled.', 'warning')
+        return redirect(url_for('restaurants'))
+    
     query = request.args.get('q', '').strip()
     restaurants = []
     
@@ -416,7 +432,13 @@ def get_admin_data():
     # Ensure default toggles exist
     default_toggles = {
         'restaurants_enabled': 'Allow users to add new restaurants',
-        'reviews_enabled': 'Allow users to post reviews'
+        'reviews_enabled': 'Allow users to post reviews',
+        'search_enabled': 'Enable restaurant search functionality',
+        'leaderboard_enabled': 'Display leaderboard and top reviewers',
+        'news_enabled': 'Allow news posts and viewing',
+        'profiles_enabled': 'Allow user profile viewing',
+        'photo_uploads_enabled': 'Allow photo uploads for restaurants',
+        'restaurant_filtering_enabled': 'Enable cuisine and price filtering'
     }
     
     for feature_name, description in default_toggles.items():
@@ -559,6 +581,10 @@ def reject_restaurant(id):
 
 @app.route('/leaderboard')
 def leaderboard():
+    if not FeatureToggle.get_feature_status('leaderboard_enabled'):
+        flash('Leaderboard is temporarily disabled.', 'warning')
+        return redirect(url_for('index'))
+    
     # Only show non-admin users who have written at least one review - using optimized query
     from sqlalchemy import func
     all_users = User.query.filter(User.is_admin == False).join(Review).group_by(User.id).having(
@@ -822,6 +848,10 @@ def edit_cuisine(id):
 # News Routes
 @app.route('/news')
 def news():
+    if not FeatureToggle.get_feature_status('news_enabled'):
+        flash('News is temporarily disabled.', 'warning')
+        return redirect(url_for('index'))
+    
     page = request.args.get('page', 1, type=int)
     news_posts = News.query.order_by(News.created_at.desc()).paginate(page=page, per_page=10)
     return render_template('news.html', news_posts=news_posts)
@@ -829,6 +859,10 @@ def news():
 @app.route('/post_news', methods=['GET', 'POST'])
 @login_required
 def post_news():
+    if not FeatureToggle.get_feature_status('news_enabled'):
+        flash('News posting is temporarily disabled.', 'warning')
+        return redirect(url_for('news'))
+    
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))

@@ -1067,10 +1067,20 @@ function renderNewsTab() {
 function renderSettingsTab() {
     const toggles = adminData.feature_toggles || {};
     
+    const featureDisplayNames = {
+        'restaurants_enabled': '🍽️ Add Restaurants',
+        'reviews_enabled': '⭐ Post Reviews',
+        'search_enabled': '🔍 Search',
+        'leaderboard_enabled': '🏆 Leaderboard',
+        'news_enabled': '📰 News',
+        'profiles_enabled': '👤 User Profiles',
+        'photo_uploads_enabled': '📸 Photo Uploads',
+        'restaurant_filtering_enabled': '🎯 Filters'
+    };
+    
     let togglesHtml = '';
     for (const [featureName, featureData] of Object.entries(toggles)) {
-        const displayName = featureName === 'restaurants_enabled' ? 'Allow Adding Restaurants' : 
-                           featureName === 'reviews_enabled' ? 'Allow Posting Reviews' : featureName;
+        const displayName = featureDisplayNames[featureName] || featureName;
         const statusBadge = featureData.is_enabled ? 
             '<span class="badge bg-success">Enabled</span>' : 
             '<span class="badge bg-danger">Disabled</span>';
@@ -1112,25 +1122,30 @@ function renderSettingsTab() {
 
 async function toggleFeature(featureName) {
     try {
-        const response = await fetch('{{ url_for("toggle_feature", feature_name="PLACEHOLDER") }}'.replace('PLACEHOLDER', featureName), {
+        const url = '{{ url_for("toggle_feature", feature_name="PLACEHOLDER") }}'.replace('PLACEHOLDER', featureName);
+        
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrf_token]')?.value || ''
-            }
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
         });
         
-        if (response.ok) {
-            const result = await response.json();
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
             // Reload data and refresh the settings tab
             await loadAdminData();
             renderTab('settings');
+            console.log('Feature toggled:', data);
         } else {
-            alert('Failed to toggle feature');
+            alert('Failed to toggle feature: ' + (data.error || 'Unknown error'));
+            console.error('Toggle failed:', data);
         }
     } catch (error) {
         console.error('Error toggling feature:', error);
-        alert('Error toggling feature');
+        alert('Error toggling feature: ' + error.message);
     }
 }
 

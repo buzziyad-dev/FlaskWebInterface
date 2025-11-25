@@ -8,7 +8,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 
 - Preferred communication style: Simple, everyday language.
 - **Database Policy**: Do NOT reset/reseed the database during development. Data persistence is critical. Only run seed_data.py if explicitly requested or during initial setup.
-- **Admin Display Policy**: Admin users must be excluded from leaderboard and top community reviewers displays.
+- **Admin Display Policy**: Admin users must be excluded from leaderboard and top community reviewers displays. Banned users must also be excluded.
 
 ## System Architecture
 
@@ -26,6 +26,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
   - Cascade deletes implemented for review/user relationships to maintain referential integrity
   - Indexed fields on username/email for query performance
   - One-to-many relationships: User→Reviews, Restaurant→Reviews, Cuisine→Restaurants
+  - FeatureToggle model for admin feature control
 
 ### Authentication & Authorization
 - **System**: Flask-Login for session-based authentication
@@ -67,6 +68,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - **Restaurant**: Business information (name, address, hours, price range, cuisine type)
 - **Review**: User-generated content linking users to restaurants with ratings
 - **Cuisine**: Category taxonomy for restaurant classification
+- **FeatureToggle**: Admin feature control for temporarily disabling features
 
 **Key Relationships**:
 - User has many Reviews (one-to-many)
@@ -86,6 +88,27 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - **Review System**: Star ratings (1-5) with title and detailed content
 - **Small Business Highlighting**: Boolean flag with visual badges
 - **Approval Workflow**: is_approved flag for content moderation (currently defaults to True)
+- **Feature Toggles**: Admin controls to temporarily disable features (restaurants, reviews, search, leaderboard, news, profiles, photo uploads, filtering)
+- **Photo Management**: Base64-encoded image storage with multi-photo support per restaurant
+
+## Feature Toggles System
+
+### Available Toggles
+Admins can temporarily disable the following features via the Settings tab in the admin dashboard:
+- **restaurants_enabled**: Allow users to add new restaurants
+- **reviews_enabled**: Allow users to post reviews
+- **search_enabled**: Enable restaurant search functionality
+- **leaderboard_enabled**: Display leaderboard and top reviewers
+- **news_enabled**: Allow news posts and viewing
+- **profiles_enabled**: Allow user profile viewing
+- **photo_uploads_enabled**: Allow photo uploads for restaurants
+- **restaurant_filtering_enabled**: Enable cuisine and price filtering
+
+### Implementation
+- **Model**: FeatureToggle model stores feature state in database
+- **Routes**: Each route checks feature status before allowing action
+- **Admin UI**: Settings tab in admin dashboard with toggle buttons
+- **User Feedback**: Clear flash messages when features are disabled
 
 ## External Dependencies
 
@@ -96,6 +119,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - **Flask-WTF**: Form handling with CSRF protection
 - **WTForms**: Form validation and rendering
 - **Werkzeug**: Password hashing utilities and WSGI middleware
+- **Pillow**: Image processing for thumbnails
 
 ### Frontend Libraries
 - **Bootstrap 5**: CSS framework for responsive UI components
@@ -105,10 +129,27 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - **DATABASE_URL**: Database connection string (SQL database)
 - **SESSION_SECRET**: Secret key for session encryption and security
 
-### Future Integration Considerations
-Based on design guidelines, the platform plans to integrate:
-- Map services for location display
-- Image hosting for restaurant photos
-- Potential business collaboration features
-- Leaderboard systems for top reviewers
-- Food pickup/ordering functionality (long-term)
+## Recent Changes (Latest Session)
+
+### Photo Upload System
+- Fixed SQLAlchemy JSON mutation tracking using `flag_modified()` for multiple photo uploads
+- Users can now upload multiple photos per restaurant
+- Photos stored as base64 in database with metadata (uploader, timestamp, mime type)
+
+### Feature Toggle System
+- Added comprehensive admin controls to temporarily disable website features
+- 8 feature toggles covering all major user-facing functionality
+- Settings tab in admin dashboard with real-time toggle UI
+- Feature checks integrated into all relevant routes
+- Clear user feedback when features are disabled
+
+### Data Quality Improvements
+- Fixed top community reviewers to exclude banned users
+- Fixed leaderboard to exclude banned users
+- Both now only show users with at least 1 review
+- Proper database queries using joins and group_by
+
+### Bug Fixes
+- Fixed photo upload mutation tracking
+- Fixed CSRF token handling for AJAX feature toggle requests
+- Fixed user display logic in leaderboards

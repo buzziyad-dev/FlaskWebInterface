@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -219,6 +219,24 @@ def search():
         restaurants = []
     return render_template('search_results.html', restaurants=restaurants, query=query)
 
+def get_admin_data():
+    """Helper function to get all admin data"""
+    pending_restaurants = Restaurant.query.filter_by(is_approved=False).order_by(Restaurant.created_at.desc()).all()
+    approved_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).all()
+    all_users = User.query.all()
+    all_reviews = Review.query.order_by(Review.created_at.desc()).all()
+    all_cuisines = Cuisine.query.all()
+    
+    return {
+        'pending': pending_restaurants,
+        'approved': approved_restaurants,
+        'all_users': all_users,
+        'all_reviews': all_reviews,
+        'all_cuisines': all_cuisines,
+        'total_users': len(all_users),
+        'total_reviews': len(all_reviews)
+    }
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
@@ -227,26 +245,32 @@ def admin_dashboard():
         return redirect(url_for('index'))
     
     tab = request.args.get('tab', 'overview')
-    
-    # Get all data needed
-    pending_restaurants = Restaurant.query.filter_by(is_approved=False).order_by(Restaurant.created_at.desc()).all()
-    approved_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).all()
-    all_users = User.query.all()
-    all_reviews = Review.query.order_by(Review.created_at.desc()).all()
-    all_cuisines = Cuisine.query.all()
-    
-    total_users = len(all_users)
-    total_reviews = len(all_reviews)
+    data = get_admin_data()
     
     return render_template('admin_dashboard.html',
                          tab=tab,
-                         pending=pending_restaurants,
-                         approved=approved_restaurants,
-                         all_users=all_users,
-                         all_reviews=all_reviews,
-                         all_cuisines=all_cuisines,
-                         total_users=total_users,
-                         total_reviews=total_reviews)
+                         pending=data['pending'],
+                         approved=data['approved'],
+                         all_users=data['all_users'],
+                         all_reviews=data['all_reviews'],
+                         all_cuisines=data['all_cuisines'],
+                         total_users=data['total_users'],
+                         total_reviews=data['total_reviews'])
+
+@app.route('/admin/api/data')
+@login_required
+def admin_api_data():
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = get_admin_data()
+    
+    return jsonify({
+        'pending_count': len(data['pending']),
+        'approved_count': len(data['approved']),
+        'total_users': data['total_users'],
+        'total_reviews': data['total_reviews']
+    })
 
 @app.route('/admin/approve/<int:id>', methods=['POST'])
 @login_required

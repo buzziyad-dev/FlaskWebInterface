@@ -4,8 +4,17 @@
 
 {% block content %}
 <div class="bg-primary text-white py-4">
-    <div class="container">
+    <div class="container d-flex justify-content-between align-items-center">
         <h2 class="fw-bold mb-0">🔧 Admin Control Panel</h2>
+        <div>
+            <small class="text-white-50">Auto-refreshing every 5 seconds</small>
+            <div class="form-check form-switch d-inline-block ms-3">
+                <input class="form-check-input" type="checkbox" id="autoRefreshToggle" checked>
+                <label class="form-check-label text-white-50" for="autoRefreshToggle">
+                    Auto-Refresh
+                </label>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -41,11 +50,11 @@
 
     <!-- OVERVIEW TAB -->
     {% if tab == 'overview' %}
-    <div class="row mb-4">
+    <div class="row mb-4" id="statsContainer">
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-primary mb-0">{{ pending|length }}</h3>
+                    <h3 class="fw-bold text-primary mb-0" id="pendingCount">{{ pending|length }}</h3>
                     <p class="text-muted small mb-0">Pending Approvals</p>
                 </div>
             </div>
@@ -53,7 +62,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-success mb-0">{{ approved|length }}</h3>
+                    <h3 class="fw-bold text-success mb-0" id="approvedCount">{{ approved|length }}</h3>
                     <p class="text-muted small mb-0">Approved Restaurants</p>
                 </div>
             </div>
@@ -61,7 +70,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-info mb-0">{{ total_users }}</h3>
+                    <h3 class="fw-bold text-info mb-0" id="usersCount">{{ total_users }}</h3>
                     <p class="text-muted small mb-0">Total Users</p>
                 </div>
             </div>
@@ -69,7 +78,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-warning mb-0">{{ total_reviews }}</h3>
+                    <h3 class="fw-bold text-warning mb-0" id="reviewsCount">{{ total_reviews }}</h3>
                     <p class="text-muted small mb-0">Total Reviews</p>
                 </div>
             </div>
@@ -386,4 +395,62 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+// Auto-refresh admin dashboard data
+let autoRefreshEnabled = true;
+let refreshInterval = null;
+
+function updateAdminData() {
+    if (!autoRefreshEnabled) return;
+    
+    fetch('{{ url_for("admin_api_data") }}')
+        .then(response => response.json())
+        .then(data => {
+            const statsContainer = document.getElementById('statsContainer');
+            if (statsContainer) {
+                document.getElementById('pendingCount').textContent = data.pending_count;
+                document.getElementById('approvedCount').textContent = data.approved_count;
+                document.getElementById('usersCount').textContent = data.total_users;
+                document.getElementById('reviewsCount').textContent = data.total_reviews;
+                
+                // Add a subtle visual feedback
+                statsContainer.style.opacity = '0.8';
+                setTimeout(() => {
+                    statsContainer.style.opacity = '1';
+                }, 200);
+            }
+        })
+        .catch(error => console.log('Auto-refresh error:', error));
+}
+
+// Set up auto-refresh
+document.addEventListener('DOMContentLoaded', function() {
+    const autoRefreshToggle = document.getElementById('autoRefreshToggle');
+    
+    if (autoRefreshToggle) {
+        autoRefreshToggle.addEventListener('change', function() {
+            autoRefreshEnabled = this.checked;
+            if (autoRefreshEnabled && !refreshInterval) {
+                refreshInterval = setInterval(updateAdminData, 5000);
+                updateAdminData(); // Update immediately
+            } else if (!autoRefreshEnabled && refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        });
+    }
+    
+    // Start auto-refresh on page load
+    if (autoRefreshEnabled) {
+        refreshInterval = setInterval(updateAdminData, 5000);
+    }
+});
+</script>
+
+<style>
+#statsContainer {
+    transition: opacity 0.3s ease;
+}
+</style>
 {% endblock %}

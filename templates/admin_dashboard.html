@@ -19,6 +19,24 @@
 </div>
 
 <div class="container py-5">
+    <!-- Submission Details Modal -->
+    <div class="modal fade" id="submissionDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Restaurant Submission Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="submissionDetailsContent">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4" role="tablist" id="adminTabs">
         <li class="nav-item" role="presentation">
@@ -165,6 +183,7 @@ function renderOverviewTab() {
                                 <td>${r.cuisine}</td>
                                 <td>${r.created_at}</td>
                                 <td>
+                                    <button type="button" class="btn btn-info btn-sm view-details-btn" data-id="${r.id}" data-bs-toggle="modal" data-bs-target="#submissionDetailsModal" onclick="showSubmissionDetails(${r.id})">Details</button>
                                     <form method="POST" action="{{ url_for('approve_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-success btn-sm approve-btn" data-id="${r.id}">Approve</button>
@@ -435,6 +454,81 @@ function attachEventListeners() {
         const username = link.dataset.username;
         link.href = `{{ url_for('profile', username='') }}${username}`;
     });
+}
+
+// Show submission details in modal
+function showSubmissionDetails(restaurantId) {
+    const restaurant = adminData.pending.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+    
+    const content = `
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="text-muted small">Restaurant Name</h6>
+                <p class="fw-bold">${restaurant.name}</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted small">Cuisine</h6>
+                <p class="fw-bold">${restaurant.cuisine}</p>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="text-muted small">Address</h6>
+                <p>${restaurant.address || 'Not provided'}</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted small">Phone</h6>
+                <p>${restaurant.phone || 'Not provided'}</p>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="text-muted small">Working Hours</h6>
+                <p>${restaurant.working_hours || 'Not provided'}</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted small">Price Range</h6>
+                <p>${'$'.repeat(restaurant.price_range)}</p>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h6 class="text-muted small">Description</h6>
+            <p>${restaurant.full_description}</p>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="text-muted small">Small Business</h6>
+                <p><span class="badge ${restaurant.is_small_business ? 'bg-success' : 'bg-secondary'}">${restaurant.is_small_business ? 'Yes' : 'No'}</span></p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted small">Submitted Date</h6>
+                <p>${restaurant.created_at}</p>
+            </div>
+        </div>
+        
+        <div class="mb-4 pb-3 border-bottom">
+            <h6 class="text-muted small">Dietary Options</h6>
+            <div>
+                ${restaurant.has_vegetarian ? '<span class="badge bg-success">Vegetarian</span>' : ''}
+                ${restaurant.has_vegan ? '<span class="badge bg-success">Vegan</span>' : ''}
+                ${restaurant.is_halal ? '<span class="badge bg-success">Halal</span>' : ''}
+                ${restaurant.has_gluten_free ? '<span class="badge bg-success">Gluten-Free</span>' : ''}
+            </div>
+        </div>
+        
+        <div class="alert alert-info">
+            <h6 class="alert-heading">Submitted By</h6>
+            <p class="mb-2"><strong>Username:</strong> ${restaurant.submitter_username}</p>
+            <p class="mb-0"><strong>Email:</strong> ${restaurant.submitter_email}</p>
+        </div>
+    `;
+    
+    document.getElementById('submissionDetailsContent').innerHTML = content;
 }
 
 // Set up auto-refresh

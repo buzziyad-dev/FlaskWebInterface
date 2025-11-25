@@ -71,6 +71,7 @@ class Restaurant(db.Model):
     working_hours = db.Column(db.String(100))
     price_range = db.Column(db.Integer, default=2)
     cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisine.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     image_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_small_business = db.Column(db.Boolean, default=False)
@@ -82,6 +83,7 @@ class Restaurant(db.Model):
     has_gluten_free = db.Column(db.Boolean, default=False)
     photos = db.Column(db.JSON, default=list)
     
+    submitter = db.relationship('User', backref='submitted_restaurants', foreign_keys=[user_id])
     reviews = db.relationship('Review', backref='restaurant', lazy='dynamic', cascade='all, delete-orphan')
     
     def avg_rating(self):

@@ -189,6 +189,7 @@ def add_restaurant():
             working_hours=form.working_hours.data,
             price_range=form.price_range.data,
             cuisine_id=form.cuisine_id.data,
+            user_id=current_user.id,
             image_url=form.image_url.data,
             is_small_business=form.is_small_business.data,
             has_vegetarian=form.has_vegetarian.data,
@@ -275,12 +276,23 @@ def admin_api_data():
             'name': r.name,
             'cuisine': r.cuisine.name,
             'description': r.description[:100],
+            'full_description': r.description,
+            'address': r.address,
+            'phone': r.phone,
+            'working_hours': r.working_hours,
+            'price_range': r.price_range,
             'is_small_business': r.is_small_business,
             'is_featured': r.is_featured,
             'is_approved': r.is_approved,
+            'has_vegetarian': r.has_vegetarian,
+            'has_vegan': r.has_vegan,
+            'is_halal': r.is_halal,
+            'has_gluten_free': r.has_gluten_free,
             'review_count': r.review_count(),
             'avg_rating': r.avg_rating(),
-            'created_at': r.created_at.strftime('%b %d, %Y')
+            'created_at': r.created_at.strftime('%b %d, %Y'),
+            'submitter_username': r.submitter.username if r.submitter else 'Unknown',
+            'submitter_email': r.submitter.email if r.submitter else 'Unknown'
         }
     
     def format_user(u):

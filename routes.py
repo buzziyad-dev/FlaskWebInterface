@@ -636,3 +636,41 @@ def edit_cuisine(id):
         flash('Please enter a cuisine name.', 'danger')
     
     return redirect(url_for('admin_dashboard', tab='cuisines'))
+
+# Error Handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html',
+        error_code=404,
+        error_title='Page Not Found',
+        error_message='The page you are looking for does not exist.',
+        error_description='The URL you tried to access was not found on this server. Please check the URL and try again.'
+    ), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('error.html',
+        error_code=500,
+        error_title='Internal Server Error',
+        error_message='Something went wrong on our end.',
+        error_description='An unexpected error occurred while processing your request. Our team has been notified. Please try again later.'
+    ), 500
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    return render_template('error.html',
+        error_code=403,
+        error_title='Access Forbidden',
+        error_message='You do not have permission to access this resource.',
+        error_description='You do not have the necessary permissions to view this page. If you believe this is an error, please contact support.'
+    ), 403
+
+@app.errorhandler(400)
+def bad_request_error(error):
+    return render_template('error.html',
+        error_code=400,
+        error_title='Bad Request',
+        error_message='The request could not be understood by the server.',
+        error_description='The request you sent was malformed or invalid. Please check your input and try again.'
+    ), 400

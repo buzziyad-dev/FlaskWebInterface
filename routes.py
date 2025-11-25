@@ -24,12 +24,12 @@ def check_banned_user():
 
 @app.route('/')
 def index():
-    featured_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=True).order_by(Restaurant.created_at.desc()).limit(3).all()
-    regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=False).order_by(Restaurant.created_at.desc()).limit(6).all()
+    promoted_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=True).order_by(Restaurant.created_at.desc()).all()
+    regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=False, is_featured=False).order_by(Restaurant.created_at.desc()).all()
     cuisines = Cuisine.query.all()
     # Get top reviewers by reputation score, excluding admin users (optimized query)
     top_reviewers = User.query.filter(User.is_admin == False).order_by(User.reputation_score.desc()).limit(4).all()
-    return render_template('index.html', featured=featured_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
+    return render_template('index.html', promoted=promoted_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

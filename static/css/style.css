@@ -456,6 +456,58 @@ footer a:hover {
     animation: pulse 2s ease-in-out infinite;
 }
 
+/* Horizontal Scroll Container */
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(13, 110, 253, 0.3) transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(13, 110, 253, 0.3);
+    border-radius: 4px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(13, 110, 253, 0.6);
+}
+
+.horizontal-scroll-item {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+}
+
+.horizontal-scroll-item .restaurant-card {
+    height: 100%;
+}
+
+.promoted-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    animation: pulse 2s ease-in-out infinite;
+}
+
 @media (max-width: 768px) {
     .hero-section {
         min-height: 60vh;
@@ -467,5 +519,9 @@ footer a:hover {
     
     .display-3 {
         font-size: 2.5rem;
+    }
+    
+    .horizontal-scroll-item {
+        flex: 0 0 280px;
     }
 }

@@ -20,20 +20,20 @@
     </div>
 </div>
 
-{% if featured %}
+{% if promoted %}
 <section class="py-5 bg-light">
-    <div class="container">
+    <div class="container-fluid px-4">
         <div class="row mb-4">
             <div class="col-12 text-center animate-slide-up">
-                <h2 class="fw-bold mb-2">⭐ Featured Partners</h2>
-                <p class="text-muted">Premium dining experiences from our partner restaurants</p>
+                <h2 class="fw-bold mb-2">🌟 Promoted Restaurants</h2>
+                <p class="text-muted">Explore our top promoted dining destinations</p>
             </div>
         </div>
-        <div class="row g-4 animate-stagger">
-            {% for restaurant in featured %}
-            <div class="col-lg-4 col-md-6">
-                <div class="card restaurant-card h-100 shadow featured-card">
-                    <div class="featured-badge">Featured Partner</div>
+        <div class="horizontal-scroll animate-fade-in">
+            {% for restaurant in promoted %}
+            <div class="horizontal-scroll-item">
+                <div class="card restaurant-card shadow">
+                    <div class="promoted-badge">Promoted</div>
                     <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
                         {% if restaurant.is_small_business %}
                         <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
@@ -68,17 +68,17 @@
 {% endif %}
 
 <section class="py-5">
-    <div class="container">
+    <div class="container-fluid px-4">
         <div class="row mb-4">
             <div class="col-12 text-center animate-slide-up">
                 <h2 class="fw-bold mb-2">Recently Added Restaurants</h2>
                 <p class="text-muted">Discover the best dining experiences in Jeddah</p>
             </div>
         </div>
-        <div class="row g-4 animate-stagger">
+        <div class="horizontal-scroll animate-fade-in">
             {% for restaurant in restaurants %}
-            <div class="col-lg-4 col-md-6">
-                <div class="card restaurant-card h-100 shadow-sm">
+            <div class="horizontal-scroll-item">
+                <div class="card restaurant-card shadow-sm">
                     <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
                         {% if restaurant.is_small_business %}
                         <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>

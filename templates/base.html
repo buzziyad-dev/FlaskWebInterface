@@ -123,26 +123,44 @@
             'recent-carousel': null
         };
 
-        // Function to update blur on peek items with graduated fade
+        // Function to update blur on peek items with graduated fade (responsive)
         function updatePeekEffect(carouselId) {
             const carousel = document.getElementById(carouselId);
             if (!carousel) return;
             
             const items = carousel.querySelectorAll('.horizontal-scroll-item');
+            if (items.length === 0) return;
+            
             const viewportCenter = carousel.scrollLeft + carousel.clientWidth / 2;
-            const itemWidth = 320 + 24; // Card width + gap
+            const itemWidth = items[0].offsetWidth + 24; // Actual card width + gap
+            const viewportWidth = carousel.clientWidth;
+            
+            // Determine thresholds based on viewport width
+            let centerThreshold, fadeThreshold;
+            if (viewportWidth < 576) {
+                // Mobile: show 1 item
+                centerThreshold = itemWidth / 2 + 50;
+                fadeThreshold = itemWidth;
+            } else if (viewportWidth < 768) {
+                // Tablet: show 2 items
+                centerThreshold = itemWidth + 50;
+                fadeThreshold = itemWidth * 1.5;
+            } else {
+                // Desktop: show 3 items
+                centerThreshold = itemWidth * 1.5 + 50;
+                fadeThreshold = itemWidth * 2;
+            }
             
             items.forEach((item, index) => {
-                const itemCenter = index * itemWidth + 160; // Center of item (320/2)
+                const itemCenter = index * itemWidth + itemWidth / 2;
                 const distanceFromCenter = Math.abs(itemCenter - viewportCenter);
-                const maxDistance = carousel.clientWidth; // Maximum visibility distance
                 
                 // Calculate fade based on distance from center
-                if (distanceFromCenter < 350) {
-                    // Center items (3) - fully visible
+                if (distanceFromCenter < centerThreshold) {
+                    // Center items - fully visible
                     item.classList.remove('peek');
                     item.classList.remove('fade-peek');
-                } else if (distanceFromCenter < 600) {
+                } else if (distanceFromCenter < fadeThreshold) {
                     // Mid-range items - slight fade
                     item.classList.add('fade-peek');
                     item.classList.remove('peek');

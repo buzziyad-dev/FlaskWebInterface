@@ -563,6 +563,22 @@ footer a:hover {
     animation: pulse 2s ease-in-out infinite;
 }
 
+@media (max-width: 1200px) {
+    .horizontal-scroll {
+        max-width: 1200px;
+    }
+}
+
+@media (max-width: 992px) {
+    .horizontal-scroll {
+        max-width: 900px;
+    }
+    
+    .horizontal-scroll-item {
+        flex: 0 0 300px;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-section {
         min-height: 60vh;
@@ -580,6 +596,10 @@ footer a:hover {
         max-width: 100%;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
+        gap: 1rem;
+        /* Adjust mask for tablet - show 2 items */
+        mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
     }
     
     .horizontal-scroll-item {
@@ -594,5 +614,48 @@ footer a:hover {
         width: 40px;
         height: 40px;
         font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .horizontal-scroll {
+        max-width: 100%;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+        gap: 0.75rem;
+        /* Adjust mask for mobile - show 1 item centered */
+        mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    }
+    
+    .horizontal-scroll-item {
+        flex: 0 0 calc(100vw - 80px);
+        max-width: 350px;
+    }
+    
+    .carousel-wrapper {
+        gap: 0.75rem;
+    }
+    
+    .carousel-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .restaurant-image {
+        height: 150px;
+    }
+    
+    .restaurant-card {
+        font-size: 0.9rem;
+    }
+    
+    .restaurant-card .card-title {
+        font-size: 0.95rem;
+    }
+    
+    .restaurant-card .text-muted {
+        font-size: 0.8rem;
     }
 }

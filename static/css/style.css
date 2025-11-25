@@ -476,10 +476,13 @@ footer a:hover {
     scrollbar-width: none;
     -ms-overflow-style: none;
     width: 100%;
-    max-width: 1400px;
+    height: auto;
     margin: 0 auto;
     scroll-snap-type: x mandatory;
     justify-content: flex-start;
+    /* Center-focused fade mask */
+    mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -491,12 +494,17 @@ footer a:hover {
     scroll-snap-align: start;
     display: flex;
     justify-content: center;
-    transition: filter 0.3s ease;
+    transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
 .horizontal-scroll-item.peek {
-    opacity: 0.4;
-    filter: blur(8px);
+    opacity: 0.3;
+    filter: blur(12px);
+}
+
+.horizontal-scroll-item.fade-peek {
+    opacity: 0.6;
+    filter: blur(6px);
 }
 
 .horizontal-scroll-item .restaurant-card {

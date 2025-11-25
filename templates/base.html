@@ -123,30 +123,33 @@
             'recent-carousel': null
         };
 
-        // Function to update blur on peek items
+        // Function to update blur on peek items with graduated fade
         function updatePeekEffect(carouselId) {
             const carousel = document.getElementById(carouselId);
             if (!carousel) return;
             
             const items = carousel.querySelectorAll('.horizontal-scroll-item');
-            const viewportStart = carousel.scrollLeft;
-            const viewportEnd = viewportStart + carousel.clientWidth;
+            const viewportCenter = carousel.scrollLeft + carousel.clientWidth / 2;
             const itemWidth = 320 + 24; // Card width + gap
             
             items.forEach((item, index) => {
-                const itemStart = index * itemWidth;
-                const itemEnd = itemStart + 320;
+                const itemCenter = index * itemWidth + 160; // Center of item (320/2)
+                const distanceFromCenter = Math.abs(itemCenter - viewportCenter);
+                const maxDistance = carousel.clientWidth; // Maximum visibility distance
                 
-                // Check if item is fully or partially visible
-                if (itemEnd <= viewportStart || itemStart >= viewportEnd) {
-                    // Completely hidden
-                    item.classList.add('peek');
-                } else if (itemStart >= viewportStart && itemEnd <= viewportEnd) {
-                    // Fully visible (main items)
+                // Calculate fade based on distance from center
+                if (distanceFromCenter < 200) {
+                    // Center items - fully visible
+                    item.classList.remove('peek');
+                    item.classList.remove('fade-peek');
+                } else if (distanceFromCenter < 500) {
+                    // Mid-range items - slight fade
+                    item.classList.add('fade-peek');
                     item.classList.remove('peek');
                 } else {
-                    // Partially visible (peek items)
+                    // Edge items - heavy blur
                     item.classList.add('peek');
+                    item.classList.remove('fade-peek');
                 }
             });
         }

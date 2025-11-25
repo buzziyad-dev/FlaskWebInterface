@@ -171,23 +171,16 @@
             }
         }
 
-        // Function to auto-scroll carousel with infinite loop
+        // Function to auto-scroll carousel
         function autoScroll(carouselId) {
             const carousel = document.getElementById(carouselId);
             if (carousel) {
                 const itemWidth = 320 + 24; // Card width + gap
-                const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-                const nextScroll = carousel.scrollLeft + itemWidth;
                 
-                // Check if we're near the end - if so, loop back to start
-                if (nextScroll >= maxScroll - 50) {
-                    carousel.scrollLeft = 0;
-                } else {
-                    carousel.scrollBy({
-                        left: itemWidth,
-                        behavior: 'smooth'
-                    });
-                }
+                carousel.scrollBy({
+                    left: itemWidth,
+                    behavior: 'smooth'
+                });
                 // Reset timer
                 resetAutoScroll(carouselId);
             }
@@ -237,10 +230,9 @@
                         updatePeekEffect(carouselId);
                     }, 50);
                     
-                    // Update peek effect on scroll and handle infinite loop
+                    // Update peek effect on scroll
                     carousel.addEventListener('scroll', function() {
                         updatePeekEffect(carouselId);
-                        handleInfiniteScroll(carousel);
                     });
                     
                     // Start auto-scroll

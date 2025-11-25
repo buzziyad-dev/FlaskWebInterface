@@ -103,6 +103,60 @@
         </div>
     </div>
 
+    <!-- Create Badge Modal -->
+    <div class="modal fade" id="createBadgeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Badge</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('create_badge') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Badge Name</label>
+                            <input type="text" class="form-control" name="badge_name" placeholder="e.g., Verified Reviewer" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Badge Color</label>
+                            <div class="d-flex gap-2">
+                                <input type="color" class="form-control" id="badgeColorPicker" name="badge_color" value="#007bff" style="max-width: 80px;">
+                                <input type="text" class="form-control" id="badgeColorValue" value="#007bff" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="badge_description" placeholder="Optional description..." rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Badge</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Badges Modal -->
+    <div class="modal fade" id="assignBadgesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Badges to User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="assignBadgesUsername" class="fw-bold mb-3"></h6>
+                    <div id="badgesList" class="d-flex flex-wrap gap-2">
+                        <!-- Badges will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Cuisine Modal -->
     <div class="modal fade" id="editCuisineModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -231,6 +285,11 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="badges-tab" data-tab="badges" type="button" role="tab">
+                🎖️ Badges
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="settings-tab" data-tab="settings" type="button" role="tab">
                 ⚙️ Settings
             </button>
@@ -284,6 +343,8 @@ function renderTab(tabName) {
         html = renderCuisinesTab();
     } else if (tabName === 'news') {
         html = renderNewsTab();
+    } else if (tabName === 'badges') {
+        html = renderBadgesTab();
     } else if (tabName === 'settings') {
         html = renderSettingsTab();
     }
@@ -559,6 +620,7 @@ function renderUsersTab() {
                                     <input type="hidden" name="action" value="delete">
                                     <button type="submit" class="btn btn-sm btn-danger delete-user-btn" data-id="${u.id}">Delete</button>
                                 </form>
+                                <button type="button" class="btn btn-sm btn-warning assign-badges-btn" data-id="${u.id}" data-username="${u.username}" data-bs-toggle="modal" data-bs-target="#assignBadgesModal">Badges</button>
                             </td>
                         </tr>
                         `).join('')}
@@ -1066,6 +1128,42 @@ function renderNewsTab() {
     `;
 }
 
+function renderBadgesTab() {
+    const badges = adminData.all_badges || [];
+    
+    let badgesHtml = badges.map(badge => `
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+                <span style="display: inline-block; width: 25px; height: 25px; background-color: ${badge.color}; border-radius: 4px;"></span>
+                <div>
+                    <h6 class="mb-0 fw-bold">${badge.name}</h6>
+                    <p class="text-muted small mb-0">${badge.description || 'No description'}</p>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('delete_badge', id=0) }}" style="display: inline;" data-id="${badge.id}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </div>
+    `).join('');
+    
+    return `
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">🎖️ Manage Badges</h4>
+                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createBadgeModal">
+                    + Create Badge
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            ${badges.length > 0 ? `<div class="list-group">${badgesHtml}</div>` : '<p class="text-center text-muted py-4">No badges yet. Create one to assign to users!</p>'}
+        </div>
+    </div>
+    `;
+}
+
 function renderSettingsTab() {
     const toggles = adminData.feature_toggles || {};
     
@@ -1183,7 +1281,59 @@ document.addEventListener('DOMContentLoaded', function() {
     if (autoRefreshEnabled) {
         refreshInterval = setInterval(loadAdminData, 5000);
     }
+    
+    // Badge color picker sync
+    const badgeColorPicker = document.getElementById('badgeColorPicker');
+    const badgeColorValue = document.getElementById('badgeColorValue');
+    if (badgeColorPicker && badgeColorValue) {
+        badgeColorPicker.addEventListener('change', function() {
+            badgeColorValue.value = this.value;
+        });
+    }
+    
+    // Assign badges button
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('assign-badges-btn')) {
+            const userId = e.target.dataset.id;
+            const username = e.target.dataset.username;
+            document.getElementById('assignBadgesUsername').textContent = `Assign badges to: ${username}`;
+            
+            const badgesContainer = document.getElementById('badgesList');
+            const allBadges = adminData?.all_badges || [];
+            const user = adminData?.all_users?.find(u => u.id == userId);
+            const userBadgeIds = (user?.custom_badges || []).map(b => b.id);
+            
+            badgesContainer.innerHTML = allBadges.map(badge => {
+                const isAssigned = userBadgeIds.includes(badge.id);
+                return `
+                    <button type="button" class="btn btn-sm" 
+                            style="background-color: ${badge.color}; color: white; opacity: ${isAssigned ? '1' : '0.5'};"
+                            onclick="toggleUserBadge(${userId}, ${badge.id}, ${!isAssigned})"
+                            title="${badge.description || badge.name}">
+                        ${badge.name} ${isAssigned ? '✓' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+    });
 });
 
+async function toggleUserBadge(userId, badgeId, assign) {
+    const baseUrl = assign ? 
+        `{{ url_for('assign_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`) :
+        `{{ url_for('remove_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`);
+    
+    try {
+        const response = await fetch(baseUrl, { method: 'POST' });
+        const data = await response.json();
+        if (response.ok) {
+            await loadAdminData();
+        } else {
+            alert('Error: ' + (data.error || 'Failed'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 </script>
 {% endblock %}

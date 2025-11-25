@@ -517,6 +517,7 @@ def admin_api_data():
         }
     
     def format_user(u):
+        user_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in u.custom_badges.all()]
         return {
             'id': u.id,
             'username': u.username,
@@ -526,7 +527,8 @@ def admin_api_data():
             'ban_reason': u.ban_reason,
             'reputation_score': u.reputation_score or u.calculate_reputation(),
             'review_count': u.review_count(),
-            'created_at': u.created_at.strftime('%b %d, %Y')
+            'created_at': u.created_at.strftime('%b %d, %Y'),
+            'custom_badges': user_badges
         }
     
     def format_review(r):
@@ -548,12 +550,24 @@ def admin_api_data():
             'name': c.name
         }
     
+    def format_badge(b):
+        return {
+            'id': b.id,
+            'name': b.name,
+            'color': b.color,
+            'description': b.description,
+            'created_at': b.created_at.strftime('%b %d, %Y')
+        }
+    
+    all_badges = Badge.query.all()
+    
     return jsonify({
         'pending': [format_restaurant(r) for r in data['pending']],
         'approved': [format_restaurant(r) for r in data['approved']],
         'all_users': [format_user(u) for u in data['all_users']],
         'all_reviews': [format_review(r) for r in data['all_reviews']],
         'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
+        'all_badges': [format_badge(b) for b in all_badges],
         'total_users': data['total_users'],
         'total_reviews': data['total_reviews'],
         'feature_toggles': data['feature_toggles']
@@ -903,6 +917,78 @@ def toggle_feature(feature_name):
     db.session.commit()
     
     return jsonify({'success': True, 'feature_name': feature_name, 'is_enabled': feature.is_enabled})
+
+# Badge Management Routes
+@app.route('/admin/create-badge', methods=['POST'])
+@login_required
+def create_badge():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    name = request.form.get('badge_name', '').strip()
+    color = request.form.get('badge_color', '#007bff')
+    description = request.form.get('badge_description', '').strip()
+    
+    if not name:
+        flash('Please enter a badge name.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='badges'))
+    
+    if Badge.query.filter_by(name=name).first():
+        flash(f'Badge "{name}" already exists.', 'warning')
+        return redirect(url_for('admin_dashboard', tab='badges'))
+    
+    badge = Badge(name=name, color=color, description=description)
+    db.session.add(badge)
+    db.session.commit()
+    
+    flash(f'Badge "{name}" created successfully!', 'success')
+    return redirect(url_for('admin_dashboard', tab='badges'))
+
+@app.route('/admin/delete-badge/<int:id>', methods=['POST'])
+@login_required
+def delete_badge(id):
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    badge = Badge.query.get_or_404(id)
+    name = badge.name
+    db.session.delete(badge)
+    db.session.commit()
+    
+    flash(f'Badge "{name}" deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='badges'))
+
+@app.route('/admin/assign-badge/<int:user_id>/<int:badge_id>', methods=['POST'])
+@login_required
+def assign_badge(user_id, badge_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    user = User.query.get_or_404(user_id)
+    badge = Badge.query.get_or_404(badge_id)
+    
+    if UserBadge.query.filter_by(user_id=user_id, badge_id=badge_id).first():
+        return jsonify({'error': 'Badge already assigned'}), 400
+    
+    user_badge = UserBadge(user_id=user_id, badge_id=badge_id)
+    db.session.add(user_badge)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': f'Badge assigned to {user.username}'})
+
+@app.route('/admin/remove-badge/<int:user_id>/<int:badge_id>', methods=['POST'])
+@login_required
+def remove_badge(user_id, badge_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    ub = UserBadge.query.filter_by(user_id=user_id, badge_id=badge_id).first_or_404()
+    db.session.delete(ub)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Badge removed'})
 
 # Error Handlers
 @app.errorhandler(404)

@@ -133,6 +133,24 @@ class News(db.Model):
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')
 
+class Badge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    color = db.Column(db.String(7), default='#007bff')  # Hex color
+    description = db.Column(db.String(255), default='')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user_badges = db.relationship('UserBadge', backref='badge', lazy='dynamic', cascade='all, delete-orphan')
+
+class UserBadge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False, index=True)
+    badge_id = db.Column(db.Integer, db.ForeignKey('badge.id', ondelete='CASCADE'), nullable=False, index=True)
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref=db.backref('custom_badges', lazy='dynamic', cascade='all, delete-orphan'))
+    __table_args__ = (db.UniqueConstraint('user_id', 'badge_id', name='uq_user_badge'),)
+
 class FeatureToggle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     feature_name = db.Column(db.String(100), unique=True, nullable=False, index=True)

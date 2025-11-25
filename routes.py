@@ -156,15 +156,22 @@ def upload_restaurant_photo(id):
                 else:
                     encoded_photo = base64.b64encode(photo_data).decode('utf-8')
                     
-                    if not restaurant.photos:
+                    # Initialize photos list if it doesn't exist
+                    if restaurant.photos is None:
                         restaurant.photos = []
                     
-                    restaurant.photos.append({
+                    # Create a new list with the new photo added (instead of appending)
+                    new_photo = {
                         'data': encoded_photo,
                         'content_type': file.content_type,
                         'uploaded_by': current_user.username,
                         'uploaded_at': datetime.utcnow().isoformat()
-                    })
+                    }
+                    restaurant.photos = restaurant.photos + [new_photo]
+                    
+                    # Mark the column as modified so SQLAlchemy tracks the change
+                    from sqlalchemy.orm.attributes import flag_modified
+                    flag_modified(restaurant, 'photos')
                     
                     db.session.commit()
                     flash('Photo uploaded successfully!', 'success')

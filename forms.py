@@ -27,7 +27,7 @@ class ReviewForm(FlaskForm):
     rating = SelectField('Rating', choices=[(5, '5 Stars'), (4, '4 Stars'), (3, '3 Stars'), (2, '2 Stars'), (1, '1 Star')], coerce=int, validators=[DataRequired()])
     title = StringField('Review Title', validators=[Length(max=100)])
     content = TextAreaField('Your Review', validators=[DataRequired(), Length(min=10, max=1000)])
-    food_category = SelectField('What did you try?', choices=[], validators=[DataRequired()])
+    food_category = SelectField('What did you try?', choices=[], render_kw={'data-placeholder': 'Optional - select a food category...'})
 
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])

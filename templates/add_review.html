@@ -26,6 +26,7 @@
                         
                         <div class="mb-4">
                             {{ form.food_category.label(class="form-label fw-bold") }}
+                            <small class="text-muted d-block mb-2">(Optional)</small>
                             {{ form.food_category(class="form-select") }}
                             {% if form.food_category.errors %}
                                 <div class="text-danger small mt-1">

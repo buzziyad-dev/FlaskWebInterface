@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Yalla{% endblock %}
+
+{% block content %}
+<div class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2">Edit Profile</h1>
+        <p class="lead">Customize your Yalla profile</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Profile Picture Preview -->
+                        <div class="text-center mb-4">
+                            <div class="profile-picture-display {% if not user.profile_picture %}no-picture{% endif %}" style="width: 150px; height: 150px; margin: 0 auto;">
+                                {% if user.profile_picture %}
+                                    <img src="data:image/png;base64,{{ user.profile_picture|b64encode|decode }}" alt="{{ user.username }}">
+                                {% else %}
+                                    {{ user.username[0].upper() }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Picture Upload -->
+                        <div class="mb-4">
+                            <label for="profile_picture" class="form-label fw-bold">📸 Profile Picture</label>
+                            {{ form.profile_picture(class="form-control") }}
+                            <small class="text-muted d-block mt-2">Recommended: Square image (PNG, JPG)</small>
+                            {% if form.profile_picture.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.profile_picture.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div class="mb-4">
+                            <label for="bio" class="form-label fw-bold">✍️ Bio</label>
+                            {{ form.bio(class="form-control", rows="5", placeholder="Tell other food lovers about yourself...") }}
+                            <small class="text-muted d-block mt-2">Max 500 characters</small>
+                            {% if form.bio.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.bio.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">💾 Save Changes</button>
+                            <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-outline-secondary btn-lg fw-bold">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

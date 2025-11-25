@@ -46,3 +46,7 @@ class PhotoUploadForm(FlaskForm):
 class NewsForm(FlaskForm):
     title = StringField('News Title', validators=[DataRequired(), Length(min=5, max=200)])
     content = TextAreaField('News Content', validators=[DataRequired(), Length(min=20, max=5000)])
+
+class ProfileEditForm(FlaskForm):
+    bio = TextAreaField('Bio', validators=[Length(max=500)])
+    profile_picture = FileField('Profile Picture')

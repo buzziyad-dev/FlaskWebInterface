@@ -1,4 +1,5 @@
 import os
+import base64
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
@@ -28,6 +29,12 @@ db.init_app(app)
 login_manager.init_app(app)
 csrf.init_app(app)
 login_manager.login_view = 'login'
+
+@app.template_filter('b64encode')
+def b64encode_filter(data):
+    if data:
+        return base64.b64encode(data).decode('utf-8')
+    return ''
 
 with app.app_context():
     import models

@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory
-from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm
+from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm
 import base64
 import os
 
@@ -276,7 +276,43 @@ def create_food_category():
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
-    return render_template('profile.html', user=user, reviews=reviews)
+    is_own_profile = current_user.is_authenticated and current_user.id == user.id
+    return render_template('profile.html', user=user, reviews=reviews, is_own_profile=is_own_profile)
+
+@app.route('/profile/<username>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if user.id != current_user.id and not current_user.is_admin:
+        flash('You can only edit your own profile.', 'danger')
+        return redirect(url_for('profile', username=username))
+    
+    form = ProfileEditForm()
+    if form.validate_on_submit():
+        user.bio = form.bio.data
+        
+        if form.profile_picture.data:
+            file = form.profile_picture.data
+            if file.filename:
+                from PIL import Image
+                from io import BytesIO
+                
+                img = Image.open(file)
+                img.thumbnail((200, 200), Image.Resampling.LANCZOS)
+                
+                img_io = BytesIO()
+                img.save(img_io, 'PNG')
+                img_io.seek(0)
+                user.profile_picture = img_io.getvalue()
+        
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile', username=user.username))
+    
+    if request.method == 'GET':
+        form.bio.data = user.bio
+    
+    return render_template('edit_profile.html', user=user, form=form)
 
 @app.route('/search')
 def search():

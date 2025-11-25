@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     ban_reason = db.Column(db.Text)
     reputation_score = db.Column(db.Integer, default=0, index=True)
     badge = db.Column(db.String(50))
+    bio = db.Column(db.Text, default='')
+    profile_picture = db.Column(db.LargeBinary)
     
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
     

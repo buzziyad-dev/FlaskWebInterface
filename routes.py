@@ -492,6 +492,7 @@ def admin_api_data():
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
     
+    from models import Badge, UserBadge
     data = get_admin_data()
     
     # Format data for JSON response
@@ -922,6 +923,7 @@ def toggle_feature(feature_name):
 @app.route('/admin/create-badge', methods=['POST'])
 @login_required
 def create_badge():
+    from models import Badge
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('admin_dashboard'))
@@ -948,6 +950,7 @@ def create_badge():
 @app.route('/admin/delete-badge/<int:id>', methods=['POST'])
 @login_required
 def delete_badge(id):
+    from models import Badge
     if not current_user.is_admin:
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_dashboard'))
@@ -963,6 +966,7 @@ def delete_badge(id):
 @app.route('/admin/assign-badge/<int:user_id>/<int:badge_id>', methods=['POST'])
 @login_required
 def assign_badge(user_id, badge_id):
+    from models import Badge, UserBadge
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -981,6 +985,7 @@ def assign_badge(user_id, badge_id):
 @app.route('/admin/remove-badge/<int:user_id>/<int:badge_id>', methods=['POST'])
 @login_required
 def remove_badge(user_id, badge_id):
+    from models import UserBadge
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
     

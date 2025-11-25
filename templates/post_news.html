@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Post News - Yalla Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📝 Post News</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Title Field -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-bold">News Title</label>
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control", placeholder="Enter news title (5-200 characters)") }}
+                                <small class="text-muted">Minimum 5 characters, maximum 200 characters</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content Field -->
+                        <div class="mb-4">
+                            <label for="content" class="form-label fw-bold">News Content</label>
+                            {% if form.content.errors %}
+                                {{ form.content(class="form-control is-invalid", rows="8", placeholder="Write your news content here...") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.content.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.content(class="form-control", rows="8", placeholder="Write your news content here... (minimum 20 characters)") }}
+                                <small class="text-muted">Minimum 20 characters, maximum 5000 characters</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary fw-bold">
+                                <span class="me-2">+</span>Post News
+                            </button>
+                            <a href="{{ url_for('news') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="alert alert-info mt-4" role="alert">
+                <h6 class="alert-heading">💡 Tips for posting news</h6>
+                <ul class="mb-0 small">
+                    <li>Keep titles clear and concise</li>
+                    <li>Use the content area to provide detailed information</li>
+                    <li>Proofread before posting</li>
+                    <li>News posts will be visible to all users immediately</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

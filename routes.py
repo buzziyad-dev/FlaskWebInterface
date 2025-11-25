@@ -3,8 +3,8 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import app, db, login_manager
-from models import User, Restaurant, Review, Cuisine
-from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm
+from models import User, Restaurant, Review, Cuisine, News
+from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm
 import base64
 import os
 
@@ -637,6 +637,30 @@ def edit_cuisine(id):
         flash('Please enter a cuisine name.', 'danger')
     
     return redirect(url_for('admin_dashboard', tab='cuisines'))
+
+# News Routes
+@app.route('/news')
+def news():
+    page = request.args.get('page', 1, type=int)
+    news_posts = News.query.order_by(News.created_at.desc()).paginate(page=page, per_page=10)
+    return render_template('news.html', news_posts=news_posts)
+
+@app.route('/post_news', methods=['GET', 'POST'])
+@login_required
+def post_news():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    form = NewsForm()
+    if form.validate_on_submit():
+        news_post = News(title=form.title.data, content=form.content.data, user_id=current_user.id)
+        db.session.add(news_post)
+        db.session.commit()
+        flash('News posted successfully!', 'success')
+        return redirect(url_for('news'))
+    
+    return render_template('post_news.html', form=form)
 
 # Error Handlers
 @app.errorhandler(404)

@@ -42,3 +42,7 @@ class RestaurantForm(FlaskForm):
 
 class PhotoUploadForm(FlaskForm):
     photo = FileField('Upload Photo', validators=[DataRequired()])
+
+class NewsForm(FlaskForm):
+    title = StringField('News Title', validators=[DataRequired(), Length(min=5, max=200)])
+    content = TextAreaField('News Content', validators=[DataRequired(), Length(min=20, max=5000)])

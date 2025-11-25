@@ -108,3 +108,15 @@ class Review(db.Model):
     
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')
+
+class News(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    
+    author = db.relationship('User', backref='news_posts')
+    
+    def formatted_date(self):
+        return self.created_at.strftime('%B %d, %Y')

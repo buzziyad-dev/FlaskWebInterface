@@ -1,8 +1,12 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine
-from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm
+from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm
+import base64
+import os
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -98,7 +102,47 @@ def restaurants():
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
     reviews = restaurant.reviews.order_by(Review.created_at.desc()).all()
-    return render_template('restaurant_detail.html', restaurant=restaurant, reviews=reviews)
+    photo_form = PhotoUploadForm()
+    return render_template('restaurant_detail.html', restaurant=restaurant, reviews=reviews, photo_form=photo_form)
+
+@app.route('/restaurant/<int:id>/upload-photo', methods=['POST'])
+@login_required
+def upload_restaurant_photo(id):
+    from datetime import datetime
+    restaurant = Restaurant.query.get_or_404(id)
+    
+    if 'photo' not in request.files:
+        flash('No file part', 'danger')
+        return redirect(url_for('restaurant_detail', id=id))
+    
+    file = request.files['photo']
+    if file.filename == '':
+        flash('No selected file', 'danger')
+        return redirect(url_for('restaurant_detail', id=id))
+    
+    if file and file.content_type.startswith('image/'):
+        try:
+            photo_data = file.read()
+            encoded_photo = base64.b64encode(photo_data).decode('utf-8')
+            
+            if not restaurant.photos:
+                restaurant.photos = []
+            
+            restaurant.photos.append({
+                'data': encoded_photo,
+                'content_type': file.content_type,
+                'uploaded_by': current_user.username,
+                'uploaded_at': datetime.utcnow().isoformat()
+            })
+            
+            db.session.commit()
+            flash('Photo uploaded successfully!', 'success')
+        except Exception as e:
+            flash(f'Error uploading photo: {str(e)}', 'danger')
+    else:
+        flash('Only image files are allowed', 'danger')
+    
+    return redirect(url_for('restaurant_detail', id=id))
 
 @app.route('/restaurant/<int:id>/review', methods=['GET', 'POST'])
 @login_required

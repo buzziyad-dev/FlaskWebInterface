@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, IntegerField, BooleanField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, NumberRange
 from models import User
 
@@ -42,3 +42,6 @@ class RestaurantForm(FlaskForm):
     has_vegan = BooleanField('Has Vegan Options')
     is_halal = BooleanField('Is Halal', default=True)
     has_gluten_free = BooleanField('Has Gluten-Free Options')
+
+class PhotoUploadForm(FlaskForm):
+    photo = FileField('Upload Photo', validators=[DataRequired()])

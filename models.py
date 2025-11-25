@@ -80,6 +80,7 @@ class Restaurant(db.Model):
     has_vegan = db.Column(db.Boolean, default=False)
     is_halal = db.Column(db.Boolean, default=True)
     has_gluten_free = db.Column(db.Boolean, default=False)
+    photos = db.Column(db.JSON, default=list)
     
     reviews = db.relationship('Review', backref='restaurant', lazy='dynamic', cascade='all, delete-orphan')
     

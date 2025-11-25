@@ -216,23 +216,37 @@
             carousels.forEach(carouselId => {
                 const carousel = document.getElementById(carouselId);
                 if (carousel) {
-                    // Center the carousel view to show blur on both sides
+                    // Clone items for infinite scroll effect
                     setTimeout(() => {
                         const items = carousel.querySelectorAll('.horizontal-scroll-item');
                         if (items.length > 0) {
-                            // Calculate scroll to center first 3 items with blur on both sides
-                            const itemWidth = 320 + 24; // Card width + gap
-                            // Scroll to show 1 item on left (blur) + 3 main items
-                            carousel.scrollLeft = itemWidth * 0;
+                            // Clone all items and append to create infinite loop
+                            items.forEach(item => {
+                                const clone = item.cloneNode(true);
+                                carousel.appendChild(clone);
+                            });
+                            
+                            // Initial peek effect setup
+                            updatePeekEffect(carouselId);
                         }
-                        
-                        // Initial peek effect setup
-                        updatePeekEffect(carouselId);
                     }, 50);
                     
-                    // Update peek effect on scroll
+                    // Update peek effect on scroll and handle infinite loop
                     carousel.addEventListener('scroll', function() {
                         updatePeekEffect(carouselId);
+                        
+                        // Check if we need to reset to start for seamless looping
+                        const items = carousel.querySelectorAll('.horizontal-scroll-item');
+                        const itemWidth = 320 + 24; // Card width + gap
+                        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                        
+                        if (carousel.scrollLeft >= maxScroll - (itemWidth * 2)) {
+                            // Reset to start smoothly
+                            setTimeout(() => {
+                                carousel.scrollLeft = 0;
+                                updatePeekEffect(carouselId);
+                            }, 300);
+                        }
                     });
                     
                     // Start auto-scroll

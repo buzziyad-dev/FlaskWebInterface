@@ -220,7 +220,7 @@ function renderOverviewTab() {
                                     </form>
                                     <form method="POST" action="{{ url_for('reject_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-danger btn-sm reject-btn" data-id="${r.id}" onclick="return confirm('Are you sure?')">Reject</button>
+                                        <button type="submit" class="btn btn-danger btn-sm reject-btn" data-id="${r.id}">Reject</button>
                                     </form>
                                 </td>
                             </tr>
@@ -287,7 +287,7 @@ function renderRestaurantsTab() {
                                 </form>
                                 <form method="POST" action="{{ url_for('delete_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-danger delete-btn" data-id="${r.id}" onclick="return confirm('Delete this restaurant?')">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-btn" data-id="${r.id}">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -362,7 +362,7 @@ function renderUsersTab() {
                                 <form method="POST" action="{{ url_for('manage_user', id=0) }}" style="display: inline;" data-id="${u.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="action" value="delete">
-                                    <button type="submit" class="btn btn-sm btn-danger delete-user-btn" data-id="${u.id}" onclick="return confirm('Delete this user?')">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-user-btn" data-id="${u.id}">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -422,7 +422,7 @@ function renderReviewsTab() {
                             <td>
                                 <form method="POST" action="{{ url_for('delete_review', id=0) }}" style="display: inline;" data-id="${r.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-danger delete-review-btn" data-id="${r.id}" onclick="return confirm('Delete this review?')">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-review-btn" data-id="${r.id}">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -467,7 +467,7 @@ function renderCuisinesTab() {
                             <span>${c.name}</span>
                             <form method="POST" action="{{ url_for('delete_cuisine', id=0) }}" style="display: inline;" data-id="${c.id}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-sm btn-danger delete-cuisine-btn" data-id="${c.id}" onclick="return confirm('Delete this cuisine?')">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger delete-cuisine-btn" data-id="${c.id}">Delete</button>
                             </form>
                         </div>
                         `).join('')}
@@ -480,11 +480,14 @@ function renderCuisinesTab() {
 }
 
 function attachEventListeners() {
-    // Update form action attributes with proper IDs
+    // Update form action attributes with proper IDs - handle both inline and full URLs
     document.querySelectorAll('form[data-id]').forEach(form => {
         const id = form.dataset.id;
-        const currentAction = form.action;
-        form.action = currentAction.replace(/\/0(?=\?|$)/, `/${id}`);
+        form.addEventListener('submit', function(e) {
+            const baseAction = this.action;
+            // Replace /0 with the actual ID anywhere in the URL
+            this.action = baseAction.replace(/\/0(?=\s|$|\/|#|\?|&)/, `/${id}`);
+        });
     });
     
     // Update links with proper IDs
@@ -506,10 +509,17 @@ function attachEventListeners() {
             document.getElementById('banUsername').value = username;
             document.getElementById('banReason').value = '';
             const banUserForm = document.getElementById('banUserForm');
-            banUserForm.action = `{{ url_for('manage_user', id=0) }}`.replace('/0', `/${userId}`);
+            banUserForm.dataset.userId = userId;
             const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
             modal.show();
         });
+    });
+    
+    // Ban user form submission
+    document.getElementById('banUserForm').addEventListener('submit', function(e) {
+        const userId = this.dataset.userId;
+        const baseUrl = `{{ url_for('manage_user', id=0) }}`;
+        this.action = baseUrl.replace('/0', `/${userId}`);
     });
 }
 

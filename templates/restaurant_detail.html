@@ -68,14 +68,12 @@
                     <div class="row g-3">
                         {% for photo in restaurant.photos %}
                         <div class="col-md-4 col-sm-6">
-                            <a href="data:{{ photo.content_type }};base64,{{ photo.data }}" class="glightbox" data-gallery="restaurant-gallery" data-title="Restaurant photo">
-                                <div class="card border-0 overflow-hidden h-100 gallery-card" style="cursor: pointer; transition: transform 0.2s;">
-                                    <img src="data:{{ photo.content_type }};base64,{{ photo.data }}" class="card-img-top" alt="Restaurant photo" style="height: 200px; object-fit: cover;">
-                                    <div class="card-footer bg-light text-muted small">
-                                        <small>📷 Uploaded by <strong>{{ photo.uploaded_by }}</strong></small>
-                                    </div>
+                            <div class="card border-0 overflow-hidden h-100 gallery-card" style="cursor: pointer;" onclick="openGalleryModal({{ loop.index0 }})">
+                                <img src="data:{{ photo.content_type }};base64,{{ photo.data }}" class="card-img-top gallery-thumb" alt="Restaurant photo" style="height: 200px; object-fit: cover;">
+                                <div class="card-footer bg-light text-muted small">
+                                    <small>📷 Uploaded by <strong>{{ photo.uploaded_by }}</strong></small>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
@@ -84,6 +82,26 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Gallery Modal -->
+            <div class="modal fade" id="galleryModal" tabindex="-1">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header bg-dark border-dark">
+                            <h6 class="modal-title text-white"><span id="photoCounter">1</span> / <span id="photoTotal">{{ restaurant.photos|length }}</span></h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                            <img id="galleryImage" src="" alt="Gallery image" style="max-width: 100%; max-height: 85vh; object-fit: contain;">
+                        </div>
+                        <div class="modal-footer bg-dark border-dark justify-content-between">
+                            <button type="button" class="btn btn-sm btn-outline-light" id="prevBtn" onclick="changePhoto(-1)">← Previous</button>
+                            <button type="button" class="btn btn-sm btn-outline-light" id="nextBtn" onclick="changePhoto(1)">Next →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <style>
                 .gallery-card {
                     transition: all 0.3s ease;
@@ -92,7 +110,50 @@
                     transform: translateY(-5px);
                     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
                 }
+                .gallery-thumb {
+                    transition: transform 0.3s ease;
+                }
+                .gallery-card:hover .gallery-thumb {
+                    transform: scale(1.05);
+                }
             </style>
+            
+            <script>
+                const photos = [
+                    {% for photo in restaurant.photos %}
+                    "data:{{ photo.content_type }};base64,{{ photo.data }}"{{ "," if not loop.last }}
+                    {% endfor %}
+                ];
+                let currentPhotoIndex = 0;
+                
+                function openGalleryModal(index) {
+                    currentPhotoIndex = index;
+                    showPhoto(index);
+                    const modal = new bootstrap.Modal(document.getElementById('galleryModal'));
+                    modal.show();
+                }
+                
+                function changePhoto(direction) {
+                    currentPhotoIndex = (currentPhotoIndex + direction + photos.length) % photos.length;
+                    showPhoto(currentPhotoIndex);
+                }
+                
+                function showPhoto(index) {
+                    document.getElementById('galleryImage').src = photos[index];
+                    document.getElementById('photoCounter').textContent = index + 1;
+                    document.getElementById('prevBtn').disabled = photos.length <= 1;
+                    document.getElementById('nextBtn').disabled = photos.length <= 1;
+                }
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    const modal = document.getElementById('galleryModal');
+                    if (modal.classList.contains('show')) {
+                        if (e.key === 'ArrowLeft') changePhoto(-1);
+                        if (e.key === 'ArrowRight') changePhoto(1);
+                    }
+                });
+            </script>
             {% endif %}
             
             {% if current_user.is_authenticated %}

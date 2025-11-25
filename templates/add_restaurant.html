@@ -3,21 +3,26 @@
 {% block title %}Add Restaurant - Yalla{% endblock %}
 
 {% block content %}
+<div class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2">Add a New Restaurant</h1>
+        <p class="lead">Help grow our community by adding a restaurant in Jeddah</p>
+    </div>
+</div>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h2 class="fw-bold mb-3">Add a New Restaurant</h2>
-                    <p class="text-muted mb-4">Help grow our community by adding a restaurant in Jeddah</p>
-                    
-                    <form method="POST" action="">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
                         
+                        <!-- Basic Info Row -->
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-4">
                                 {{ form.name.label(class="form-label fw-bold") }}
-                                {{ form.name(class="form-control") }}
+                                {{ form.name(class="form-control", placeholder="Restaurant name") }}
                                 {% if form.name.errors %}
                                     <div class="text-danger small mt-1">
                                         {% for error in form.name.errors %}{{ error }}{% endfor %}
@@ -25,15 +30,21 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-4">
                                 {{ form.cuisine_id.label(class="form-label fw-bold") }}
                                 {{ form.cuisine_id(class="form-select") }}
+                                {% if form.cuisine_id.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.cuisine_id.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
-                        <div class="mb-3">
+                        <!-- Description -->
+                        <div class="mb-4">
                             {{ form.description.label(class="form-label fw-bold") }}
-                            {{ form.description(class="form-control", rows="4") }}
+                            {{ form.description(class="form-control", rows="4", placeholder="Tell us about this restaurant...") }}
                             {% if form.description.errors %}
                                 <div class="text-danger small mt-1">
                                     {% for error in form.description.errors %}{{ error }}{% endfor %}
@@ -41,39 +52,70 @@
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            {{ form.address.label(class="form-label fw-bold") }}
-                            {{ form.address(class="form-control") }}
-                        </div>
-                        
+                        <!-- Price Range & Image Upload Row -->
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form.phone.label(class="form-label fw-bold") }}
-                                {{ form.phone(class="form-control", placeholder="+966 XX XXX XXXX") }}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                {{ form.working_hours.label(class="form-label fw-bold") }}
-                                {{ form.working_hours(class="form-control", placeholder="e.g., 9 AM - 11 PM") }}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-4">
                                 {{ form.price_range.label(class="form-label fw-bold") }}
                                 {{ form.price_range(class="form-select") }}
+                                {% if form.price_range.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.price_range.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             
-                            <div class="col-md-6 mb-3">
-                                {{ form.image_url.label(class="form-label fw-bold") }}
-                                {{ form.image_url(class="form-control", placeholder="https://example.com/image.jpg") }}
-                                <small class="text-muted">Optional: Add an image URL</small>
+                            <div class="col-md-6 mb-4">
+                                {{ form.restaurant_image.label(class="form-label fw-bold") }}
+                                {{ form.restaurant_image(class="form-control", accept=".png,.jpg,.jpeg") }}
+                                <small class="text-muted d-block mt-2">PNG or JPG (max 2MB)</small>
+                                {% if form.restaurant_image.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.restaurant_image.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
+                        <!-- Working Hours Section -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">🕐 Working Hours</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.monday_hours.label("Monday", class="form-label") }}
+                                    {{ form.monday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.tuesday_hours.label("Tuesday", class="form-label") }}
+                                    {{ form.tuesday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.wednesday_hours.label("Wednesday", class="form-label") }}
+                                    {{ form.wednesday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.thursday_hours.label("Thursday", class="form-label") }}
+                                    {{ form.thursday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.friday_hours.label("Friday", class="form-label") }}
+                                    {{ form.friday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.saturday_hours.label("Saturday", class="form-label") }}
+                                    {{ form.saturday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                                <div class="col-md-6 mb-0">
+                                    {{ form.sunday_hours.label("Sunday", class="form-label") }}
+                                    {{ form.sunday_hours(class="form-control", placeholder="9 AM - 11 PM") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Food Categories -->
                         <div class="mb-4">
                             {{ form.food_categories.label(class="form-label fw-bold") }}
                             {{ form.food_categories(class="form-select", multiple=True, id="foodCategories") }}
+                            <small class="text-muted d-block mt-2">Select or type to add custom categories</small>
                             {% if form.food_categories.errors %}
                                 <div class="text-danger small mt-1">
                                     {% for error in form.food_categories.errors %}{{ error }}{% endfor %}
@@ -81,16 +123,29 @@
                             {% endif %}
                         </div>
                         
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary px-4">Add Restaurant</button>
-                            <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">🍽️ Submit Restaurant</button>
+                            <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary btn-lg fw-bold">Cancel</a>
                         </div>
                     </form>
                 </div>
             </div>
+            
+            <!-- Info Box -->
+            <div class="alert alert-info mt-4">
+                <h6 class="fw-bold mb-2">📋 Before You Submit</h6>
+                <ul class="mb-0 small">
+                    <li>Make sure the restaurant is located in Jeddah</li>
+                    <li>Upload a clear photo of the restaurant</li>
+                    <li>Enter accurate working hours for each day</li>
+                    <li>An admin will review and approve your submission</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -123,12 +178,12 @@
                         const tomSelect = document.getElementById('foodCategories').tomselect;
                         // Remove the old temporary value
                         tomSelect.removeOption(value);
-                        // Add with the new ID from backend
-                        tomSelect.addOption({ value: data.id, text: data.name });
-                        tomSelect.addItem(data.id);
+                        // Add the new option with proper ID
+                        tomSelect.addOption({value: String(data.id), text: data.name});
+                        tomSelect.addItem(String(data.id), true);
                     }
                 })
-                .catch(error => console.error('Error creating category:', error));
+                .catch(err => console.error('Error creating category:', err));
             }
         }
     });

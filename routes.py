@@ -230,20 +230,56 @@ def add_restaurant():
             if category:
                 selected_categories.append(category.name)
         
+        # Build working hours dict
+        working_hours = {
+            'monday': form.monday_hours.data,
+            'tuesday': form.tuesday_hours.data,
+            'wednesday': form.wednesday_hours.data,
+            'thursday': form.thursday_hours.data,
+            'friday': form.friday_hours.data,
+            'saturday': form.saturday_hours.data,
+            'sunday': form.sunday_hours.data,
+        }
+        
+        # Handle image upload
+        image_url = None
+        if form.restaurant_image.data:
+            file = form.restaurant_image.data
+            if file.filename:
+                from PIL import Image
+                from io import BytesIO
+                import base64
+                
+                try:
+                    img = Image.open(file)
+                    img.thumbnail((400, 300), Image.Resampling.LANCZOS)
+                    
+                    img_io = BytesIO()
+                    img.save(img_io, 'PNG')
+                    img_io.seek(0)
+                    image_data = base64.b64encode(img_io.getvalue()).decode('utf-8')
+                    image_url = f"data:image/png;base64,{image_data}"
+                except Exception as e:
+                    flash('Invalid image file. Please upload a valid PNG or JPG.', 'danger')
+                    return redirect(url_for('add_restaurant'))
+        
+        import json
+        
         restaurant = Restaurant(
             name=form.name.data,
             description=form.description.data,
-            address=form.address.data,
-            phone=form.phone.data,
-            working_hours=form.working_hours.data,
+            working_hours=json.dumps(working_hours),
             price_range=form.price_range.data,
             cuisine_id=form.cuisine_id.data,
             user_id=current_user.id,
-            image_url=form.image_url.data,
+            image_url=image_url,
             is_small_business=False,
             food_categories=selected_categories,
             is_approved=False
         )
+        
+        restaurant.photos = [image_url] if image_url else []
+        
         db.session.add(restaurant)
         db.session.commit()
         flash('Restaurant submitted for review! An admin will approve it shortly.', 'success')

@@ -32,13 +32,27 @@ class ReviewForm(FlaskForm):
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=500)])
-    address = StringField('Address', validators=[DataRequired(), Length(max=200)])
-    phone = StringField('Phone Number', validators=[Length(max=20)])
-    working_hours = StringField('Working Hours', validators=[Length(max=100)])
     price_range = SelectField('Price Range', choices=[(1, '$ - Budget'), (2, '$$ - Moderate'), (3, '$$$ - Expensive'), (4, '$$$$ - Very Expensive')], coerce=int, validators=[DataRequired()])
     cuisine_id = SelectField('Cuisine Type', coerce=int, validators=[DataRequired()])
-    image_url = StringField('Image URL', validators=[Length(max=500)])
+    restaurant_image = FileField('Restaurant Image')
+    
+    # Working hours for each day
+    monday_hours = StringField('Monday', validators=[Length(max=50)])
+    tuesday_hours = StringField('Tuesday', validators=[Length(max=50)])
+    wednesday_hours = StringField('Wednesday', validators=[Length(max=50)])
+    thursday_hours = StringField('Thursday', validators=[Length(max=50)])
+    friday_hours = StringField('Friday', validators=[Length(max=50)])
+    saturday_hours = StringField('Saturday', validators=[Length(max=50)])
+    sunday_hours = StringField('Sunday', validators=[Length(max=50)])
+    
     food_categories = SelectMultipleField('Food Categories', coerce=int, validators=[DataRequired()])
+    
+    def validate_restaurant_image(self, restaurant_image):
+        if restaurant_image.data and restaurant_image.data.filename:
+            allowed_extensions = {'png', 'jpg', 'jpeg'}
+            filename = restaurant_image.data.filename.lower()
+            if not any(filename.endswith('.' + ext) for ext in allowed_extensions):
+                raise ValidationError('Only PNG and JPG files are allowed.')
 
 class PhotoUploadForm(FlaskForm):
     photo = FileField('Upload Photo', validators=[DataRequired()])

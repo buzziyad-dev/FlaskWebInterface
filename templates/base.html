@@ -138,11 +138,11 @@
                 const maxDistance = carousel.clientWidth; // Maximum visibility distance
                 
                 // Calculate fade based on distance from center
-                if (distanceFromCenter < 200) {
-                    // Center items - fully visible
+                if (distanceFromCenter < 350) {
+                    // Center items (3) - fully visible
                     item.classList.remove('peek');
                     item.classList.remove('fade-peek');
-                } else if (distanceFromCenter < 500) {
+                } else if (distanceFromCenter < 600) {
                     // Mid-range items - slight fade
                     item.classList.add('fade-peek');
                     item.classList.remove('peek');

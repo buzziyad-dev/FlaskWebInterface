@@ -480,9 +480,9 @@ footer a:hover {
     margin: 0 auto;
     scroll-snap-type: x mandatory;
     justify-content: flex-start;
-    /* Center-focused fade mask */
-    mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+    /* Center-focused fade mask - wider to show 3 items */
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
 .horizontal-scroll::-webkit-scrollbar {

@@ -463,6 +463,7 @@ footer a:hover {
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
+    width: 100%;
 }
 
 .horizontal-scroll {
@@ -473,8 +474,10 @@ footer a:hover {
     padding: 1rem 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    flex: 1;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 400px;
+    justify-content: center;
+    scroll-snap-type: x mandatory;
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -483,11 +486,14 @@ footer a:hover {
 
 .horizontal-scroll-item {
     flex: 0 0 320px;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .horizontal-scroll-item .restaurant-card {
     height: 100%;
+    width: 100%;
 }
 
 /* Arrow Button Styles */
@@ -554,7 +560,21 @@ footer a:hover {
         font-size: 2.5rem;
     }
     
+    .horizontal-scroll {
+        max-width: 350px;
+    }
+    
     .horizontal-scroll-item {
         flex: 0 0 280px;
+    }
+    
+    .carousel-wrapper {
+        gap: 1rem;
+    }
+    
+    .carousel-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 }

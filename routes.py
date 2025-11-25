@@ -449,9 +449,64 @@ def manage_user(id):
         user.is_banned = False
         user.ban_reason = None
         flash(f'{user.username} has been unbanned.', 'success')
+    elif action == 'edit':
+        user.username = request.form.get('username', user.username)
+        user.email = request.form.get('email', user.email)
+        user.reputation_score = int(request.form.get('reputation_score', user.reputation_score))
+        flash(f'{user.username} has been updated.', 'success')
     
     db.session.commit()
     return redirect(url_for('admin_dashboard', tab='users'))
+
+@app.route('/admin/edit-restaurant/<int:id>', methods=['POST'])
+@login_required
+def edit_restaurant(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    restaurant = Restaurant.query.get_or_404(id)
+    
+    restaurant.name = request.form.get('name', restaurant.name)
+    restaurant.description = request.form.get('description', restaurant.description)
+    restaurant.address = request.form.get('address', restaurant.address)
+    restaurant.phone = request.form.get('phone', restaurant.phone)
+    restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours)
+    restaurant.price_range = int(request.form.get('price_range', restaurant.price_range))
+    restaurant.cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
+    restaurant.is_small_business = request.form.get('is_small_business') == 'on'
+    restaurant.has_vegetarian = request.form.get('has_vegetarian') == 'on'
+    restaurant.has_vegan = request.form.get('has_vegan') == 'on'
+    restaurant.is_halal = request.form.get('is_halal') == 'on'
+    restaurant.has_gluten_free = request.form.get('has_gluten_free') == 'on'
+    
+    db.session.commit()
+    flash(f'{restaurant.name} has been updated.', 'success')
+    return redirect(url_for('admin_dashboard', tab='restaurants'))
+
+@app.route('/admin/bulk-delete', methods=['POST'])
+@login_required
+def bulk_delete():
+    if not current_user.is_admin:
+        return jsonify({'error': 'Access denied'}), 403
+    
+    item_type = request.form.get('type')
+    ids = request.form.getlist('ids[]')
+    
+    if item_type == 'user':
+        for user_id in ids:
+            Review.query.filter_by(user_id=int(user_id)).update({'user_id': None})
+            User.query.filter_by(id=int(user_id)).delete()
+        flash(f'Deleted {len(ids)} user(s).', 'success')
+    elif item_type == 'restaurant':
+        Restaurant.query.filter(Restaurant.id.in_([int(id) for id in ids])).delete()
+        flash(f'Deleted {len(ids)} restaurant(s).', 'success')
+    elif item_type == 'review':
+        Review.query.filter(Review.id.in_([int(id) for id in ids])).delete()
+        flash(f'Deleted {len(ids)} review(s).', 'success')
+    
+    db.session.commit()
+    return redirect(url_for('admin_dashboard', tab=item_type + 's' if item_type != 'review' else 'reviews'))
 
 @app.route('/admin/delete-review/<int:id>', methods=['POST'])
 @login_required

@@ -15,11 +15,11 @@
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-3">
-                            {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
-                            {% if form.email.errors %}
+                            {{ form.user_input.label(class="form-label") }}
+                            {{ form.user_input(class="form-control" + (" is-invalid" if form.user_input.errors else ""), placeholder="Enter your username or email") }}
+                            {% if form.user_input.errors %}
                                 <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                    {% for error in form.user_input.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>

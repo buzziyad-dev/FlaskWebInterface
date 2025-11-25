@@ -32,8 +32,9 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Registration successful! You can now log in.', 'success')
-        return redirect(url_for('login'))
+        login_user(user)
+        flash('Registration successful! Welcome to Yalla!', 'success')
+        return redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -42,14 +43,16 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user_input = form.user_input.data
+        # Try to find user by username or email
+        user = User.query.filter((User.username == user_input) | (User.email == user_input)).first()
         if user and user.check_password(form.password.data):
             login_user(user)
             next_page = request.args.get('next')
             flash(f'Welcome back, {user.username}!', 'success')
             return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
-            flash('Login failed. Please check your email and password.', 'danger')
+            flash('Login failed. Please check your username/email and password.', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/logout')

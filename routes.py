@@ -440,8 +440,6 @@ def admin_api_data():
             'cuisine': r.cuisine.name,
             'description': r.description[:100],
             'full_description': r.description,
-            'address': r.address,
-            'phone': r.phone,
             'working_hours': r.working_hours,
             'price_range': r.price_range,
             'is_small_business': r.is_small_business,
@@ -637,9 +635,7 @@ def edit_restaurant(id):
     try:
         restaurant.name = request.form.get('name', restaurant.name).strip()[:100] or restaurant.name
         restaurant.description = request.form.get('description', restaurant.description).strip()[:1000] or restaurant.description
-        restaurant.address = request.form.get('address', restaurant.address).strip()[:200] or restaurant.address
-        restaurant.phone = request.form.get('phone', restaurant.phone).strip()[:20] or restaurant.phone
-        restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours).strip()[:100] or restaurant.working_hours
+        restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours).strip()[:500] or restaurant.working_hours
         
         # Validate cuisine exists
         cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))

@@ -155,16 +155,6 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Address</label>
-                                <input type="text" class="form-control" id="editRestaurantAddress" name="address">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" class="form-control" id="editRestaurantPhone" name="phone">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Hours</label>
                                 <input type="text" class="form-control" id="editRestaurantHours" name="working_hours">
                             </div>
@@ -863,8 +853,6 @@ function attachEventListeners() {
             if (!restaurant) return;
             document.getElementById('editRestaurantName').value = restaurant.name;
             document.getElementById('editRestaurantDescription').value = restaurant.description;
-            document.getElementById('editRestaurantAddress').value = restaurant.address;
-            document.getElementById('editRestaurantPhone').value = restaurant.phone;
             document.getElementById('editRestaurantHours').value = restaurant.working_hours;
             document.getElementById('editRestaurantPrice').value = restaurant.price_range;
             document.getElementById('editRestaurantCuisine').value = restaurant.cuisine_id;
@@ -943,17 +931,6 @@ function showSubmissionDetails(restaurantId) {
             <div class="col-md-6">
                 <h6 class="text-muted small">Cuisine</h6>
                 <p class="fw-bold">${restaurant.cuisine}</p>
-            </div>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h6 class="text-muted small">Address</h6>
-                <p>${restaurant.address || 'Not provided'}</p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-muted small">Phone</h6>
-                <p>${restaurant.phone || 'Not provided'}</p>
             </div>
         </div>
         

@@ -8,6 +8,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 
 - Preferred communication style: Simple, everyday language.
 - **Database Policy**: Do NOT reset/reseed the database during development. Data persistence is critical. Only run seed_data.py if explicitly requested or during initial setup.
+- **Admin Display Policy**: Admin users must be excluded from leaderboard and top community reviewers displays.
 
 ## System Architecture
 

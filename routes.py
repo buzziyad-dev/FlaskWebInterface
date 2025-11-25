@@ -27,7 +27,8 @@ def index():
     featured_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=True).order_by(Restaurant.created_at.desc()).limit(3).all()
     regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=False).order_by(Restaurant.created_at.desc()).limit(6).all()
     cuisines = Cuisine.query.all()
-    top_reviewers = User.query.all()
+    # Get top reviewers excluding admin users
+    top_reviewers = User.query.filter(User.is_admin == False).all()
     top_reviewers.sort(key=lambda u: u.review_count(), reverse=True)
     top_reviewers = top_reviewers[:4]
     return render_template('index.html', featured=featured_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
@@ -399,9 +400,9 @@ def reject_restaurant(id):
 
 @app.route('/leaderboard')
 def leaderboard():
-    # Only show users who have written at least one review - using optimized query with eager loading
-    from sqlalchemy import func, and_
-    all_users = User.query.join(Review).group_by(User.id).having(
+    # Only show non-admin users who have written at least one review - using optimized query
+    from sqlalchemy import func
+    all_users = User.query.filter(User.is_admin == False).join(Review).group_by(User.id).having(
         func.count(Review.id) > 0
     ).all()
     # Sort by reputation score in memory

@@ -1298,22 +1298,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const username = e.target.dataset.username;
             document.getElementById('assignBadgesUsername').textContent = `Assign badges to: ${username}`;
             
-            const badgesContainer = document.getElementById('badgesList');
-            const allBadges = adminData?.all_badges || [];
-            const user = adminData?.all_users?.find(u => u.id == userId);
-            const userBadgeIds = (user?.custom_badges || []).map(b => b.id);
-            
-            badgesContainer.innerHTML = allBadges.map(badge => {
-                const isAssigned = userBadgeIds.includes(badge.id);
-                return `
-                    <button type="button" class="btn btn-sm" 
-                            style="background-color: ${badge.color}; color: white; opacity: ${isAssigned ? '1' : '0.5'};"
-                            onclick="toggleUserBadge(${userId}, ${badge.id}, ${!isAssigned})"
-                            title="${badge.description || badge.name}">
-                        ${badge.name} ${isAssigned ? '✓' : ''}
-                    </button>
-                `;
-            }).join('');
+            // Fetch user badges data
+            fetch(`/admin/api/user-badges/${userId}`)
+                .then(r => r.json())
+                .then(userData => {
+                    const badgesContainer = document.getElementById('badgesList');
+                    const allBadges = adminData?.all_badges || [];
+                    const userBadgeIds = (userData.custom_badges || []).map(b => b.id);
+                    
+                    badgesContainer.innerHTML = allBadges.map(badge => {
+                        const isAssigned = userBadgeIds.includes(badge.id);
+                        return `
+                            <button type="button" class="btn btn-sm" 
+                                    style="background-color: ${badge.color}; color: white; opacity: ${isAssigned ? '1' : '0.5'};"
+                                    onclick="toggleUserBadge(${userId}, ${badge.id}, ${!isAssigned})"
+                                    title="${badge.description || badge.name}">
+                                ${badge.name} ${isAssigned ? '✓' : ''}
+                            </button>
+                        `;
+                    }).join('');
+                });
         }
     });
 });

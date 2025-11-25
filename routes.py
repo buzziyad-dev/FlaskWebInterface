@@ -517,9 +517,8 @@ def admin_api_data():
             'submitter_email': r.submitter.email if r.submitter else 'Unknown'
         }
     
-    def format_user(u):
-        user_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in u.custom_badges.all()]
-        return {
+    def format_user(u, include_badges=False):
+        user_data = {
             'id': u.id,
             'username': u.username,
             'email': u.email,
@@ -528,9 +527,12 @@ def admin_api_data():
             'ban_reason': u.ban_reason,
             'reputation_score': u.reputation_score or u.calculate_reputation(),
             'review_count': u.review_count(),
-            'created_at': u.created_at.strftime('%b %d, %Y'),
-            'custom_badges': user_badges
+            'created_at': u.created_at.strftime('%b %d, %Y')
         }
+        if include_badges:
+            user_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in u.custom_badges.all()]
+            user_data['custom_badges'] = user_badges
+        return user_data
     
     def format_review(r):
         return {
@@ -565,7 +567,7 @@ def admin_api_data():
     return jsonify({
         'pending': [format_restaurant(r) for r in data['pending']],
         'approved': [format_restaurant(r) for r in data['approved']],
-        'all_users': [format_user(u) for u in data['all_users']],
+        'all_users': [format_user(u, include_badges=False) for u in data['all_users']],
         'all_reviews': [format_review(r) for r in data['all_reviews']],
         'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
         'all_badges': [format_badge(b) for b in all_badges],
@@ -994,6 +996,18 @@ def remove_badge(user_id, badge_id):
     db.session.commit()
     
     return jsonify({'success': True, 'message': 'Badge removed'})
+
+@app.route('/admin/api/user-badges/<int:user_id>')
+@login_required
+def user_badges_api(user_id):
+    from models import UserBadge
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    user = User.query.get_or_404(user_id)
+    custom_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in user.custom_badges.all()]
+    
+    return jsonify({'custom_badges': custom_badges})
 
 # Error Handlers
 @app.errorhandler(404)

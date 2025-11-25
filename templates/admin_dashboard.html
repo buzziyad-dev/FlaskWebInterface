@@ -5,11 +5,42 @@
 {% block content %}
 <div class="bg-primary text-white py-4">
     <div class="container">
-        <h2 class="fw-bold mb-0">Admin Dashboard</h2>
+        <h2 class="fw-bold mb-0">🔧 Admin Control Panel</h2>
     </div>
 </div>
 
 <div class="container py-5">
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if tab == 'overview' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='overview') }}">
+                📊 Overview
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if tab == 'restaurants' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='restaurants') }}">
+                🍽️ Restaurants
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if tab == 'users' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='users') }}">
+                👥 Users
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if tab == 'reviews' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='reviews') }}">
+                ⭐ Reviews
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if tab == 'cuisines' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='cuisines') }}">
+                🍴 Cuisines
+            </a>
+        </li>
+    </ul>
+
+    <!-- OVERVIEW TAB -->
+    {% if tab == 'overview' %}
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
@@ -48,7 +79,7 @@
     {% if pending %}
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0 fw-bold">Pending Restaurant Submissions</h4>
+            <h4 class="mb-0 fw-bold">⚠️ Pending Restaurant Submissions</h4>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -79,7 +110,7 @@
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-success btn-sm">Approve</button>
                                 </form>
-                                <form method="POST" action="{{ url_for('reject_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to reject this restaurant?')">
+                                <form method="POST" action="{{ url_for('reject_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure?')">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                                 </form>
@@ -91,16 +122,14 @@
             </div>
         </div>
     </div>
-    {% else %}
-    <div class="alert alert-info">
-        <h5 class="alert-heading">No pending submissions</h5>
-        <p class="mb-0">All restaurant submissions have been reviewed.</p>
-    </div>
     {% endif %}
-    
+    {% endif %}
+
+    <!-- RESTAURANTS TAB -->
+    {% if tab == 'restaurants' %}
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <h4 class="mb-0 fw-bold">Recently Approved Restaurants</h4>
+            <h4 class="mb-0 fw-bold">🍽️ Manage Restaurants</h4>
         </div>
         <div class="card-body">
             {% if approved %}
@@ -108,7 +137,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Restaurant Name</th>
+                            <th>Name</th>
                             <th>Cuisine</th>
                             <th>Reviews</th>
                             <th>Rating</th>
@@ -120,31 +149,29 @@
                         {% for restaurant in approved %}
                         <tr>
                             <td>
-                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="text-decoration-none">
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" target="_blank" class="text-decoration-none">
                                     <strong>{{ restaurant.name }}</strong>
                                 </a>
                                 {% if restaurant.is_small_business %}
-                                <span class="badge bg-success ms-2">Small Business</span>
+                                <span class="badge bg-success ms-2">Small Biz</span>
                                 {% endif %}
                             </td>
                             <td>{{ restaurant.cuisine.name }}</td>
                             <td>{{ restaurant.review_count() }}</td>
                             <td>
-                                <div class="rating-small">
-                                    {% set rating = restaurant.avg_rating() %}
-                                    {% for i in range(5) %}
-                                        {% if i < rating %}
-                                        <span class="star filled">★</span>
-                                        {% else %}
-                                        <span class="star">☆</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <span class="text-muted small">({{ restaurant.avg_rating() }})</span>
-                                </div>
+                                {% set rating = restaurant.avg_rating() %}
+                                {% for i in range(5) %}
+                                    {% if i < rating %}
+                                    <span class="star filled" style="color: gold;">★</span>
+                                    {% else %}
+                                    <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-muted small">({{ restaurant.avg_rating() }})</span>
                             </td>
                             <td>
                                 {% if restaurant.is_featured %}
-                                <span class="badge bg-warning">Featured</span>
+                                <span class="badge bg-warning">⭐ Featured</span>
                                 {% else %}
                                 <span class="badge bg-secondary">Regular</span>
                                 {% endif %}
@@ -156,6 +183,10 @@
                                         {% if restaurant.is_featured %}Unfeature{% else %}Feature{% endif %}
                                     </button>
                                 </form>
+                                <form method="POST" action="{{ url_for('delete_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Delete this restaurant?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -163,9 +194,192 @@
                 </table>
             </div>
             {% else %}
-            <p class="text-center text-muted py-4">No approved restaurants yet.</p>
+            <p class="text-center text-muted py-4">No restaurants yet.</p>
             {% endif %}
         </div>
     </div>
+    {% endif %}
+
+    <!-- USERS TAB -->
+    {% if tab == 'users' %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 fw-bold">👥 Manage Users</h4>
+        </div>
+        <div class="card-body">
+            {% if all_users %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Reputation</th>
+                            <th>Reviews</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in all_users %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('profile', username=user.username) }}" target="_blank" class="text-decoration-none">
+                                    <strong>{{ user.username }}</strong>
+                                </a>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-info">{{ user.reputation_score }}</span></td>
+                            <td>{{ user.review_count() }}</td>
+                            <td><small>{{ user.created_at.strftime('%b %d, %Y') }}</small></td>
+                            <td>
+                                <form method="POST" action="{{ url_for('manage_user', id=user.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="action" value="toggle_admin">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        {% if user.is_admin %}Demote{% else %}Promote{% endif %}
+                                    </button>
+                                </form>
+                                {% if user.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('manage_user', id=user.id) }}" style="display: inline;" onsubmit="return confirm('Delete this user?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted py-4">No users yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- REVIEWS TAB -->
+    {% if tab == 'reviews' %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 fw-bold">⭐ Manage Reviews</h4>
+        </div>
+        <div class="card-body">
+            {% if all_reviews %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Author</th>
+                            <th>Restaurant</th>
+                            <th>Rating</th>
+                            <th>Content</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in all_reviews %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('profile', username=review.author.username) }}" target="_blank" class="text-decoration-none">
+                                    {{ review.author.username }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('restaurant_detail', id=review.restaurant.id) }}" target="_blank" class="text-decoration-none">
+                                    {{ review.restaurant.name }}
+                                </a>
+                            </td>
+                            <td>
+                                {% for i in range(5) %}
+                                    {% if i < review.rating %}
+                                    <span style="color: gold;">★</span>
+                                    {% else %}
+                                    <span>☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if review.title %}
+                                <strong>{{ review.title }}</strong><br>
+                                {% endif %}
+                                <small>{{ review.content[:80] }}...</small>
+                            </td>
+                            <td><small>{{ review.created_at.strftime('%b %d, %Y') }}</small></td>
+                            <td>
+                                <form method="POST" action="{{ url_for('delete_review', id=review.id) }}" style="display: inline;" onsubmit="return confirm('Delete this review?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted py-4">No reviews yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- CUISINES TAB -->
+    {% if tab == 'cuisines' %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 fw-bold">➕ Add New Cuisine</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_cuisine') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="cuisine_name" class="form-label">Cuisine Name</label>
+                            <input type="text" class="form-control" id="cuisine_name" name="name" required placeholder="e.g., Thai, Korean, Indian">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Cuisine</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 fw-bold">📋 All Cuisines ({{ all_cuisines|length }})</h4>
+                </div>
+                <div class="card-body">
+                    {% if all_cuisines %}
+                    <div class="list-group">
+                        {% for cuisine in all_cuisines %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ cuisine.name }}</span>
+                            <form method="POST" action="{{ url_for('delete_cuisine', id=cuisine.id) }}" style="display: inline;" onsubmit="return confirm('Delete this cuisine?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No cuisines yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

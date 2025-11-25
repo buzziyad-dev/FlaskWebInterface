@@ -226,14 +226,25 @@ def admin_dashboard():
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
     
-    pending_restaurants = Restaurant.query.filter_by(is_approved=False).order_by(Restaurant.created_at.desc()).all()
-    approved_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).limit(10).all()
-    total_users = User.query.count()
-    total_reviews = Review.query.count()
+    tab = request.args.get('tab', 'overview')
     
-    return render_template('admin_dashboard.html', 
+    # Get all data needed
+    pending_restaurants = Restaurant.query.filter_by(is_approved=False).order_by(Restaurant.created_at.desc()).all()
+    approved_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).all()
+    all_users = User.query.all()
+    all_reviews = Review.query.order_by(Review.created_at.desc()).all()
+    all_cuisines = Cuisine.query.all()
+    
+    total_users = len(all_users)
+    total_reviews = len(all_reviews)
+    
+    return render_template('admin_dashboard.html',
+                         tab=tab,
                          pending=pending_restaurants,
                          approved=approved_restaurants,
+                         all_users=all_users,
+                         all_reviews=all_reviews,
+                         all_cuisines=all_cuisines,
                          total_users=total_users,
                          total_reviews=total_reviews)
 
@@ -281,4 +292,85 @@ def toggle_featured(id):
     db.session.commit()
     status = 'featured' if restaurant.is_featured else 'unfeatured'
     flash(f'{restaurant.name} is now {status}!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard', tab='restaurants'))
+
+@app.route('/admin/delete-restaurant/<int:id>', methods=['POST'])
+@login_required
+def delete_restaurant(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    restaurant = Restaurant.query.get_or_404(id)
+    name = restaurant.name
+    db.session.delete(restaurant)
+    db.session.commit()
+    flash(f'{name} has been deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='restaurants'))
+
+@app.route('/admin/manage-user/<int:id>', methods=['POST'])
+@login_required
+def manage_user(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(id)
+    action = request.form.get('action')
+    
+    if action == 'toggle_admin':
+        user.is_admin = not user.is_admin
+        status = 'promoted to admin' if user.is_admin else 'demoted from admin'
+        flash(f'{user.username} has been {status}.', 'success')
+    elif action == 'delete':
+        username = user.username
+        db.session.delete(user)
+        flash(f'{username} has been deleted.', 'success')
+    
+    db.session.commit()
+    return redirect(url_for('admin_dashboard', tab='users'))
+
+@app.route('/admin/delete-review/<int:id>', methods=['POST'])
+@login_required
+def delete_review(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    review = Review.query.get_or_404(id)
+    db.session.delete(review)
+    db.session.commit()
+    flash('Review has been deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='reviews'))
+
+@app.route('/admin/add-cuisine', methods=['POST'])
+@login_required
+def add_cuisine():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    cuisine_name = request.form.get('name')
+    if cuisine_name:
+        cuisine = Cuisine(name=cuisine_name)
+        db.session.add(cuisine)
+        db.session.commit()
+        flash(f'{cuisine_name} has been added.', 'success')
+    else:
+        flash('Please enter a cuisine name.', 'danger')
+    
+    return redirect(url_for('admin_dashboard', tab='cuisines'))
+
+@app.route('/admin/delete-cuisine/<int:id>', methods=['POST'])
+@login_required
+def delete_cuisine(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    cuisine = Cuisine.query.get_or_404(id)
+    name = cuisine.name
+    db.session.delete(cuisine)
+    db.session.commit()
+    flash(f'{name} has been deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='cuisines'))

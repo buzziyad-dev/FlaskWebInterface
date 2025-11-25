@@ -64,7 +64,10 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
-                                            <h6 class="fw-bold mb-0">{{ review.author.username }}</h6>
+                                            <h6 class="fw-bold mb-0">
+                                                {{ review.author.username }}
+                                                <span class="badge bg-light text-dark small ms-2">{{ review.author.get_badge() }}</span>
+                                            </h6>
                                             <div class="rating-small">
                                                 {% for i in range(5) %}
                                                     {% if i < review.rating %}
@@ -117,9 +120,27 @@
                     </div>
                     {% endif %}
                     
-                    <div>
+                    <div class="mb-3">
                         <h6 class="fw-bold text-muted small mb-1">PRICE RANGE</h6>
                         <p class="mb-0">{{ '$' * restaurant.price_range }}</p>
+                    </div>
+                    
+                    <div>
+                        <h6 class="fw-bold text-muted small mb-1">DIETARY OPTIONS</h6>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% if restaurant.has_vegetarian %}
+                            <span class="badge bg-success">Vegetarian</span>
+                            {% endif %}
+                            {% if restaurant.has_vegan %}
+                            <span class="badge bg-success">Vegan</span>
+                            {% endif %}
+                            {% if restaurant.is_halal %}
+                            <span class="badge bg-success">Halal</span>
+                            {% endif %}
+                            {% if restaurant.has_gluten_free %}
+                            <span class="badge bg-success">Gluten-Free</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

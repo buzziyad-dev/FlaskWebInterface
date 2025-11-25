@@ -20,11 +20,58 @@
     </div>
 </div>
 
+{% if featured %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-2">⭐ Featured Partners</h2>
+                <p class="text-muted">Premium dining experiences from our partner restaurants</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for restaurant in featured %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card restaurant-card h-100 shadow featured-card">
+                    <div class="featured-badge">Featured Partner</div>
+                    <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
+                        {% if restaurant.is_small_business %}
+                        <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
+                        <p class="text-muted small mb-2">
+                            <span class="badge bg-primary">{{ restaurant.cuisine.name }}</span>
+                            <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
+                        </p>
+                        <div class="rating mb-2">
+                            {% set rating = restaurant.avg_rating() %}
+                            {% for i in range(5) %}
+                                {% if i < rating %}
+                                <span class="star filled">★</span>
+                                {% else %}
+                                <span class="star">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                        </div>
+                        <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
+                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <section class="py-5">
     <div class="container">
         <div class="row mb-4">
             <div class="col-12 text-center">
-                <h2 class="fw-bold mb-2">Featured Restaurants</h2>
+                <h2 class="fw-bold mb-2">Recently Added Restaurants</h2>
                 <p class="text-muted">Discover the best dining experiences in Jeddah</p>
             </div>
         </div>
@@ -106,6 +153,7 @@
                     <div class="card-body">
                         <div class="reviewer-avatar mb-3">{{ user.username[0].upper() }}</div>
                         <h6 class="fw-bold">{{ user.username }}</h6>
+                        <span class="badge bg-light text-dark small mb-2">{{ user.get_badge() }}</span>
                         <p class="text-muted small mb-2">{{ user.review_count() }} reviews</p>
                         <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">View Profile</a>
                     </div>

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Yalla{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <h2 class="fw-bold mb-0">Admin Dashboard</h2>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-primary mb-0">{{ pending|length }}</h3>
+                    <p class="text-muted small mb-0">Pending Approvals</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-success mb-0">{{ approved|length }}</h3>
+                    <p class="text-muted small mb-0">Approved Restaurants</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-info mb-0">{{ total_users }}</h3>
+                    <p class="text-muted small mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-warning mb-0">{{ total_reviews }}</h3>
+                    <p class="text-muted small mb-0">Total Reviews</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if pending %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0 fw-bold">Pending Restaurant Submissions</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Restaurant Name</th>
+                            <th>Cuisine</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for restaurant in pending %}
+                        <tr>
+                            <td>
+                                <strong>{{ restaurant.name }}</strong>
+                                {% if restaurant.is_small_business %}
+                                <span class="badge bg-success ms-2">Small Business</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ restaurant.description[:100] }}...</small>
+                            </td>
+                            <td>{{ restaurant.cuisine.name }}</td>
+                            <td>{{ restaurant.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('approve_restaurant', id=restaurant.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('reject_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to reject this restaurant?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h5 class="alert-heading">No pending submissions</h5>
+        <p class="mb-0">All restaurant submissions have been reviewed.</p>
+    </div>
+    {% endif %}
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 fw-bold">Recently Approved Restaurants</h4>
+        </div>
+        <div class="card-body">
+            {% if approved %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Restaurant Name</th>
+                            <th>Cuisine</th>
+                            <th>Reviews</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for restaurant in approved %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="text-decoration-none">
+                                    <strong>{{ restaurant.name }}</strong>
+                                </a>
+                                {% if restaurant.is_small_business %}
+                                <span class="badge bg-success ms-2">Small Business</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ restaurant.cuisine.name }}</td>
+                            <td>{{ restaurant.review_count() }}</td>
+                            <td>
+                                <div class="rating-small">
+                                    {% set rating = restaurant.avg_rating() %}
+                                    {% for i in range(5) %}
+                                        {% if i < rating %}
+                                        <span class="star filled">★</span>
+                                        {% else %}
+                                        <span class="star">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-muted small">({{ restaurant.avg_rating() }})</span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if restaurant.is_featured %}
+                                <span class="badge bg-warning">Featured</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Regular</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('toggle_featured', id=restaurant.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                                        {% if restaurant.is_featured %}Unfeature{% else %}Feature{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted py-4">No approved restaurants yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -38,3 +38,7 @@ class RestaurantForm(FlaskForm):
     cuisine_id = SelectField('Cuisine Type', coerce=int, validators=[DataRequired()])
     image_url = StringField('Image URL', validators=[Length(max=500)])
     is_small_business = BooleanField('This is a small business')
+    has_vegetarian = BooleanField('Has Vegetarian Options')
+    has_vegan = BooleanField('Has Vegan Options')
+    is_halal = BooleanField('Is Halal', default=True)
+    has_gluten_free = BooleanField('Has Gluten-Free Options')

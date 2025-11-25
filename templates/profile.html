@@ -10,8 +10,14 @@
                 <div class="profile-avatar-large">{{ user.username[0].upper() }}</div>
             </div>
             <div class="col">
-                <h2 class="fw-bold mb-2">{{ user.username }}</h2>
-                <p class="mb-0">Member since {{ user.created_at.strftime('%B %Y') }}</p>
+                <h2 class="fw-bold mb-2">
+                    {{ user.username }}
+                    <span class="badge bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">{{ user.get_badge() }}</span>
+                </h2>
+                <p class="mb-2">Member since {{ user.created_at.strftime('%B %Y') }}</p>
+                <p class="mb-0">
+                    <span class="badge bg-light text-dark">Reputation: {{ user.reputation_score or user.calculate_reputation() }}</span>
+                </p>
             </div>
         </div>
     </div>

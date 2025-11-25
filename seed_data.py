@@ -26,6 +26,11 @@ def seed_database():
         
         print("Creating users...")
         users = []
+        
+        admin = User(username='admin', email='admin@yalla.com', is_admin=True)
+        admin.set_password('admin123')
+        users.append(admin)
+        
         user1 = User(username='ahmed_jeddah', email='ahmed@example.com')
         user1.set_password('password123')
         users.append(user1)
@@ -202,8 +207,10 @@ def seed_database():
         print(f"Created {len(reviews)} reviews")
         
         print("\nDatabase seeded successfully!")
-        print("\nTest users (all with password 'password123'):")
-        for user in users:
+        print("\nTest users:")
+        print(f"  Admin: admin@yalla.com / admin123")
+        print("\nRegular users (all with password 'password123'):")
+        for user in users[1:]:
             print(f"  - {user.email}")
 
 if __name__ == '__main__':

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - Yalla{% endblock %}
+
+{% block content %}
+<div class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2">Community Leaderboard</h1>
+        <p class="lead">Celebrating our top food enthusiasts and reviewers</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            {% if users %}
+            {% for user in users[:3] %}
+            <div class="card shadow-lg mb-4 top-reviewer-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="leaderboard-rank rank-{{ loop.index }}">
+                                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                                <div class="rank-number">#{{ loop.index }}</div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="profile-avatar-large">{{ user.username[0].upper() }}</div>
+                        </div>
+                        <div class="col">
+                            <h3 class="fw-bold mb-2">
+                                {{ user.username }}
+                                <span class="badge bg-gradient ms-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">{{ user.get_badge() }}</span>
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <p class="mb-0 text-muted small">Reputation</p>
+                                    <h4 class="fw-bold text-primary mb-0">{{ user.reputation_score }}</h4>
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mb-0 text-muted small">Reviews</p>
+                                    <h4 class="fw-bold mb-0">{{ user.review_count() }}</h4>
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mb-0 text-muted small">Avg Rating</p>
+                                    <h4 class="fw-bold mb-0">{{ '%.1f'|format(user.avg_rating_given()) }}</h4>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-outline-primary">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if users|length > 3 %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 fw-bold">Other Top Reviewers</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="80">Rank</th>
+                                    <th>User</th>
+                                    <th>Badge</th>
+                                    <th>Reputation</th>
+                                    <th>Reviews</th>
+                                    <th>Avg Rating</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users[3:] %}
+                                <tr>
+                                    <td class="fw-bold text-muted">#{{ loop.index + 3 }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="reviewer-avatar-small me-2">{{ user.username[0].upper() }}</div>
+                                            <strong>{{ user.username }}</strong>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ user.get_badge() }}</span></td>
+                                    <td class="fw-bold text-primary">{{ user.reputation_score }}</td>
+                                    <td>{{ user.review_count() }}</td>
+                                    <td>
+                                        <div class="rating-small">
+                                            {% set rating = user.avg_rating_given() %}
+                                            {% for i in range(5) %}
+                                                {% if i < rating %}
+                                                <span class="star filled">★</span>
+                                                {% else %}
+                                                <span class="star">☆</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <h4 class="text-muted">No reviewers yet</h4>
+                <p class="text-muted">Be the first to write reviews and earn your spot on the leaderboard!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

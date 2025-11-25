@@ -10,12 +10,13 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    featured_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).limit(6).all()
+    featured_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=True).order_by(Restaurant.created_at.desc()).limit(3).all()
+    regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=False).order_by(Restaurant.created_at.desc()).limit(6).all()
     cuisines = Cuisine.query.all()
     top_reviewers = User.query.all()
     top_reviewers.sort(key=lambda u: u.review_count(), reverse=True)
     top_reviewers = top_reviewers[:4]
-    return render_template('index.html', restaurants=featured_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
+    return render_template('index.html', featured=featured_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -60,6 +61,7 @@ def restaurants():
     price_filter = request.args.get('price', type=int)
     rating_filter = request.args.get('rating', type=int)
     search_query = request.args.get('search', '')
+    dietary_filter = request.args.get('dietary', '')
     
     query = Restaurant.query.filter_by(is_approved=True)
     
@@ -72,6 +74,15 @@ def restaurants():
     if search_query:
         query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
     
+    if dietary_filter == 'vegetarian':
+        query = query.filter_by(has_vegetarian=True)
+    elif dietary_filter == 'vegan':
+        query = query.filter_by(has_vegan=True)
+    elif dietary_filter == 'halal':
+        query = query.filter_by(is_halal=True)
+    elif dietary_filter == 'gluten_free':
+        query = query.filter_by(has_gluten_free=True)
+    
     all_restaurants = query.all()
     
     if rating_filter:
@@ -81,7 +92,7 @@ def restaurants():
     
     return render_template('restaurants.html', restaurants=all_restaurants, cuisines=cuisines, 
                          current_cuisine=cuisine_filter, current_price=price_filter, 
-                         current_rating=rating_filter, search_query=search_query)
+                         current_rating=rating_filter, current_dietary=dietary_filter, search_query=search_query)
 
 @app.route('/restaurant/<int:id>')
 def restaurant_detail(id):
@@ -109,6 +120,7 @@ def add_review(id):
             restaurant_id=id
         )
         db.session.add(review)
+        current_user.update_reputation()
         db.session.commit()
         flash('Your review has been posted!', 'success')
         return redirect(url_for('restaurant_detail', id=id))
@@ -132,12 +144,16 @@ def add_restaurant():
             cuisine_id=form.cuisine_id.data,
             image_url=form.image_url.data,
             is_small_business=form.is_small_business.data,
-            is_approved=True
+            has_vegetarian=form.has_vegetarian.data,
+            has_vegan=form.has_vegan.data,
+            is_halal=form.is_halal.data,
+            has_gluten_free=form.has_gluten_free.data,
+            is_approved=False
         )
         db.session.add(restaurant)
         db.session.commit()
-        flash('Restaurant added successfully!', 'success')
-        return redirect(url_for('restaurant_detail', id=restaurant.id))
+        flash('Restaurant submitted for review! An admin will approve it shortly.', 'success')
+        return redirect(url_for('restaurants'))
     
     return render_template('add_restaurant.html', form=form)
 
@@ -158,3 +174,67 @@ def search():
     else:
         restaurants = []
     return render_template('search_results.html', restaurants=restaurants, query=query)
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    pending_restaurants = Restaurant.query.filter_by(is_approved=False).order_by(Restaurant.created_at.desc()).all()
+    approved_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).limit(10).all()
+    total_users = User.query.count()
+    total_reviews = Review.query.count()
+    
+    return render_template('admin_dashboard.html', 
+                         pending=pending_restaurants,
+                         approved=approved_restaurants,
+                         total_users=total_users,
+                         total_reviews=total_reviews)
+
+@app.route('/admin/approve/<int:id>', methods=['POST'])
+@login_required
+def approve_restaurant(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    restaurant = Restaurant.query.get_or_404(id)
+    restaurant.is_approved = True
+    db.session.commit()
+    flash(f'{restaurant.name} has been approved!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/reject/<int:id>', methods=['POST'])
+@login_required
+def reject_restaurant(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    restaurant = Restaurant.query.get_or_404(id)
+    db.session.delete(restaurant)
+    db.session.commit()
+    flash(f'{restaurant.name} has been rejected and removed.', 'warning')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/leaderboard')
+def leaderboard():
+    all_users = User.query.filter(User.reputation_score > 0).all()
+    all_users.sort(key=lambda u: u.reputation_score, reverse=True)
+    return render_template('leaderboard.html', users=all_users)
+
+@app.route('/admin/toggle-featured/<int:id>', methods=['POST'])
+@login_required
+def toggle_featured(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    restaurant = Restaurant.query.get_or_404(id)
+    restaurant.is_featured = not restaurant.is_featured
+    db.session.commit()
+    status = 'featured' if restaurant.is_featured else 'unfeatured'
+    flash(f'{restaurant.name} is now {status}!', 'success')
+    return redirect(url_for('admin_dashboard'))

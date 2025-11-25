@@ -71,6 +71,26 @@
                             </div>
                         </div>
                         
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Dietary Options</label>
+                            <div class="form-check">
+                                {{ form.has_vegetarian(class="form-check-input") }}
+                                {{ form.has_vegetarian.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check">
+                                {{ form.has_vegan(class="form-check-input") }}
+                                {{ form.has_vegan.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check">
+                                {{ form.is_halal(class="form-check-input", checked=True) }}
+                                {{ form.is_halal.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check">
+                                {{ form.has_gluten_free(class="form-check-input") }}
+                                {{ form.has_gluten_free.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
                         <div class="mb-4">
                             <div class="form-check">
                                 {{ form.is_small_business(class="form-check-input") }}

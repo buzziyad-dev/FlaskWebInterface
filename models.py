@@ -1,7 +1,7 @@
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,6 +113,12 @@ class Review(db.Model):
     
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')
+    
+    def formatted_datetime_ksa(self):
+        # Convert to KSA timezone (UTC+3)
+        ksa_tz = timezone(timedelta(hours=3))
+        ksa_time = self.created_at.replace(tzinfo=timezone.utc).astimezone(ksa_tz)
+        return f"{ksa_time.strftime('%B %d, %Y')} at {ksa_time.strftime('%I:%M %p')} (KSA)"
 
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -133,7 +133,7 @@
                                                 {% endfor %}
                                             </div>
                                         </div>
-                                        <small class="text-muted">{{ review.formatted_date() }} at {{ review.created_at.strftime('%I:%M %p') }}</small>
+                                        <small class="text-muted">{{ review.formatted_datetime_ksa() }}</small>
                                     </div>
                                     {% if review.title %}
                                     <h6 class="fw-bold">{{ review.title }}</h6>

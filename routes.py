@@ -276,8 +276,10 @@ def reject_restaurant(id):
 
 @app.route('/leaderboard')
 def leaderboard():
-    all_users = User.query.filter(User.reputation_score > 0).all()
-    all_users.sort(key=lambda u: u.reputation_score, reverse=True)
+    # Only show users who have written at least one review
+    all_users = User.query.all()
+    all_users = [u for u in all_users if u.review_count() > 0]
+    all_users.sort(key=lambda u: u.reputation_score or u.calculate_reputation(), reverse=True)
     return render_template('leaderboard.html', users=all_users)
 
 @app.route('/admin/toggle-featured/<int:id>', methods=['POST'])
@@ -324,6 +326,8 @@ def manage_user(id):
         flash(f'{user.username} has been {status}.', 'success')
     elif action == 'delete':
         username = user.username
+        # Set all reviews to have NULL user_id instead of deleting them
+        Review.query.filter_by(user_id=id).update({'user_id': None})
         db.session.delete(user)
         flash(f'{username} has been deleted.', 'success')
     

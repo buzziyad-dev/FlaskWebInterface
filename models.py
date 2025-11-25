@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     reputation_score = db.Column(db.Integer, default=0)
     badge = db.Column(db.String(50))
     
-    reviews = db.relationship('Review', backref='author', lazy='dynamic', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', backref='author', lazy='dynamic')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -100,7 +100,7 @@ class Review(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     
     def formatted_date(self):

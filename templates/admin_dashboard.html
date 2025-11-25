@@ -292,9 +292,13 @@
                         {% for review in all_reviews %}
                         <tr>
                             <td>
+                                {% if review.author %}
                                 <a href="{{ url_for('profile', username=review.author.username) }}" target="_blank" class="text-decoration-none">
                                     {{ review.author.username }}
                                 </a>
+                                {% else %}
+                                <span class="text-muted">Deleted User</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <a href="{{ url_for('restaurant_detail', id=review.restaurant.id) }}" target="_blank" class="text-decoration-none">

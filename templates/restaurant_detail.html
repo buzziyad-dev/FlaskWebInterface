@@ -101,13 +101,17 @@
                         {% for review in reviews %}
                         <div class="review-item {% if not loop.last %}border-bottom pb-3 mb-3{% endif %}">
                             <div class="d-flex align-items-start">
-                                <div class="reviewer-avatar-small me-3">{{ review.author.username[0].upper() }}</div>
+                                <div class="reviewer-avatar-small me-3">{{ (review.author.username[0].upper() if review.author else 'D') }}</div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h6 class="fw-bold mb-0">
-                                                {{ review.author.username }}
-                                                <span class="badge bg-light text-dark small ms-2">{{ review.author.get_badge() }}</span>
+                                                {% if review.author %}
+                                                    {{ review.author.username }}
+                                                    <span class="badge bg-light text-dark small ms-2">{{ review.author.get_badge() }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">Deleted User</span>
+                                                {% endif %}
                                             </h6>
                                             <div class="rating-small">
                                                 {% for i in range(5) %}

@@ -504,9 +504,13 @@ def bulk_delete():
     elif item_type == 'review':
         Review.query.filter(Review.id.in_([int(id) for id in ids])).delete()
         flash(f'Deleted {len(ids)} review(s).', 'success')
+    elif item_type == 'cuisine':
+        Cuisine.query.filter(Cuisine.id.in_([int(id) for id in ids])).delete()
+        flash(f'Deleted {len(ids)} cuisine(s).', 'success')
     
     db.session.commit()
-    return redirect(url_for('admin_dashboard', tab=item_type + 's' if item_type != 'review' else 'reviews'))
+    tab_mapping = {'review': 'reviews', 'cuisine': 'cuisines', 'user': 'users', 'restaurant': 'restaurants'}
+    return redirect(url_for('admin_dashboard', tab=tab_mapping.get(item_type, item_type + 's')))
 
 @app.route('/admin/delete-review/<int:id>', methods=['POST'])
 @login_required
@@ -551,4 +555,23 @@ def delete_cuisine(id):
     db.session.delete(cuisine)
     db.session.commit()
     flash(f'{name} has been deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='cuisines'))
+
+@app.route('/admin/edit-cuisine/<int:id>', methods=['POST'])
+@login_required
+def edit_cuisine(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    
+    cuisine = Cuisine.query.get_or_404(id)
+    new_name = request.form.get('name', cuisine.name)
+    
+    if new_name:
+        cuisine.name = new_name
+        db.session.commit()
+        flash(f'Cuisine has been updated to {new_name}.', 'success')
+    else:
+        flash('Please enter a cuisine name.', 'danger')
+    
     return redirect(url_for('admin_dashboard', tab='cuisines'))

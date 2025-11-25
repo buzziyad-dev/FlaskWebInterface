@@ -246,6 +246,18 @@ function renderRestaurantsTab() {
             <h4 class="mb-0 fw-bold">🍽️ Manage Restaurants</h4>
         </div>
         <div class="card-body">
+            <div class="row mb-4 g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="restaurantSearch" placeholder="Search by name...">
+                </div>
+                <div class="col-md-6">
+                    <select class="form-select" id="restaurantFeatureFilter">
+                        <option value="">All Statuses</option>
+                        <option value="featured">Featured Only</option>
+                        <option value="regular">Regular Only</option>
+                    </select>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -310,6 +322,25 @@ function renderUsersTab() {
             <h4 class="mb-0 fw-bold">👥 Manage Users</h4>
         </div>
         <div class="card-body">
+            <div class="row mb-4 g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="userSearch" placeholder="Search by username or email...">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="userRoleFilter">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="userStatusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="banned">Banned</option>
+                    </select>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -385,6 +416,21 @@ function renderReviewsTab() {
             <h4 class="mb-0 fw-bold">⭐ Manage Reviews</h4>
         </div>
         <div class="card-body">
+            <div class="row mb-4 g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="reviewSearch" placeholder="Search by author or restaurant...">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="reviewRatingFilter">
+                        <option value="">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -515,6 +561,82 @@ function attachEventListeners() {
             modal.show();
         });
     });
+    
+    // Restaurant filtering
+    const restaurantSearch = document.getElementById('restaurantSearch');
+    const restaurantFeatureFilter = document.getElementById('restaurantFeatureFilter');
+    if (restaurantSearch || restaurantFeatureFilter) {
+        const filterRestaurants = () => {
+            const searchTerm = (restaurantSearch?.value || '').toLowerCase();
+            const featureFilter = restaurantFeatureFilter?.value || '';
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                const name = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+                const isFeatured = row.textContent.includes('⭐ Featured');
+                
+                let matches = name.includes(searchTerm);
+                if (featureFilter === 'featured') matches = matches && isFeatured;
+                else if (featureFilter === 'regular') matches = matches && !isFeatured;
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        };
+        restaurantSearch?.addEventListener('input', filterRestaurants);
+        restaurantFeatureFilter?.addEventListener('change', filterRestaurants);
+    }
+    
+    // User filtering
+    const userSearch = document.getElementById('userSearch');
+    const userRoleFilter = document.getElementById('userRoleFilter');
+    const userStatusFilter = document.getElementById('userStatusFilter');
+    if (userSearch || userRoleFilter || userStatusFilter) {
+        const filterUsers = () => {
+            const searchTerm = (userSearch?.value || '').toLowerCase();
+            const roleFilter = userRoleFilter?.value || '';
+            const statusFilter = userStatusFilter?.value || '';
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                const username = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+                const email = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                const isAdmin = row.textContent.includes('Admin') && !row.textContent.includes('User');
+                const isBanned = row.textContent.includes('🚫 Banned');
+                
+                let matches = username.includes(searchTerm) || email.includes(searchTerm);
+                if (roleFilter === 'admin') matches = matches && isAdmin;
+                else if (roleFilter === 'user') matches = matches && !isAdmin;
+                if (statusFilter === 'active') matches = matches && !isBanned;
+                else if (statusFilter === 'banned') matches = matches && isBanned;
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        };
+        userSearch?.addEventListener('input', filterUsers);
+        userRoleFilter?.addEventListener('change', filterUsers);
+        userStatusFilter?.addEventListener('change', filterUsers);
+    }
+    
+    // Review filtering
+    const reviewSearch = document.getElementById('reviewSearch');
+    const reviewRatingFilter = document.getElementById('reviewRatingFilter');
+    if (reviewSearch || reviewRatingFilter) {
+        const filterReviews = () => {
+            const searchTerm = (reviewSearch?.value || '').toLowerCase();
+            const ratingFilter = reviewRatingFilter?.value || '';
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                const author = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+                const restaurant = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                const ratingStars = row.querySelectorAll('span[style*="gold"]').length;
+                
+                let matches = author.includes(searchTerm) || restaurant.includes(searchTerm);
+                if (ratingFilter) matches = matches && ratingStars === parseInt(ratingFilter);
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        };
+        reviewSearch?.addEventListener('input', filterReviews);
+        reviewRatingFilter?.addEventListener('change', filterReviews);
+    }
 }
 
 // Show submission details in modal

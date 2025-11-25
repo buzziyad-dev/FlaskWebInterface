@@ -128,6 +128,9 @@
                                     {% if review.title %}
                                     <h6 class="fw-bold">{{ review.title }}</h6>
                                     {% endif %}
+                                    {% if review.menu_tag %}
+                                    <p class="mb-1"><small><span class="badge bg-info">{{ review.menu_tag }}</span></small></p>
+                                    {% endif %}
                                     <p class="mb-0">{{ review.content }}</p>
                                 </div>
                             </div>
@@ -170,23 +173,16 @@
                         <p class="mb-0">{{ '$' * restaurant.price_range }}</p>
                     </div>
                     
+                    {% if restaurant.menu_tags %}
                     <div>
-                        <h6 class="fw-bold text-muted small mb-1">DIETARY OPTIONS</h6>
+                        <h6 class="fw-bold text-muted small mb-1">MENU CATEGORIES</h6>
                         <div class="d-flex flex-wrap gap-1">
-                            {% if restaurant.has_vegetarian %}
-                            <span class="badge bg-success">Vegetarian</span>
-                            {% endif %}
-                            {% if restaurant.has_vegan %}
-                            <span class="badge bg-success">Vegan</span>
-                            {% endif %}
-                            {% if restaurant.is_halal %}
-                            <span class="badge bg-success">Halal</span>
-                            {% endif %}
-                            {% if restaurant.has_gluten_free %}
-                            <span class="badge bg-success">Gluten-Free</span>
-                            {% endif %}
+                            {% for tag in restaurant.menu_tags %}
+                            <span class="badge bg-info">{{ tag }}</span>
+                            {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             

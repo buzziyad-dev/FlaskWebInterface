@@ -90,7 +90,6 @@ def restaurants():
     price_filter = request.args.get('price', type=int)
     rating_filter = request.args.get('rating', type=int)
     search_query = request.args.get('search', '')
-    dietary_filter = request.args.get('dietary', '')
     
     query = Restaurant.query.filter_by(is_approved=True)
     
@@ -103,15 +102,6 @@ def restaurants():
     if search_query:
         query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
     
-    if dietary_filter == 'vegetarian':
-        query = query.filter_by(has_vegetarian=True)
-    elif dietary_filter == 'vegan':
-        query = query.filter_by(has_vegan=True)
-    elif dietary_filter == 'halal':
-        query = query.filter_by(is_halal=True)
-    elif dietary_filter == 'gluten_free':
-        query = query.filter_by(has_gluten_free=True)
-    
     all_restaurants = query.all()
     
     if rating_filter:
@@ -121,7 +111,7 @@ def restaurants():
     
     return render_template('restaurants.html', restaurants=all_restaurants, cuisines=cuisines, 
                          current_cuisine=cuisine_filter, current_price=price_filter, 
-                         current_rating=rating_filter, current_dietary=dietary_filter, search_query=search_query)
+                         current_rating=rating_filter, search_query=search_query)
 
 @app.route('/restaurant/<int:id>')
 def restaurant_detail(id):
@@ -193,11 +183,18 @@ def add_review(id):
         return redirect(url_for('restaurant_detail', id=id))
     
     form = ReviewForm()
+    # Populate menu tag choices from restaurant's menu_tags
+    if restaurant.menu_tags:
+        form.menu_tag.choices = [(tag, tag) for tag in restaurant.menu_tags]
+    else:
+        form.menu_tag.choices = [('', 'No menu categories available')]
+    
     if form.validate_on_submit():
         review = Review(
             rating=form.rating.data,
             title=form.title.data,
             content=form.content.data,
+            menu_tag=form.menu_tag.data if form.menu_tag.data else None,
             user_id=current_user.id,
             restaurant_id=id
         )
@@ -216,6 +213,9 @@ def add_restaurant():
     form.cuisine_id.choices = [(c.id, c.name) for c in Cuisine.query.all()]
     
     if form.validate_on_submit():
+        # Parse menu tags from comma-separated input
+        menu_tags = [tag.strip() for tag in form.menu_tags.data.split(',') if tag.strip()] if form.menu_tags.data else []
+        
         restaurant = Restaurant(
             name=form.name.data,
             description=form.description.data,
@@ -227,10 +227,7 @@ def add_restaurant():
             user_id=current_user.id,
             image_url=form.image_url.data,
             is_small_business=form.is_small_business.data,
-            has_vegetarian=form.has_vegetarian.data,
-            has_vegan=form.has_vegan.data,
-            is_halal=form.is_halal.data,
-            has_gluten_free=form.has_gluten_free.data,
+            menu_tags=menu_tags,
             is_approved=False
         )
         db.session.add(restaurant)
@@ -319,10 +316,7 @@ def admin_api_data():
             'is_small_business': r.is_small_business,
             'is_featured': r.is_featured,
             'is_approved': r.is_approved,
-            'has_vegetarian': r.has_vegetarian,
-            'has_vegan': r.has_vegan,
-            'is_halal': r.is_halal,
-            'has_gluten_free': r.has_gluten_free,
+            'menu_tags': r.menu_tags if r.menu_tags else [],
             'review_count': r.review_count(),
             'avg_rating': r.avg_rating(),
             'created_at': r.created_at.strftime('%b %d, %Y'),
@@ -530,10 +524,10 @@ def edit_restaurant(id):
         restaurant.price_range = price_range
         
         restaurant.is_small_business = request.form.get('is_small_business') == 'on'
-        restaurant.has_vegetarian = request.form.get('has_vegetarian') == 'on'
-        restaurant.has_vegan = request.form.get('has_vegan') == 'on'
-        restaurant.is_halal = request.form.get('is_halal') == 'on'
-        restaurant.has_gluten_free = request.form.get('has_gluten_free') == 'on'
+        
+        # Parse menu tags from comma-separated input
+        menu_tags_input = request.form.get('menu_tags', '').strip()
+        restaurant.menu_tags = [tag.strip() for tag in menu_tags_input.split(',') if tag.strip()] if menu_tags_input else []
         
         db.session.commit()
         flash(f'{restaurant.name} has been updated.', 'success')

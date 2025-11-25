@@ -178,30 +178,14 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="editSmallBiz" name="is_small_business">
-                                    <label class="form-check-label">Small Business</label>
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="editVegetarian" name="has_vegetarian">
-                                    <label class="form-check-label">Vegetarian</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="editVegan" name="has_vegan">
-                                    <label class="form-check-label">Vegan</label>
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="editHalal" name="is_halal">
-                                    <label class="form-check-label">Halal</label>
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="editGlutenFree" name="has_gluten_free">
-                                    <label class="form-check-label">Gluten-Free</label>
-                                </div>
+                        <div class="mb-3">
+                            <label class="form-label">Menu Categories (comma-separated)</label>
+                            <input type="text" class="form-control" id="editMenuTags" name="menu_tags" placeholder="e.g., Appetizers, Main Courses, Desserts">
+                        </div>
+                        <div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editSmallBiz" name="is_small_business">
+                                <label class="form-check-label">Small Business</label>
                             </div>
                         </div>
                     </div>
@@ -878,10 +862,7 @@ function attachEventListeners() {
             document.getElementById('editRestaurantPrice').value = restaurant.price_range;
             document.getElementById('editRestaurantCuisine').value = restaurant.cuisine_id;
             document.getElementById('editSmallBiz').checked = restaurant.is_small_business;
-            document.getElementById('editVegetarian').checked = restaurant.has_vegetarian;
-            document.getElementById('editVegan').checked = restaurant.has_vegan;
-            document.getElementById('editHalal').checked = restaurant.is_halal;
-            document.getElementById('editGlutenFree').checked = restaurant.has_gluten_free;
+            document.getElementById('editMenuTags').value = (restaurant.menu_tags || []).join(', ');
             document.getElementById('editRestaurantForm').action = `{{ url_for('edit_restaurant', id=0) }}`.replace('/0', `/${this.dataset.id}`);
             adminData.all_cuisines.forEach(c => {
                 if (!document.querySelector(`#editRestaurantCuisine option[value="${c.id}"]`)) {
@@ -997,12 +978,9 @@ function showSubmissionDetails(restaurantId) {
         </div>
         
         <div class="mb-4 pb-3 border-bottom">
-            <h6 class="text-muted small">Dietary Options</h6>
+            <h6 class="text-muted small">Menu Categories</h6>
             <div>
-                ${restaurant.has_vegetarian ? '<span class="badge bg-success">Vegetarian</span>' : ''}
-                ${restaurant.has_vegan ? '<span class="badge bg-success">Vegan</span>' : ''}
-                ${restaurant.is_halal ? '<span class="badge bg-success">Halal</span>' : ''}
-                ${restaurant.has_gluten_free ? '<span class="badge bg-success">Gluten-Free</span>' : ''}
+                ${(restaurant.menu_tags || []).length > 0 ? restaurant.menu_tags.map(tag => `<span class="badge bg-info">${tag}</span>`).join(' ') : '<span class="text-muted">No menu categories</span>'}
             </div>
         </div>
         

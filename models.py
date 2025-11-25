@@ -79,10 +79,7 @@ class Restaurant(db.Model):
     is_small_business = db.Column(db.Boolean, default=False)
     is_approved = db.Column(db.Boolean, default=True)
     is_featured = db.Column(db.Boolean, default=False)
-    has_vegetarian = db.Column(db.Boolean, default=False)
-    has_vegan = db.Column(db.Boolean, default=False)
-    is_halal = db.Column(db.Boolean, default=True)
-    has_gluten_free = db.Column(db.Boolean, default=False)
+    menu_tags = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)
     
     submitter = db.relationship('User', backref='submitted_restaurants', foreign_keys=[user_id])
@@ -103,6 +100,7 @@ class Review(db.Model):
     title = db.Column(db.String(100))
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    menu_tag = db.Column(db.String(100))
     
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)

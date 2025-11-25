@@ -464,6 +464,7 @@ footer a:hover {
     justify-content: center;
     gap: 1.5rem;
     width: 100%;
+    margin: 0 auto;
 }
 
 .horizontal-scroll {
@@ -475,10 +476,10 @@ footer a:hover {
     scrollbar-width: none;
     -ms-overflow-style: none;
     width: 100%;
-    max-width: 1500px;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
     scroll-snap-type: x mandatory;
+    justify-content: flex-start;
 }
 
 .horizontal-scroll::-webkit-scrollbar {

@@ -201,8 +201,19 @@
             carousels.forEach(carouselId => {
                 const carousel = document.getElementById(carouselId);
                 if (carousel) {
-                    // Initial peek effect setup
-                    updatePeekEffect(carouselId);
+                    // Center the carousel view to show blur on both sides
+                    setTimeout(() => {
+                        const items = carousel.querySelectorAll('.horizontal-scroll-item');
+                        if (items.length > 0) {
+                            // Calculate scroll to center first 3 items with blur on both sides
+                            const itemWidth = 320 + 24; // Card width + gap
+                            // Scroll to show 1 item on left (blur) + 3 main items
+                            carousel.scrollLeft = itemWidth * 0;
+                        }
+                        
+                        // Initial peek effect setup
+                        updatePeekEffect(carouselId);
+                    }, 50);
                     
                     // Update peek effect on scroll
                     carousel.addEventListener('scroll', function() {

@@ -446,6 +446,7 @@ def admin_api_data():
             'is_featured': r.is_featured,
             'is_approved': r.is_approved,
             'food_categories': r.food_categories if r.food_categories else [],
+            'image_url': r.image_url,
             'review_count': r.review_count(),
             'avg_rating': r.avg_rating(),
             'created_at': r.created_at.strftime('%b %d, %Y'),
@@ -636,6 +637,29 @@ def edit_restaurant(id):
         restaurant.name = request.form.get('name', restaurant.name).strip()[:100] or restaurant.name
         restaurant.description = request.form.get('description', restaurant.description).strip()[:1000] or restaurant.description
         restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours).strip()[:500] or restaurant.working_hours
+        
+        # Handle image upload
+        if 'restaurant_image' in request.files:
+            file = request.files['restaurant_image']
+            if file and file.filename:
+                from PIL import Image
+                from io import BytesIO
+                import base64
+                
+                allowed_extensions = {'png', 'jpg', 'jpeg'}
+                filename = file.filename.lower()
+                if any(filename.endswith('.' + ext) for ext in allowed_extensions):
+                    try:
+                        img = Image.open(file)
+                        img.thumbnail((400, 300), Image.Resampling.LANCZOS)
+                        
+                        img_io = BytesIO()
+                        img.save(img_io, 'PNG')
+                        img_io.seek(0)
+                        image_data = base64.b64encode(img_io.getvalue()).decode('utf-8')
+                        restaurant.image_url = f"data:image/png;base64,{image_data}"
+                    except Exception as e:
+                        pass
         
         # Validate cuisine exists
         cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))

@@ -134,7 +134,7 @@
                     <h5 class="modal-title">Edit Restaurant</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" id="editRestaurantForm">
+                <form method="POST" id="editRestaurantForm" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="modal-body">
                         <div class="row">
@@ -171,6 +171,14 @@
                         <div class="mb-3">
                             <label class="form-label">Food Categories (comma-separated)</label>
                             <textarea class="form-control" id="editFoodCategories" name="food_categories" placeholder="e.g., Appetizers, Main Courses, Desserts" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Restaurant Image</label>
+                            <input type="file" class="form-control" id="editRestaurantImage" name="restaurant_image" accept=".png,.jpg,.jpeg">
+                            <small class="text-muted">PNG or JPG only</small>
+                        </div>
+                        <div class="mb-3">
+                            <div id="editImagePreview"></div>
                         </div>
                         <div>
                             <div class="form-check">
@@ -408,10 +416,15 @@ function renderRestaurantsTab() {
                         <tr>
                             <td><input type="checkbox" class="form-check-input restaurant-checkbox" value="${r.id}"></td>
                             <td>
-                                <a href="{{ url_for('restaurant_detail', id=0) }}" target="_blank" class="text-decoration-none" data-id="${r.id}">
-                                    <strong>${r.name}</strong>
-                                </a>
-                                ${r.is_small_business ? '<span class="badge bg-success ms-2">Small Biz</span>' : ''}
+                                <div class="d-flex align-items-center gap-3">
+                                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : '<div style="width: 50px; height: 50px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center;"><span style="color: #999;">No Image</span></div>'}
+                                    <div>
+                                        <a href="{{ url_for('restaurant_detail', id=0) }}" target="_blank" class="text-decoration-none" data-id="${r.id}">
+                                            <strong>${r.name}</strong>
+                                        </a>
+                                        ${r.is_small_business ? '<span class="badge bg-success ms-2">Small Biz</span>' : ''}
+                                    </div>
+                                </div>
                             </td>
                             <td>${r.cuisine}</td>
                             <td>${r.review_count}</td>
@@ -858,6 +871,18 @@ function attachEventListeners() {
             document.getElementById('editRestaurantCuisine').value = restaurant.cuisine_id;
             document.getElementById('editSmallBiz').checked = restaurant.is_small_business;
             document.getElementById('editFoodCategories').value = (restaurant.food_categories || []).join(', ');
+            
+            // Show current image preview
+            const previewDiv = document.getElementById('editImagePreview');
+            if (restaurant.image_url) {
+                previewDiv.innerHTML = `<img src="${restaurant.image_url}" alt="${restaurant.name}" style="max-width: 200px; max-height: 150px; border-radius: 4px;">`;
+            } else {
+                previewDiv.innerHTML = '<p class="text-muted small">No image</p>';
+            }
+            
+            // Clear file input
+            document.getElementById('editRestaurantImage').value = '';
+            
             document.getElementById('editRestaurantForm').action = `{{ url_for('edit_restaurant', id=0) }}`.replace('/0', `/${this.dataset.id}`);
             adminData.all_cuisines.forEach(c => {
                 if (!document.querySelector(`#editRestaurantCuisine option[value="${c.id}"]`)) {
@@ -869,6 +894,22 @@ function attachEventListeners() {
             });
         });
     });
+    
+    // Image preview on file select
+    const editRestaurantImage = document.getElementById('editRestaurantImage');
+    if (editRestaurantImage) {
+        editRestaurantImage.addEventListener('change', function() {
+            const previewDiv = document.getElementById('editImagePreview');
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 4px;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
     
     // Edit user button handler
     document.querySelectorAll('.edit-user-btn').forEach(btn => {
@@ -922,7 +963,15 @@ function showSubmissionDetails(restaurantId) {
     const restaurant = adminData.pending.find(r => r.id === restaurantId);
     if (!restaurant) return;
     
+    const imageHtml = restaurant.image_url ? `
+        <div class="mb-4">
+            <h6 class="text-muted small">Restaurant Image</h6>
+            <img src="${restaurant.image_url}" alt="${restaurant.name}" style="max-width: 100%; height: auto; border-radius: 8px;">
+        </div>
+    ` : '';
+    
     const content = `
+        ${imageHtml}
         <div class="row mb-4">
             <div class="col-md-6">
                 <h6 class="text-muted small">Restaurant Name</h6>

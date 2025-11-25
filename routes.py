@@ -12,6 +12,16 @@ import os
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.before_request
+def check_banned_user():
+    if current_user.is_authenticated:
+        # Refresh user data from database to check if they've been banned
+        user = User.query.get(current_user.id)
+        if user and user.is_banned:
+            logout_user()
+            flash('Your account has been banned.', 'danger')
+            return redirect(url_for('banned', username=user.username))
+
 @app.route('/')
 def index():
     featured_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=True).order_by(Restaurant.created_at.desc()).limit(3).all()

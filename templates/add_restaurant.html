@@ -73,7 +73,8 @@
                         
                         <div class="mb-4">
                             {{ form.food_categories.label(class="form-label fw-bold") }}
-                            {{ form.food_categories(class="form-select") }}
+                            {{ form.food_categories(class="form-select", multiple=True, size=5) }}
+                            <small class="text-muted">Hold Ctrl (or Cmd on Mac) to select multiple categories</small>
                             {% if form.food_categories.errors %}
                                 <div class="text-danger small mt-1">
                                     {% for error in form.food_categories.errors %}{{ error }}{% endfor %}

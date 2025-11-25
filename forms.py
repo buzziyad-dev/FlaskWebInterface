@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, IntegerField, BooleanField, FileField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, SelectMultipleField, IntegerField, BooleanField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, NumberRange
 from models import User
 
@@ -38,7 +38,7 @@ class RestaurantForm(FlaskForm):
     price_range = SelectField('Price Range', choices=[(1, '$ - Budget'), (2, '$$ - Moderate'), (3, '$$$ - Expensive'), (4, '$$$$ - Very Expensive')], coerce=int, validators=[DataRequired()])
     cuisine_id = SelectField('Cuisine Type', coerce=int, validators=[DataRequired()])
     image_url = StringField('Image URL', validators=[Length(max=500)])
-    food_categories = SelectField('Food Categories', coerce=int, validators=[DataRequired()])
+    food_categories = SelectMultipleField('Food Categories', coerce=int, validators=[DataRequired()])
 
 class PhotoUploadForm(FlaskForm):
     photo = FileField('Upload Photo', validators=[DataRequired()])

@@ -216,9 +216,9 @@ def add_restaurant():
     form.food_categories.choices = [(i, cat) for i, cat in enumerate(default_categories)]
     
     if form.validate_on_submit():
-        # Get selected food category
-        selected_category_idx = int(form.food_categories.data)
-        selected_category = default_categories[selected_category_idx] if selected_category_idx < len(default_categories) else default_categories[0]
+        # Get selected food categories (multiple)
+        selected_indices = [int(idx) for idx in form.food_categories.data]
+        selected_categories = [default_categories[idx] for idx in selected_indices if idx < len(default_categories)]
         
         restaurant = Restaurant(
             name=form.name.data,
@@ -231,7 +231,7 @@ def add_restaurant():
             user_id=current_user.id,
             image_url=form.image_url.data,
             is_small_business=False,
-            food_categories=[selected_category],
+            food_categories=selected_categories,
             is_approved=False
         )
         db.session.add(restaurant)

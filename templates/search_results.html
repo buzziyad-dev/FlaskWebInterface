@@ -10,6 +10,11 @@
     </div>
     
     {% if restaurants %}
+    {% if is_suggestion and query %}
+    <div class="alert alert-info mb-4" role="alert">
+        <strong>No exact matches found.</strong> Showing related restaurants and suggestions instead.
+    </div>
+    {% endif %}
     <div class="row g-4">
         {% for restaurant in restaurants %}
         <div class="col-lg-4 col-md-6">

@@ -278,15 +278,37 @@ def profile(username):
 
 @app.route('/search')
 def search():
-    query = request.args.get('q', '')
+    query = request.args.get('q', '').strip()
+    restaurants = []
+    
     if query:
-        restaurants = Restaurant.query.filter(
+        # First, search by exact name match (highest priority)
+        name_matches = Restaurant.query.filter(
             Restaurant.is_approved == True,
             Restaurant.name.ilike(f'%{query}%')
         ).all()
-    else:
-        restaurants = []
-    return render_template('search_results.html', restaurants=restaurants, query=query)
+        restaurants.extend(name_matches)
+        
+        # If no name matches, search by cuisine type or description (related results)
+        if not name_matches:
+            # Search in cuisine names
+            from sqlalchemy import or_
+            related = Restaurant.query.join(Cuisine).filter(
+                Restaurant.is_approved == True,
+                or_(
+                    Cuisine.name.ilike(f'%{query}%'),
+                    Restaurant.description.ilike(f'%{query}%')
+                )
+            ).all()
+            restaurants.extend(related)
+            
+            # If still no results, show promoted/popular restaurants as suggestions
+            if not related:
+                restaurants = Restaurant.query.filter(
+                    Restaurant.is_approved == True
+                ).order_by(Restaurant.is_promoted.desc(), Restaurant.created_at.desc()).limit(10).all()
+    
+    return render_template('search_results.html', restaurants=restaurants, query=query, is_suggestion=bool(query and not any(query.lower() in r.name.lower() for r in restaurants)))
 
 def get_admin_data():
     """Helper function to get all admin data"""

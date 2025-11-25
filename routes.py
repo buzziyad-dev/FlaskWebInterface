@@ -27,10 +27,8 @@ def index():
     featured_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=True).order_by(Restaurant.created_at.desc()).limit(3).all()
     regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_featured=False).order_by(Restaurant.created_at.desc()).limit(6).all()
     cuisines = Cuisine.query.all()
-    # Get top reviewers excluding admin users
-    top_reviewers = User.query.filter(User.is_admin == False).all()
-    top_reviewers.sort(key=lambda u: u.review_count(), reverse=True)
-    top_reviewers = top_reviewers[:4]
+    # Get top reviewers by reputation score, excluding admin users (optimized query)
+    top_reviewers = User.query.filter(User.is_admin == False).order_by(User.reputation_score.desc()).limit(4).all()
     return render_template('index.html', featured=featured_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -86,6 +84,8 @@ def logout():
 
 @app.route('/restaurants')
 def restaurants():
+    from sqlalchemy import func
+    
     cuisine_filter = request.args.get('cuisine', type=int)
     price_filter = request.args.get('price', type=int)
     rating_filter = request.args.get('rating', type=int)
@@ -104,6 +104,7 @@ def restaurants():
     
     all_restaurants = query.all()
     
+    # Filter by rating using average calculation (done in Python to avoid complex SQL)
     if rating_filter:
         all_restaurants = [r for r in all_restaurants if r.avg_rating() >= rating_filter]
     

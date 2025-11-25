@@ -9,10 +9,10 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False, index=True)
     is_banned = db.Column(db.Boolean, default=False)
     ban_reason = db.Column(db.Text)
-    reputation_score = db.Column(db.Integer, default=0)
+    reputation_score = db.Column(db.Integer, default=0, index=True)
     badge = db.Column(db.String(50))
     
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
@@ -71,14 +71,14 @@ class Restaurant(db.Model):
     address = db.Column(db.String(200))
     phone = db.Column(db.String(20))
     working_hours = db.Column(db.String(100))
-    price_range = db.Column(db.Integer, default=2)
-    cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisine.id'), nullable=False)
+    price_range = db.Column(db.Integer, default=2, index=True)
+    cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisine.id'), nullable=False, index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     image_url = db.Column(db.String(500))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     is_small_business = db.Column(db.Boolean, default=False)
-    is_approved = db.Column(db.Boolean, default=True)
-    is_featured = db.Column(db.Boolean, default=False)
+    is_approved = db.Column(db.Boolean, default=True, index=True)
+    is_featured = db.Column(db.Boolean, default=False, index=True)
     food_categories = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)
     
@@ -96,14 +96,14 @@ class Restaurant(db.Model):
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    rating = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Integer, nullable=False, index=True)
     title = db.Column(db.String(100))
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     food_category = db.Column(db.String(100))
     
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False, index=True)
     
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')

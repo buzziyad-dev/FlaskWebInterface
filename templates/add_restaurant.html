@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Add Restaurant - Yalla{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-3">Add a New Restaurant</h2>
+                    <p class="text-muted mb-4">Help grow our community by adding a restaurant in Jeddah</p>
+                    
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.name.label(class="form-label fw-bold") }}
+                                {{ form.name(class="form-control") }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.cuisine_id.label(class="form-label fw-bold") }}
+                                {{ form.cuisine_id(class="form-select") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label fw-bold") }}
+                            {{ form.description(class="form-control", rows="4") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.address.label(class="form-label fw-bold") }}
+                            {{ form.address(class="form-control") }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control", placeholder="+966 XX XXX XXXX") }}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.working_hours.label(class="form-label fw-bold") }}
+                                {{ form.working_hours(class="form-control", placeholder="e.g., 9 AM - 11 PM") }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.price_range.label(class="form-label fw-bold") }}
+                                {{ form.price_range(class="form-select") }}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.image_url.label(class="form-label fw-bold") }}
+                                {{ form.image_url(class="form-control", placeholder="https://example.com/image.jpg") }}
+                                <small class="text-muted">Optional: Add an image URL</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.is_small_business(class="form-check-input") }}
+                                {{ form.is_small_business.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4">Add Restaurant</button>
+                            <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

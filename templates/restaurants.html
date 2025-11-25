@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Restaurants - Yalla{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card shadow-sm mb-4 sticky-top" style="top: 80px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('restaurants') }}" method="GET">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Cuisine Type</label>
+                            <select name="cuisine" class="form-select" onchange="this.form.submit()">
+                                <option value="">All Cuisines</option>
+                                {% for cuisine in cuisines %}
+                                <option value="{{ cuisine.id }}" {% if current_cuisine == cuisine.id %}selected{% endif %}>{{ cuisine.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Price Range</label>
+                            <select name="price" class="form-select" onchange="this.form.submit()">
+                                <option value="">Any Price</option>
+                                <option value="1" {% if current_price == 1 %}selected{% endif %}>$ - Budget</option>
+                                <option value="2" {% if current_price == 2 %}selected{% endif %}>$$ - Moderate</option>
+                                <option value="3" {% if current_price == 3 %}selected{% endif %}>$$$ - Expensive</option>
+                                <option value="4" {% if current_price == 4 %}selected{% endif %}>$$$$ - Very Expensive</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Minimum Rating</label>
+                            <select name="rating" class="form-select" onchange="this.form.submit()">
+                                <option value="">Any Rating</option>
+                                <option value="4" {% if current_rating == 4 %}selected{% endif %}>4+ Stars</option>
+                                <option value="3" {% if current_rating == 3 %}selected{% endif %}>3+ Stars</option>
+                                <option value="2" {% if current_rating == 2 %}selected{% endif %}>2+ Stars</option>
+                            </select>
+                        </div>
+                        
+                        {% if current_cuisine or current_price or current_rating %}
+                        <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">All Restaurants</h2>
+                    <p class="text-muted mb-0">{{ restaurants|length }} restaurants found</p>
+                </div>
+            </div>
+            
+            {% if restaurants %}
+            <div class="row g-4">
+                {% for restaurant in restaurants %}
+                <div class="col-lg-6">
+                    <div class="card restaurant-card h-100 shadow-sm">
+                        <div class="row g-0">
+                            <div class="col-md-5">
+                                <div class="restaurant-image-small" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400' }}');">
+                                    {% if restaurant.is_small_business %}
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-2 small">Small Business</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold mb-2">{{ restaurant.name }}</h5>
+                                    <p class="text-muted small mb-2">
+                                        <span class="badge bg-light text-dark">{{ restaurant.cuisine.name }}</span>
+                                        <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
+                                    </p>
+                                    <div class="rating mb-2">
+                                        {% set rating = restaurant.avg_rating() %}
+                                        {% for i in range(5) %}
+                                            {% if i < rating %}
+                                            <span class="star filled">★</span>
+                                            {% else %}
+                                            <span class="star">☆</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="text-muted small ms-2">({{ restaurant.review_count() }})</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-3">{{ restaurant.description[:80] }}...</p>
+                                    <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <h4 class="text-muted">No restaurants found</h4>
+                <p class="text-muted">Try adjusting your filters or search criteria</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

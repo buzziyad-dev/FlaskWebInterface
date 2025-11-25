@@ -31,7 +31,7 @@
         </div>
         <div class="d-flex justify-content-center">
             <div class="carousel-wrapper animate-fade-in">
-                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('promoted', -320)" aria-label="Previous">‹</button>
+                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('promoted', -1)" aria-label="Previous">‹</button>
                 <div class="horizontal-scroll" id="promoted-carousel">
                     {% for restaurant in promoted %}
                     <div class="horizontal-scroll-item">
@@ -66,7 +66,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('promoted', 320)" aria-label="Next">›</button>
+                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('promoted', 1)" aria-label="Next">›</button>
             </div>
         </div>
     </div>
@@ -83,7 +83,7 @@
         </div>
         <div class="d-flex justify-content-center">
             <div class="carousel-wrapper animate-fade-in">
-                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('recent', -320)" aria-label="Previous">‹</button>
+                <button class="carousel-arrow carousel-prev" onclick="scrollCarousel('recent', -1)" aria-label="Previous">‹</button>
                 <div class="horizontal-scroll" id="recent-carousel">
                     {% for restaurant in restaurants %}
                     <div class="horizontal-scroll-item">
@@ -117,7 +117,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('recent', 320)" aria-label="Next">›</button>
+                <button class="carousel-arrow carousel-next" onclick="scrollCarousel('recent', 1)" aria-label="Next">›</button>
             </div>
         </div>
         <div class="text-center mt-4">

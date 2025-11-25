@@ -123,11 +123,42 @@
             'recent-carousel': null
         };
 
+        // Function to update blur on peek items
+        function updatePeekEffect(carouselId) {
+            const carousel = document.getElementById(carouselId);
+            if (!carousel) return;
+            
+            const items = carousel.querySelectorAll('.horizontal-scroll-item');
+            const viewportStart = carousel.scrollLeft;
+            const viewportEnd = viewportStart + carousel.clientWidth;
+            const itemWidth = 320 + 24; // Card width + gap
+            
+            items.forEach((item, index) => {
+                const itemStart = index * itemWidth;
+                const itemEnd = itemStart + 320;
+                
+                // Check if item is fully or partially visible
+                if (itemEnd <= viewportStart || itemStart >= viewportEnd) {
+                    // Completely hidden
+                    item.classList.add('peek');
+                } else if (itemStart >= viewportStart && itemEnd <= viewportEnd) {
+                    // Fully visible (main items)
+                    item.classList.remove('peek');
+                } else {
+                    // Partially visible (peek items)
+                    item.classList.add('peek');
+                }
+            });
+        }
+
         // Function to scroll carousel
-        function scrollCarousel(carouselType, distance) {
+        function scrollCarousel(carouselType, direction) {
             const carouselId = carouselType === 'promoted' ? 'promoted-carousel' : 'recent-carousel';
             const carousel = document.getElementById(carouselId);
             if (carousel) {
+                const itemWidth = 320 + 24; // Card width + gap
+                const distance = direction > 0 ? itemWidth : -itemWidth;
+                
                 carousel.scrollBy({
                     left: distance,
                     behavior: 'smooth'
@@ -165,23 +196,21 @@
 
         // Initialize auto-scroll for both carousels when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Start auto-scroll for promoted carousel
-            resetAutoScroll('promoted-carousel');
-            // Start auto-scroll for recent carousel
-            resetAutoScroll('recent-carousel');
-
-            // Handle scroll end - loop back to beginning if reached end
             const carousels = ['promoted-carousel', 'recent-carousel'];
+            
             carousels.forEach(carouselId => {
                 const carousel = document.getElementById(carouselId);
                 if (carousel) {
+                    // Initial peek effect setup
+                    updatePeekEffect(carouselId);
+                    
+                    // Update peek effect on scroll
                     carousel.addEventListener('scroll', function() {
-                        // Check if at end
-                        if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10) {
-                            // Loop back to beginning
-                            carousel.scrollTo({ left: 0, behavior: 'smooth' });
-                        }
+                        updatePeekEffect(carouselId);
                     });
+                    
+                    // Start auto-scroll
+                    resetAutoScroll(carouselId);
                 }
             });
         });

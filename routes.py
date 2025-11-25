@@ -183,18 +183,18 @@ def add_review(id):
         return redirect(url_for('restaurant_detail', id=id))
     
     form = ReviewForm()
-    # Populate menu tag choices from restaurant's menu_tags
-    if restaurant.menu_tags:
-        form.menu_tag.choices = [(tag, tag) for tag in restaurant.menu_tags]
+    # Populate food category choices from restaurant's food_categories
+    if restaurant.food_categories:
+        form.food_category.choices = [(tag, tag) for tag in restaurant.food_categories]
     else:
-        form.menu_tag.choices = [('', 'No menu categories available')]
+        form.food_category.choices = [('', 'No food categories available')]
     
     if form.validate_on_submit():
         review = Review(
             rating=form.rating.data,
             title=form.title.data,
             content=form.content.data,
-            menu_tag=form.menu_tag.data if form.menu_tag.data else None,
+            food_category=form.food_category.data if form.food_category.data else None,
             user_id=current_user.id,
             restaurant_id=id
         )
@@ -211,10 +211,14 @@ def add_review(id):
 def add_restaurant():
     form = RestaurantForm()
     form.cuisine_id.choices = [(c.id, c.name) for c in Cuisine.query.all()]
+    # Populate food categories as dropdown - create some default categories
+    default_categories = ['Appetizers', 'Main Courses', 'Desserts', 'Beverages', 'Salads', 'Soups', 'Sides', 'Breakfast', 'Lunch', 'Dinner', 'Vegetarian', 'Seafood', 'Meat']
+    form.food_categories.choices = [(i, cat) for i, cat in enumerate(default_categories)]
     
     if form.validate_on_submit():
-        # Parse menu tags from comma-separated input
-        menu_tags = [tag.strip() for tag in form.menu_tags.data.split(',') if tag.strip()] if form.menu_tags.data else []
+        # Get selected food category
+        selected_category_idx = int(form.food_categories.data)
+        selected_category = default_categories[selected_category_idx] if selected_category_idx < len(default_categories) else default_categories[0]
         
         restaurant = Restaurant(
             name=form.name.data,
@@ -226,8 +230,8 @@ def add_restaurant():
             cuisine_id=form.cuisine_id.data,
             user_id=current_user.id,
             image_url=form.image_url.data,
-            is_small_business=form.is_small_business.data,
-            menu_tags=menu_tags,
+            is_small_business=False,
+            food_categories=[selected_category],
             is_approved=False
         )
         db.session.add(restaurant)
@@ -316,7 +320,7 @@ def admin_api_data():
             'is_small_business': r.is_small_business,
             'is_featured': r.is_featured,
             'is_approved': r.is_approved,
-            'menu_tags': r.menu_tags if r.menu_tags else [],
+            'food_categories': r.food_categories if r.food_categories else [],
             'review_count': r.review_count(),
             'avg_rating': r.avg_rating(),
             'created_at': r.created_at.strftime('%b %d, %Y'),
@@ -525,9 +529,9 @@ def edit_restaurant(id):
         
         restaurant.is_small_business = request.form.get('is_small_business') == 'on'
         
-        # Parse menu tags from comma-separated input
-        menu_tags_input = request.form.get('menu_tags', '').strip()
-        restaurant.menu_tags = [tag.strip() for tag in menu_tags_input.split(',') if tag.strip()] if menu_tags_input else []
+        # Parse food categories from comma-separated input
+        food_categories_input = request.form.get('food_categories', '').strip()
+        restaurant.food_categories = [tag.strip() for tag in food_categories_input.split(',') if tag.strip()] if food_categories_input else []
         
         db.session.commit()
         flash(f'{restaurant.name} has been updated.', 'success')

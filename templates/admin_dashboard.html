@@ -179,8 +179,8 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Menu Categories (comma-separated)</label>
-                            <input type="text" class="form-control" id="editMenuTags" name="menu_tags" placeholder="e.g., Appetizers, Main Courses, Desserts">
+                            <label class="form-label">Food Categories</label>
+                            <textarea class="form-control" id="editFoodCategories" name="food_categories" placeholder="e.g., Appetizers, Main Courses, Desserts (comma-separated)" rows="2"></textarea>
                         </div>
                         <div>
                             <div class="form-check">
@@ -862,7 +862,7 @@ function attachEventListeners() {
             document.getElementById('editRestaurantPrice').value = restaurant.price_range;
             document.getElementById('editRestaurantCuisine').value = restaurant.cuisine_id;
             document.getElementById('editSmallBiz').checked = restaurant.is_small_business;
-            document.getElementById('editMenuTags').value = (restaurant.menu_tags || []).join(', ');
+            document.getElementById('editFoodCategories').value = (restaurant.food_categories || []).join(', ');
             document.getElementById('editRestaurantForm').action = `{{ url_for('edit_restaurant', id=0) }}`.replace('/0', `/${this.dataset.id}`);
             adminData.all_cuisines.forEach(c => {
                 if (!document.querySelector(`#editRestaurantCuisine option[value="${c.id}"]`)) {
@@ -978,9 +978,9 @@ function showSubmissionDetails(restaurantId) {
         </div>
         
         <div class="mb-4 pb-3 border-bottom">
-            <h6 class="text-muted small">Menu Categories</h6>
+            <h6 class="text-muted small">Food Categories</h6>
             <div>
-                ${(restaurant.menu_tags || []).length > 0 ? restaurant.menu_tags.map(tag => `<span class="badge bg-info">${tag}</span>`).join(' ') : '<span class="text-muted">No menu categories</span>'}
+                ${(restaurant.food_categories || []).length > 0 ? restaurant.food_categories.map(tag => `<span class="badge bg-info">${tag}</span>`).join(' ') : '<span class="text-muted">No food categories</span>'}
             </div>
         </div>
         

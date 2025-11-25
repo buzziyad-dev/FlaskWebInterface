@@ -25,11 +25,11 @@
                         </div>
                         
                         <div class="mb-4">
-                            {{ form.menu_tag.label(class="form-label fw-bold") }}
-                            {{ form.menu_tag(class="form-select") }}
-                            {% if form.menu_tag.errors %}
+                            {{ form.food_category.label(class="form-label fw-bold") }}
+                            {{ form.food_category(class="form-select") }}
+                            {% if form.food_category.errors %}
                                 <div class="text-danger small mt-1">
-                                    {% for error in form.menu_tag.errors %}{{ error }}{% endfor %}
+                                    {% for error in form.food_category.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>

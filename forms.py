@@ -27,7 +27,7 @@ class ReviewForm(FlaskForm):
     rating = SelectField('Rating', choices=[(5, '5 Stars'), (4, '4 Stars'), (3, '3 Stars'), (2, '2 Stars'), (1, '1 Star')], coerce=int, validators=[DataRequired()])
     title = StringField('Review Title', validators=[Length(max=100)])
     content = TextAreaField('Your Review', validators=[DataRequired(), Length(min=10, max=1000)])
-    menu_tag = SelectField('What did you try?', choices=[], validators=[DataRequired()])
+    food_category = SelectField('What did you try?', choices=[], validators=[DataRequired()])
 
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])
@@ -38,8 +38,7 @@ class RestaurantForm(FlaskForm):
     price_range = SelectField('Price Range', choices=[(1, '$ - Budget'), (2, '$$ - Moderate'), (3, '$$$ - Expensive'), (4, '$$$$ - Very Expensive')], coerce=int, validators=[DataRequired()])
     cuisine_id = SelectField('Cuisine Type', coerce=int, validators=[DataRequired()])
     image_url = StringField('Image URL', validators=[Length(max=500)])
-    is_small_business = BooleanField('This is a small business')
-    menu_tags = StringField('Menu Categories (comma-separated)', validators=[Length(max=500)])
+    food_categories = SelectField('Food Categories', coerce=int, validators=[DataRequired()])
 
 class PhotoUploadForm(FlaskForm):
     photo = FileField('Upload Photo', validators=[DataRequired()])

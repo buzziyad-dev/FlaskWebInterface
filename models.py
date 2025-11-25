@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     profile_picture = db.Column(db.LargeBinary)
     
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
-    tags = db.relationship('UserTag', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    tags = db.relationship('UserTag', backref='user', lazy='dynamic', cascade='all, delete-orphan', foreign_keys='UserTag.user_id')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

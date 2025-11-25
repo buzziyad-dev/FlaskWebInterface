@@ -20,41 +20,92 @@
 
 <div class="container py-5">
     <!-- Tab Navigation -->
-    <ul class="nav nav-tabs mb-4" role="tablist">
+    <ul class="nav nav-tabs mb-4" role="tablist" id="adminTabs">
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if tab == 'overview' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='overview') }}">
+            <button class="nav-link active" id="overview-tab" data-tab="overview" type="button" role="tab">
                 📊 Overview
-            </a>
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if tab == 'restaurants' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='restaurants') }}">
+            <button class="nav-link" id="restaurants-tab" data-tab="restaurants" type="button" role="tab">
                 🍽️ Restaurants
-            </a>
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if tab == 'users' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='users') }}">
+            <button class="nav-link" id="users-tab" data-tab="users" type="button" role="tab">
                 👥 Users
-            </a>
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if tab == 'reviews' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='reviews') }}">
+            <button class="nav-link" id="reviews-tab" data-tab="reviews" type="button" role="tab">
                 ⭐ Reviews
-            </a>
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if tab == 'cuisines' %}active{% endif %}" href="{{ url_for('admin_dashboard', tab='cuisines') }}">
+            <button class="nav-link" id="cuisines-tab" data-tab="cuisines" type="button" role="tab">
                 🍴 Cuisines
-            </a>
+            </button>
         </li>
     </ul>
 
-    <!-- OVERVIEW TAB -->
-    {% if tab == 'overview' %}
-    <div class="row mb-4" id="statsContainer">
+    <!-- Tab Content Container -->
+    <div id="tabContent"></div>
+</div>
+
+<script>
+let adminData = null;
+let currentTab = 'overview';
+let autoRefreshEnabled = true;
+let refreshInterval = null;
+
+// Load all admin data
+async function loadAdminData() {
+    try {
+        const response = await fetch('{{ url_for("admin_api_data") }}');
+        const data = await response.json();
+        adminData = data;
+        renderTab(currentTab);
+    } catch (error) {
+        console.error('Failed to load admin data:', error);
+    }
+}
+
+// Render specific tab
+function renderTab(tabName) {
+    currentTab = tabName;
+    const container = document.getElementById('tabContent');
+    
+    // Update active tab button
+    document.querySelectorAll('#adminTabs button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    
+    let html = '';
+    
+    if (tabName === 'overview') {
+        html = renderOverviewTab();
+    } else if (tabName === 'restaurants') {
+        html = renderRestaurantsTab();
+    } else if (tabName === 'users') {
+        html = renderUsersTab();
+    } else if (tabName === 'reviews') {
+        html = renderReviewsTab();
+    } else if (tabName === 'cuisines') {
+        html = renderCuisinesTab();
+    }
+    
+    container.innerHTML = html;
+    attachEventListeners();
+}
+
+function renderOverviewTab() {
+    let html = `
+    <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-primary mb-0" id="pendingCount">{{ pending|length }}</h3>
+                    <h3 class="fw-bold text-primary mb-0">${adminData.pending.length}</h3>
                     <p class="text-muted small mb-0">Pending Approvals</p>
                 </div>
             </div>
@@ -62,7 +113,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-success mb-0" id="approvedCount">{{ approved|length }}</h3>
+                    <h3 class="fw-bold text-success mb-0">${adminData.approved.length}</h3>
                     <p class="text-muted small mb-0">Approved Restaurants</p>
                 </div>
             </div>
@@ -70,7 +121,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-info mb-0" id="usersCount">{{ total_users }}</h3>
+                    <h3 class="fw-bold text-info mb-0">${adminData.total_users}</h3>
                     <p class="text-muted small mb-0">Total Users</p>
                 </div>
             </div>
@@ -78,70 +129,74 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="fw-bold text-warning mb-0" id="reviewsCount">{{ total_reviews }}</h3>
+                    <h3 class="fw-bold text-warning mb-0">${adminData.total_reviews}</h3>
                     <p class="text-muted small mb-0">Total Reviews</p>
                 </div>
             </div>
         </div>
-    </div>
+    </div>`;
     
-    {% if pending %}
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0 fw-bold">⚠️ Pending Restaurant Submissions</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Restaurant Name</th>
-                            <th>Cuisine</th>
-                            <th>Submitted</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for restaurant in pending %}
-                        <tr>
-                            <td>
-                                <strong>{{ restaurant.name }}</strong>
-                                {% if restaurant.is_small_business %}
-                                <span class="badge bg-success ms-2">Small Business</span>
-                                {% endif %}
-                                <br>
-                                <small class="text-muted">{{ restaurant.description[:100] }}...</small>
-                            </td>
-                            <td>{{ restaurant.cuisine.name }}</td>
-                            <td>{{ restaurant.created_at.strftime('%b %d, %Y') }}</td>
-                            <td>
-                                <form method="POST" action="{{ url_for('approve_restaurant', id=restaurant.id) }}" style="display: inline;">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                </form>
-                                <form method="POST" action="{{ url_for('reject_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure?')">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    if (adminData.pending.length > 0) {
+        html += `
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0 fw-bold">⚠️ Pending Restaurant Submissions</h4>
             </div>
-        </div>
-    </div>
-    {% endif %}
-    {% endif %}
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Restaurant Name</th>
+                                <th>Cuisine</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${adminData.pending.map(r => `
+                            <tr>
+                                <td>
+                                    <strong>${r.name}</strong>
+                                    ${r.is_small_business ? '<span class="badge bg-success ms-2">Small Business</span>' : ''}
+                                    <br>
+                                    <small class="text-muted">${r.description}...</small>
+                                </td>
+                                <td>${r.cuisine}</td>
+                                <td>${r.created_at}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('approve_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success btn-sm approve-btn" data-id="${r.id}">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('reject_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger btn-sm reject-btn" data-id="${r.id}" onclick="return confirm('Are you sure?')">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>`;
+    }
+    
+    return html;
+}
 
-    <!-- RESTAURANTS TAB -->
-    {% if tab == 'restaurants' %}
+function renderRestaurantsTab() {
+    if (adminData.approved.length === 0) {
+        return '<p class="text-center text-muted py-4">No restaurants yet.</p>';
+    }
+    
+    return `
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0 fw-bold">🍽️ Manage Restaurants</h4>
         </div>
         <div class="card-body">
-            {% if approved %}
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -155,68 +210,57 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for restaurant in approved %}
+                        ${adminData.approved.map(r => `
                         <tr>
                             <td>
-                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" target="_blank" class="text-decoration-none">
-                                    <strong>{{ restaurant.name }}</strong>
+                                <a href="{{ url_for('restaurant_detail', id=0) }}" target="_blank" class="text-decoration-none" data-id="${r.id}">
+                                    <strong>${r.name}</strong>
                                 </a>
-                                {% if restaurant.is_small_business %}
-                                <span class="badge bg-success ms-2">Small Biz</span>
-                                {% endif %}
+                                ${r.is_small_business ? '<span class="badge bg-success ms-2">Small Biz</span>' : ''}
                             </td>
-                            <td>{{ restaurant.cuisine.name }}</td>
-                            <td>{{ restaurant.review_count() }}</td>
+                            <td>${r.cuisine}</td>
+                            <td>${r.review_count}</td>
                             <td>
-                                {% set rating = restaurant.avg_rating() %}
-                                {% for i in range(5) %}
-                                    {% if i < rating %}
-                                    <span class="star filled" style="color: gold;">★</span>
-                                    {% else %}
-                                    <span class="star">☆</span>
-                                    {% endif %}
-                                {% endfor %}
-                                <span class="text-muted small">({{ restaurant.avg_rating() }})</span>
+                                ${[...Array(5)].map((_, i) => `
+                                    <span ${i < Math.floor(r.avg_rating) ? 'style="color: gold;"' : ''}>★</span>
+                                `).join('')}
+                                <span class="text-muted small">(${r.avg_rating})</span>
                             </td>
                             <td>
-                                {% if restaurant.is_featured %}
-                                <span class="badge bg-warning">⭐ Featured</span>
-                                {% else %}
-                                <span class="badge bg-secondary">Regular</span>
-                                {% endif %}
+                                ${r.is_featured ? '<span class="badge bg-warning">⭐ Featured</span>' : '<span class="badge bg-secondary">Regular</span>'}
                             </td>
                             <td>
-                                <form method="POST" action="{{ url_for('toggle_featured', id=restaurant.id) }}" style="display: inline;">
+                                <form method="POST" action="{{ url_for('toggle_featured', id=0) }}" style="display: inline;" data-id="${r.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-warning">
-                                        {% if restaurant.is_featured %}Unfeature{% else %}Feature{% endif %}
+                                    <button type="submit" class="btn btn-sm btn-outline-warning feature-btn" data-id="${r.id}">
+                                        ${r.is_featured ? 'Unfeature' : 'Feature'}
                                     </button>
                                 </form>
-                                <form method="POST" action="{{ url_for('delete_restaurant', id=restaurant.id) }}" style="display: inline;" onsubmit="return confirm('Delete this restaurant?')">
+                                <form method="POST" action="{{ url_for('delete_restaurant', id=0) }}" style="display: inline;" data-id="${r.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-btn" data-id="${r.id}" onclick="return confirm('Delete this restaurant?')">Delete</button>
                                 </form>
                             </td>
                         </tr>
-                        {% endfor %}
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <p class="text-center text-muted py-4">No restaurants yet.</p>
-            {% endif %}
         </div>
-    </div>
-    {% endif %}
+    </div>`;
+}
 
-    <!-- USERS TAB -->
-    {% if tab == 'users' %}
+function renderUsersTab() {
+    if (adminData.all_users.length === 0) {
+        return '<p class="text-center text-muted py-4">No users yet.</p>';
+    }
+    
+    return `
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0 fw-bold">👥 Manage Users</h4>
         </div>
         <div class="card-body">
-            {% if all_users %}
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -231,60 +275,54 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in all_users %}
+                        ${adminData.all_users.map(u => `
                         <tr>
                             <td>
-                                <a href="{{ url_for('profile', username=user.username) }}" target="_blank" class="text-decoration-none">
-                                    <strong>{{ user.username }}</strong>
+                                <a href="{{ url_for('profile', username='') }}" target="_blank" class="text-decoration-none user-link" data-username="${u.username}">
+                                    <strong>${u.username}</strong>
                                 </a>
                             </td>
-                            <td>{{ user.email }}</td>
+                            <td>${u.email}</td>
                             <td>
-                                {% if user.is_admin %}
-                                <span class="badge bg-danger">Admin</span>
-                                {% else %}
-                                <span class="badge bg-secondary">User</span>
-                                {% endif %}
+                                ${u.is_admin ? '<span class="badge bg-danger">Admin</span>' : '<span class="badge bg-secondary">User</span>'}
                             </td>
-                            <td><span class="badge bg-info">{{ user.reputation_score }}</span></td>
-                            <td>{{ user.review_count() }}</td>
-                            <td><small>{{ user.created_at.strftime('%b %d, %Y') }}</small></td>
+                            <td><span class="badge bg-info">${u.reputation_score}</span></td>
+                            <td>${u.review_count}</td>
+                            <td><small>${u.created_at}</small></td>
                             <td>
-                                <form method="POST" action="{{ url_for('manage_user', id=user.id) }}" style="display: inline;">
+                                <form method="POST" action="{{ url_for('manage_user', id=0) }}" style="display: inline;" data-id="${u.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="action" value="toggle_admin">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        {% if user.is_admin %}Demote{% else %}Promote{% endif %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary toggle-admin-btn" data-id="${u.id}">
+                                        ${u.is_admin ? 'Demote' : 'Promote'}
                                     </button>
                                 </form>
-                                {% if user.id != current_user.id %}
-                                <form method="POST" action="{{ url_for('manage_user', id=user.id) }}" style="display: inline;" onsubmit="return confirm('Delete this user?')">
+                                <form method="POST" action="{{ url_for('manage_user', id=0) }}" style="display: inline;" data-id="${u.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="action" value="delete">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-user-btn" data-id="${u.id}" onclick="return confirm('Delete this user?')">Delete</button>
                                 </form>
-                                {% endif %}
                             </td>
                         </tr>
-                        {% endfor %}
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <p class="text-center text-muted py-4">No users yet.</p>
-            {% endif %}
         </div>
-    </div>
-    {% endif %}
+    </div>`;
+}
 
-    <!-- REVIEWS TAB -->
-    {% if tab == 'reviews' %}
+function renderReviewsTab() {
+    if (adminData.all_reviews.length === 0) {
+        return '<p class="text-center text-muted py-4">No reviews yet.</p>';
+    }
+    
+    return `
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0 fw-bold">⭐ Manage Reviews</h4>
         </div>
         <div class="card-body">
-            {% if all_reviews %}
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -298,58 +336,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for review in all_reviews %}
+                        ${adminData.all_reviews.map(r => `
                         <tr>
                             <td>
-                                {% if review.author %}
-                                <a href="{{ url_for('profile', username=review.author.username) }}" target="_blank" class="text-decoration-none">
-                                    {{ review.author.username }}
-                                </a>
-                                {% else %}
-                                <span class="text-muted">Deleted User</span>
-                                {% endif %}
+                                ${r.author_username === 'Deleted User' ? '<span class="text-muted">Deleted User</span>' : `
+                                <a href="{{ url_for('profile', username='') }}" target="_blank" class="text-decoration-none user-link" data-username="${r.author_username}">
+                                    ${r.author_username}
+                                </a>`}
                             </td>
                             <td>
-                                <a href="{{ url_for('restaurant_detail', id=review.restaurant.id) }}" target="_blank" class="text-decoration-none">
-                                    {{ review.restaurant.name }}
+                                <a href="{{ url_for('restaurant_detail', id=0) }}" target="_blank" class="text-decoration-none" data-id="${r.restaurant_id}">
+                                    ${r.restaurant_name}
                                 </a>
                             </td>
                             <td>
-                                {% for i in range(5) %}
-                                    {% if i < review.rating %}
-                                    <span style="color: gold;">★</span>
-                                    {% else %}
-                                    <span>☆</span>
-                                    {% endif %}
-                                {% endfor %}
+                                ${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color: gold;"' : ''}>★</span>`).join('')}
                             </td>
                             <td>
-                                {% if review.title %}
-                                <strong>{{ review.title }}</strong><br>
-                                {% endif %}
-                                <small>{{ review.content[:80] }}...</small>
+                                ${r.title ? `<strong>${r.title}</strong><br>` : ''}
+                                <small>${r.content}</small>
                             </td>
-                            <td><small>{{ review.created_at.strftime('%b %d, %Y') }}</small></td>
+                            <td><small>${r.created_at}</small></td>
                             <td>
-                                <form method="POST" action="{{ url_for('delete_review', id=review.id) }}" style="display: inline;" onsubmit="return confirm('Delete this review?')">
+                                <form method="POST" action="{{ url_for('delete_review', id=0) }}" style="display: inline;" data-id="${r.id}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger delete-review-btn" data-id="${r.id}" onclick="return confirm('Delete this review?')">Delete</button>
                                 </form>
                             </td>
                         </tr>
-                        {% endfor %}
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <p class="text-center text-muted py-4">No reviews yet.</p>
-            {% endif %}
         </div>
-    </div>
-    {% endif %}
+    </div>`;
+}
 
-    <!-- CUISINES TAB -->
-    {% if tab == 'cuisines' %}
+function renderCuisinesTab() {
+    return `
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm">
@@ -357,7 +381,7 @@
                     <h4 class="mb-0 fw-bold">➕ Add New Cuisine</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('add_cuisine') }}">
+                    <form method="POST" action="{{ url_for('add_cuisine') }}" id="addCuisineForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label for="cuisine_name" class="form-label">Cuisine Name</label>
@@ -371,69 +395,66 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
-                    <h4 class="mb-0 fw-bold">📋 All Cuisines ({{ all_cuisines|length }})</h4>
+                    <h4 class="mb-0 fw-bold">📋 All Cuisines (${adminData.all_cuisines.length})</h4>
                 </div>
                 <div class="card-body">
-                    {% if all_cuisines %}
+                    ${adminData.all_cuisines.length > 0 ? `
                     <div class="list-group">
-                        {% for cuisine in all_cuisines %}
+                        ${adminData.all_cuisines.map(c => `
                         <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>{{ cuisine.name }}</span>
-                            <form method="POST" action="{{ url_for('delete_cuisine', id=cuisine.id) }}" style="display: inline;" onsubmit="return confirm('Delete this cuisine?')">
+                            <span>${c.name}</span>
+                            <form method="POST" action="{{ url_for('delete_cuisine', id=0) }}" style="display: inline;" data-id="${c.id}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger delete-cuisine-btn" data-id="${c.id}" onclick="return confirm('Delete this cuisine?')">Delete</button>
                             </form>
                         </div>
-                        {% endfor %}
+                        `).join('')}
                     </div>
-                    {% else %}
-                    <p class="text-center text-muted py-4">No cuisines yet.</p>
-                    {% endif %}
+                    ` : '<p class="text-center text-muted py-4">No cuisines yet.</p>'}
                 </div>
             </div>
         </div>
-    </div>
-    {% endif %}
-</div>
+    </div>`;
+}
 
-<script>
-// Auto-refresh admin dashboard data
-let autoRefreshEnabled = true;
-let refreshInterval = null;
-
-function updateAdminData() {
-    if (!autoRefreshEnabled) return;
+function attachEventListeners() {
+    // Update form action attributes with proper IDs
+    document.querySelectorAll('form[data-id]').forEach(form => {
+        const id = form.dataset.id;
+        const currentAction = form.action;
+        form.action = currentAction.replace(/\/0(?=\?|$)/, `/${id}`);
+    });
     
-    fetch('{{ url_for("admin_api_data") }}')
-        .then(response => response.json())
-        .then(data => {
-            const statsContainer = document.getElementById('statsContainer');
-            if (statsContainer) {
-                document.getElementById('pendingCount').textContent = data.pending_count;
-                document.getElementById('approvedCount').textContent = data.approved_count;
-                document.getElementById('usersCount').textContent = data.total_users;
-                document.getElementById('reviewsCount').textContent = data.total_reviews;
-                
-                // Add a subtle visual feedback
-                statsContainer.style.opacity = '0.8';
-                setTimeout(() => {
-                    statsContainer.style.opacity = '1';
-                }, 200);
-            }
-        })
-        .catch(error => console.log('Auto-refresh error:', error));
+    // Update links with proper IDs
+    document.querySelectorAll('a[data-id]').forEach(link => {
+        const id = link.dataset.id;
+        link.href = `{{ url_for('restaurant_detail', id=0) }}`.replace('/0', `/${id}`);
+    });
+    
+    document.querySelectorAll('a[data-username]').forEach(link => {
+        const username = link.dataset.username;
+        link.href = `{{ url_for('profile', username='') }}${username}`;
+    });
 }
 
 // Set up auto-refresh
 document.addEventListener('DOMContentLoaded', function() {
     const autoRefreshToggle = document.getElementById('autoRefreshToggle');
     
+    // Tab switching
+    document.querySelectorAll('#adminTabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            renderTab(btn.dataset.tab);
+        });
+    });
+    
+    // Auto-refresh toggle
     if (autoRefreshToggle) {
         autoRefreshToggle.addEventListener('change', function() {
             autoRefreshEnabled = this.checked;
             if (autoRefreshEnabled && !refreshInterval) {
-                refreshInterval = setInterval(updateAdminData, 5000);
-                updateAdminData(); // Update immediately
+                refreshInterval = setInterval(loadAdminData, 5000);
+                loadAdminData();
             } else if (!autoRefreshEnabled && refreshInterval) {
                 clearInterval(refreshInterval);
                 refreshInterval = null;
@@ -441,16 +462,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Start auto-refresh on page load
+    // Initial load
+    loadAdminData();
     if (autoRefreshEnabled) {
-        refreshInterval = setInterval(updateAdminData, 5000);
+        refreshInterval = setInterval(loadAdminData, 5000);
     }
 });
 </script>
-
-<style>
-#statsContainer {
-    transition: opacity 0.3s ease;
-}
-</style>
 {% endblock %}

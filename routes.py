@@ -265,9 +265,57 @@ def admin_api_data():
     
     data = get_admin_data()
     
+    # Format data for JSON response
+    def format_restaurant(r):
+        return {
+            'id': r.id,
+            'name': r.name,
+            'cuisine': r.cuisine.name,
+            'description': r.description[:100],
+            'is_small_business': r.is_small_business,
+            'is_featured': r.is_featured,
+            'is_approved': r.is_approved,
+            'review_count': r.review_count(),
+            'avg_rating': r.avg_rating(),
+            'created_at': r.created_at.strftime('%b %d, %Y')
+        }
+    
+    def format_user(u):
+        return {
+            'id': u.id,
+            'username': u.username,
+            'email': u.email,
+            'is_admin': u.is_admin,
+            'reputation_score': u.reputation_score or u.calculate_reputation(),
+            'review_count': u.review_count(),
+            'created_at': u.created_at.strftime('%b %d, %Y')
+        }
+    
+    def format_review(r):
+        return {
+            'id': r.id,
+            'author_id': r.user_id,
+            'author_username': r.author.username if r.author else 'Deleted User',
+            'restaurant_name': r.restaurant.name,
+            'restaurant_id': r.restaurant.id,
+            'rating': r.rating,
+            'title': r.title,
+            'content': r.content[:80] + '...' if len(r.content) > 80 else r.content,
+            'created_at': r.created_at.strftime('%b %d, %Y')
+        }
+    
+    def format_cuisine(c):
+        return {
+            'id': c.id,
+            'name': c.name
+        }
+    
     return jsonify({
-        'pending_count': len(data['pending']),
-        'approved_count': len(data['approved']),
+        'pending': [format_restaurant(r) for r in data['pending']],
+        'approved': [format_restaurant(r) for r in data['approved']],
+        'all_users': [format_user(u) for u in data['all_users']],
+        'all_reviews': [format_review(r) for r in data['all_reviews']],
+        'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
         'total_users': data['total_users'],
         'total_reviews': data['total_reviews']
     })

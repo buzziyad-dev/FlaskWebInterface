@@ -1,58 +1,167 @@
 {% extends "base.html" %}
 
-{% block title %}Write Review - {{ restaurant.name }}{% endblock %}
+{% block title %}Review {{ restaurant.name }} - Yalla{% endblock %}
 
 {% block content %}
+
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h2 class="fw-bold mb-3">Write a Review for {{ restaurant.name }}</h2>
-                    <p class="text-muted mb-4">Share your experience with the community</p>
-                    
-                    <form method="POST" action="">
+        <div class="col-lg-8 animate-slide-up">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white fw-bold py-4">
+                    <h4 class="mb-0">⭐ Write a Review for {{ restaurant.name }}</h4>
+                </div>
+                <div class="card-body p-5">
+                    <form method="POST" class="needs-validation">
                         {{ form.hidden_tag() }}
-                        
+
+                        <!-- Rating Stars -->
                         <div class="mb-4">
-                            {{ form.rating.label(class="form-label fw-bold") }}
-                            {{ form.rating(class="form-select") }}
-                        </div>
-                        
-                        <div class="mb-4">
-                            {{ form.title.label(class="form-label fw-bold") }}
-                            {{ form.title(class="form-control", placeholder="e.g., Amazing food and service!") }}
-                        </div>
-                        
-                        <div class="mb-4">
-                            {{ form.food_category.label(class="form-label fw-bold") }}
-                            <small class="text-muted d-block mb-2">(Optional)</small>
-                            {{ form.food_category(class="form-select") }}
-                            {% if form.food_category.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.food_category.errors %}{{ error }}{% endfor %}
-                                </div>
+                            <label class="form-label fw-bold">Your Rating</label>
+                            <div class="star-rating-interactive" id="starRating" data-rating="0">
+                                {% for i in range(1, 6) %}
+                                <span class="star-interactive" data-value="{{ i }}" style="cursor: pointer; font-size: 3rem; margin-right: 0.5rem; transition: all 0.2s ease;">
+                                    ☆
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <!-- Hidden input to store selected rating -->
+                            <input type="hidden" id="ratingInput" name="rating" value="0" required>
+                            <small class="text-muted d-block mt-2">
+                                Selected: <span id="ratingText">0</span> stars
+                            </small>
+                            {% if form.rating.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.rating.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
-                        
+
+                        <!-- Title -->
                         <div class="mb-4">
-                            {{ form.content.label(class="form-label fw-bold") }}
-                            {{ form.content(class="form-control", rows="6", placeholder="Tell us about your experience...") }}
+                            <label for="title" class="form-label fw-bold">Review Title</label>
+                            {{ form.title(class="form-control form-control-lg", placeholder="e.g., Amazing food and great service!") }}
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.title.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-4">
+                            <label for="content" class="form-label fw-bold">Your Review</label>
+                            {{ form.content(class="form-control form-control-lg", rows="6", placeholder="Share your dining experience...") }}
+                            <small class="text-muted">Minimum 10 characters</small>
                             {% if form.content.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.content.errors %}{{ error }}{% endfor %}
-                                </div>
+                            <div class="text-danger small mt-2">
+                                {% for error in form.content.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
-                        
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary px-4">Submit Review</button>
-                            <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-secondary">Cancel</a>
+
+                        <!-- Food Category -->
+                        {% if form.food_category.choices %}
+                        <div class="mb-4">
+                            <label for="food_category" class="form-label fw-bold">Food Category (Optional)</label>
+                            {{ form.food_category(class="form-select form-select-lg") }}
+                            {% if form.food_category.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.food_category.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-3 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                                ✓ Submit Review
+                            </button>
+                            <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Restaurant Info Card -->
+            <div class="card shadow-sm mt-4 animate-slide-up">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-4">
+                        {% if restaurant.image_url %}
+                        <img src="{{ restaurant.image_url }}" alt="{{ restaurant.name }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 0.5rem;">
+                        {% else %}
+                        <div style="width: 120px; height: 120px; background: #e9ecef; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #999;">
+                            No Image
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="fw-bold text-muted small">REVIEWING</h6>
+                            <h5 class="fw-bold mb-1">{{ restaurant.name }}</h5>
+                            <p class="text-muted small mb-0">{{ restaurant.cuisine.name }} • {{ '$' * restaurant.price_range }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-interactive');
+    const ratingInput = document.getElementById('ratingInput');
+    const ratingText = document.getElementById('ratingText');
+    const starRating = document.getElementById('starRating');
+    
+    stars.forEach(star => {
+        // Hover effect
+        star.addEventListener('mouseenter', function() {
+            const value = this.dataset.value;
+            updateStarDisplay(stars, value);
+        });
+
+        // Click to set rating
+        star.addEventListener('click', function() {
+            const value = this.dataset.value;
+            ratingInput.value = value;
+            ratingText.textContent = value;
+            updateStarDisplay(stars, value);
+            starRating.dataset.rating = value;
+        });
+    });
+
+    // Reset hover effect
+    starRating.addEventListener('mouseleave', function() {
+        const currentRating = ratingInput.value;
+        updateStarDisplay(stars, currentRating);
+    });
+
+    function updateStarDisplay(stars, rating) {
+        stars.forEach(star => {
+            const value = star.dataset.value;
+            if (value <= rating) {
+                star.textContent = '★';
+                star.style.color = 'var(--warning)';
+                star.style.textShadow = '0 0 10px rgba(255, 217, 61, 0.5)';
+            } else {
+                star.textContent = '☆';
+                star.style.color = '#ddd';
+                star.style.textShadow = 'none';
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}

@@ -58,6 +58,38 @@ class User(UserMixin, db.Model):
     def update_reputation(self):
         self.reputation_score = self.calculate_reputation()
         self.badge = self.get_badge()
+        self.assign_auto_badges()
+    
+    def assign_auto_badges(self):
+        """Automatically assign badges based on reputation"""
+        from models import Badge, UserBadge
+        
+        # Badge thresholds (reputation -> badge_name)
+        badge_mappings = [
+            (100, 'Elite Foodie'),
+            (75, 'Expert Reviewer'),
+            (50, 'Experienced Diner'),
+            (25, 'Rising Critic'),
+            (10, 'Food Explorer'),
+            (0, 'Newcomer'),
+        ]
+        
+        reputation = self.reputation_score or self.calculate_reputation()
+        
+        for threshold, badge_name in badge_mappings:
+            if reputation >= threshold:
+                # Find badge by name
+                badge = Badge.query.filter_by(name=badge_name).first()
+                if badge:
+                    # Check if user already has this badge
+                    existing = UserBadge.query.filter_by(user_id=self.id, badge_id=badge.id).first()
+                    if not existing:
+                        # Remove previous tier badges (only keep highest tier)
+                        UserBadge.query.filter_by(user_id=self.id).delete()
+                        # Assign new badge
+                        user_badge = UserBadge(user_id=self.id, badge_id=badge.id)
+                        db.session.add(user_badge)
+                break
 
 class Cuisine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -145,7 +177,7 @@ class News(db.Model):
 class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False, index=True)
-    color = db.Column(db.String(7), default='#007bff')  # Hex color
+    color = db.Column(db.String(7), default='#007bff')
     description = db.Column(db.String(255), default='')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     

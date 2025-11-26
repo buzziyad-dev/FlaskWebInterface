@@ -18,7 +18,8 @@
 
         <!-- Badges -->
         {% if user.custom_badges.all() %}
-        <div class="mb-3 animate-slide-up">
+        <div class="mb-4 animate-slide-up">
+            <h6 class="text-white-50 small mb-2">BADGES</h6>
             {% for user_badge in user.custom_badges.all() %}
             <span class="badge me-2 mb-2" style="background-color: {{ user_badge.badge.color }}; color: white; font-size: 0.9rem; padding: 0.5rem 1rem;">
                 {{ user_badge.badge.name }}
@@ -36,10 +37,6 @@
             <div class="stat-card animate-slide-up">
                 <div class="h3 fw-bold mb-1">{{ user.reputation_score or user.calculate_reputation() }}</div>
                 <div class="text-white-50">Reputation</div>
-            </div>
-            <div class="stat-card animate-slide-up">
-                <div class="h6 fw-bold mb-1">{{ user.get_badge() }}</div>
-                <div class="text-white-50">Badge</div>
             </div>
         </div>
 

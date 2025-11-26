@@ -16,13 +16,125 @@
     </div>
 </div>
 
-<!-- Promoted Restaurants -->
+<!-- Featured Restaurants Carousel -->
 {% if promoted %}
 <section class="py-5 bg-white">
     <div class="container">
-        <h2 class="animate-slide-up">⭐ Promoted Restaurants</h2>
+        <h2 class="animate-slide-up mb-4">⭐ Featured Restaurants</h2>
+        
+        <div class="carousel-container position-relative">
+            <!-- Carousel Wrapper -->
+            <div class="carousel-wrapper overflow-hidden">
+                <div class="carousel-track" id="carouselTrack">
+                    {% for restaurant in promoted %}
+                    <div class="carousel-slide">
+                        <div class="card restaurant-card h-100 shadow-sm">
+                            <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');"></div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">{{ restaurant.name }}</h5>
+                                <p class="text-muted small mb-2">
+                                    <span class="badge bg-primary">{{ restaurant.cuisine.name }}</span>
+                                    <span class="ms-2">{{ '$' * restaurant.price_range }}</span>
+                                </p>
+                                <div class="rating mb-3">
+                                    {% set rating = restaurant.avg_rating() %}
+                                    {% for i in range(5) %}
+                                        {% if i < rating %}<span class="star filled">★</span>{% else %}<span class="star">☆</span>{% endif %}
+                                    {% endfor %}
+                                    <span class="text-muted small ms-2">({{ restaurant.review_count() }})</span>
+                                </div>
+                                <p class="card-text text-muted small flex-grow-1">{{ restaurant.description[:100] }}...</p>
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm mt-auto">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <button class="carousel-btn carousel-btn-prev" id="prevBtn" aria-label="Previous slide">
+                <span class="carousel-icon">‹</span>
+            </button>
+            <button class="carousel-btn carousel-btn-next" id="nextBtn" aria-label="Next slide">
+                <span class="carousel-icon">›</span>
+            </button>
+
+            <!-- Dots Navigation -->
+            <div class="carousel-dots mt-4" id="carouselDots"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Carousel Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const track = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('carouselDots');
+    
+    if (!track) return;
+    
+    const slides = track.querySelectorAll('.carousel-slide');
+    const slideCount = slides.length;
+    let currentIndex = 0;
+    
+    // Create dots
+    for (let i = 0; i < slideCount; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('carousel-dot');
+        if (i === 0) dot.classList.add('active');
+        dot.dataset.index = i;
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+    
+    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+    
+    function updateCarousel() {
+        const slideWidth = slides[0].offsetWidth + 24; // 24px gap
+        track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        
+        // Update dots
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex);
+        });
+    }
+    
+    function goToSlide(index) {
+        currentIndex = index % slideCount;
+        updateCarousel();
+    }
+    
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % slideCount;
+        updateCarousel();
+    }
+    
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+        updateCarousel();
+    }
+    
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+    
+    // Auto-advance carousel every 6 seconds
+    setInterval(nextSlide, 6000);
+    
+    // Update on window resize
+    window.addEventListener('resize', updateCarousel);
+});
+</script>
+{% endif %}
+
+<!-- Promoted Restaurants (Non-Carousel Alternative) -->
+{% if promoted and promoted|length <= 3 %}
+<section class="py-5 bg-white">
+    <div class="container">
         <div class="row g-4">
-            {% for restaurant in promoted[:3] %}
+            {% for restaurant in promoted %}
             <div class="col-lg-4 col-md-6 animate-slide-up">
                 <div class="card restaurant-card h-100">
                     <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');"></div>

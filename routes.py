@@ -432,6 +432,9 @@ def admin_api_data():
     # Ensure default badges exist
     seed_default_badges()
     
+    # Get admin data first
+    data = get_admin_data()
+    
     def format_restaurant(r):
         return {
             'id': r.id,
@@ -450,8 +453,10 @@ def admin_api_data():
             'avg_rating': r.avg_rating(),
             'created_at': r.created_at.strftime('%b %d, %Y'),
             'submitter_username': r.submitter.username if r.submitter else 'Unknown',
-            'submitter_email': r.submitter.email if r.submitter else 'Unknown'
+            'submitter_email': r.submitter.email if r.submitter else 'Unknown',
+            'cuisine_id': r.cuisine_id
         }
+    
     def format_user(u, include_badges=False):
         user_data = {
             'id': u.id,
@@ -468,6 +473,7 @@ def admin_api_data():
             user_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in u.custom_badges.all()]
             user_data['custom_badges'] = user_badges
         return user_data
+    
     def format_review(r):
         return {
             'id': r.id,
@@ -480,11 +486,13 @@ def admin_api_data():
             'content': r.content[:80] + '...' if len(r.content) > 80 else r.content,
             'created_at': r.created_at.strftime('%b %d, %Y')
         }
+    
     def format_cuisine(c):
         return {
             'id': c.id,
             'name': c.name
         }
+    
     def format_badge(b):
         return {
             'id': b.id,
@@ -493,6 +501,7 @@ def admin_api_data():
             'description': b.description,
             'created_at': b.created_at.strftime('%b %d, %Y')
         }
+    
     all_badges = Badge.query.all()
     
     return jsonify({

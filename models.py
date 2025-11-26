@@ -92,6 +92,16 @@ class Restaurant(db.Model):
     submitter = db.relationship('User', backref='submitted_restaurants', foreign_keys=[user_id])
     reviews = db.relationship('Review', backref='restaurant', lazy='dynamic', cascade='all, delete-orphan')
     
+    def get_formatted_hours(self):
+        """Parse JSON working_hours and return formatted dict, or fallback"""
+        if not self.working_hours:
+            return {}
+        try:
+            import json
+            return json.loads(self.working_hours)
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    
     def avg_rating(self):
         reviews = self.reviews.all()
         if not reviews:

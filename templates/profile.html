@@ -1,134 +1,93 @@
 {% extends "base.html" %}
-
-{% block title %}{{ user.username }}'s Profile - Yalla{% endblock %}
+{% block title %}{{ user.username }} - Yalla{% endblock %}
 
 {% block content %}
-<!-- Profile Header -->
-<div class="profile-header text-white py-5">
-    <div class="container profile-header-content animate-fade-in">
-        <div class="row align-items-center">
-            <div class="col-md-3 text-center">
-                <!-- Profile Picture -->
-                <div class="profile-picture-container">
-                    <div class="profile-picture-display {% if not user.profile_picture %}no-picture{% endif %}">
-                        {% if user.profile_picture %}
-                            <img src="data:image/png;base64,{{ user.profile_picture|b64encode }}" alt="{{ user.username }}">
-                        {% else %}
-                            {{ user.username[0].upper() }}
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Edit Button (only for own profile) -->
-                {% if is_own_profile %}
-                <a href="{{ url_for('edit_profile', username=user.username) }}" class="btn btn-light btn-sm w-100">
-                    ✏️ Edit Profile
-                </a>
-                {% endif %}
-            </div>
-            
-            <div class="col-md-9">
-                <!-- Username & Badge -->
-                <h1 class="display-5 fw-bold mb-2">
-                    {{ user.username }}
-                    {% if user.is_admin %}
-                    <span class="badge bg-danger badge-with-tooltip admin-badge">
-                        Admin
-                        <span class="badge-tooltip">This user is an Admin</span>
-                    </span>
-                    {% else %}
-                    <span class="badge badge-with-tooltip user-badge" style="background: rgba(255, 255, 255, 0.3); color: white;">
-                        {{ user.get_badge() }}
-                        <span class="badge-tooltip">This user is a {{ user.get_badge() }}</span>
-                    </span>
-                    {% endif %}
-                </h1>
-                
-                <!-- Member Info -->
-                <p class="lead opacity-90 mb-3">Member since <strong>{{ user.created_at.strftime('%B %Y') }}</strong></p>
-                
-                <!-- Bio -->
-                {% if user.bio %}
-                <p class="opacity-85">{{ user.bio }}</p>
-                {% else %}
-                <p class="opacity-75 fst-italic">No bio yet</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="container py-5 animate-slide-up">
-    <!-- Stats Section -->
-    <div class="profile-stats mb-5">
-        <div class="stat-card">
-            <div class="stat-card-value">{{ user.review_count() }}</div>
-            <div class="stat-card-label">Reviews Written</div>
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="profile-header-content container py-5 text-center text-white">
+        <div class="profile-picture-display mb-3 animate-slide-up">
+            {% if user.profile_picture %}
+            <img src="data:image/png;base64,{{ user.profile_picture | b64encode }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+            <span>{{ user.username[0].upper() }}</span>
+            {% endif %}
         </div>
-        <div class="stat-card">
-            <div class="stat-card-value">{{ '%.1f'|format(user.avg_rating_given()) }}</div>
-            <div class="stat-card-label">Avg Rating Given</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-value">{{ user.reputation_score or user.calculate_reputation() }}</div>
-            <div class="stat-card-label">Reputation Score</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-value">{{ reviews|length }}</div>
-            <div class="stat-card-label">Unique Restaurants</div>
-        </div>
-    </div>
-    
-    <!-- Reviews Tab -->
-    <div>
-        <h3 class="fw-bold mb-4">📝 Recent Reviews</h3>
-        
-        {% if reviews %}
-            {% for review in reviews %}
-            <div class="review-card animate-scale-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
-                <!-- Restaurant Link -->
-                <a href="{{ url_for('restaurant_detail', id=review.restaurant.id) }}" class="review-card-restaurant">
-                    🍽️ {{ review.restaurant.name }}
-                </a>
-                
-                <!-- Review Title -->
-                {% if review.title %}
-                <h4 class="review-card-title">{{ review.title }}</h4>
-                {% endif %}
-                
-                <!-- Rating & Date Row -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="review-card-rating">
-                        {% for i in range(5) %}
-                            {% if i < review.rating %}
-                            <span class="star filled">★</span>
-                            {% else %}
-                            <span class="star">☆</span>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    <small class="review-card-date">{{ review.formatted_datetime_ksa() }}</small>
-                </div>
-                
-                <!-- Food Category -->
-                {% if review.food_category %}
-                <div class="mt-2 mb-2">
-                    <span class="badge bg-light text-dark">{{ review.food_category }}</span>
-                </div>
-                {% endif %}
-                
-                <!-- Review Content -->
-                <p class="review-card-content">{{ review.content }}</p>
-            </div>
+        <h2 class="fw-bold mb-2 animate-slide-up">{{ user.username }}</h2>
+        <p class="text-white-50 mb-3 animate-slide-up">Joined {{ user.created_at.strftime('%B %Y') }}</p>
+
+        <!-- Badges -->
+        {% if user.custom_badges.all() %}
+        <div class="mb-3 animate-slide-up">
+            {% for user_badge in user.custom_badges.all() %}
+            <span class="badge me-2 mb-2" style="background-color: {{ user_badge.badge.color }}; color: white; font-size: 0.9rem; padding: 0.5rem 1rem;">
+                {{ user_badge.badge.name }}
+            </span>
             {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <div class="empty-state-icon">📋</div>
-                <p class="text-muted">No reviews yet</p>
-                <p class="text-muted small">Be the first to share your dining experience!</p>
-                <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-sm mt-2">Start Reviewing →</a>
+        </div>
+        {% endif %}
+
+        <!-- Stats -->
+        <div class="profile-stats">
+            <div class="stat-card animate-slide-up">
+                <div class="h3 fw-bold mb-1">{{ user.review_count() }}</div>
+                <div class="text-white-50">Reviews</div>
             </div>
+            <div class="stat-card animate-slide-up">
+                <div class="h3 fw-bold mb-1">{{ user.reputation_score or user.calculate_reputation() }}</div>
+                <div class="text-white-50">Reputation</div>
+            </div>
+            <div class="stat-card animate-slide-up">
+                <div class="h6 fw-bold mb-1">{{ user.get_badge() }}</div>
+                <div class="text-white-50">Badge</div>
+            </div>
+        </div>
+
+        {% if is_own_profile %}
+        <a href="{{ url_for('edit_profile', username=user.username) }}" class="btn btn-light mt-3 animate-slide-up">Edit Profile</a>
         {% endif %}
     </div>
 </div>
+
+<!-- Content -->
+<div class="container py-5">
+    <!-- Bio -->
+    {% if user.bio %}
+    <div class="card shadow-sm mb-4 animate-slide-up">
+        <div class="card-header bg-primary text-white fw-bold">About</div>
+        <div class="card-body">
+            <p class="mb-0">{{ user.bio }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Reviews -->
+    <h3 class="fw-bold mb-4 animate-slide-up">⭐ Reviews ({{ reviews|length }})</h3>
+    {% if reviews %}
+    <div class="row">
+        {% for review in reviews %}
+        <div class="col-md-6 mb-4 animate-slide-up">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">{{ review.title or 'Untitled Review' }}</h6>
+                    <a href="{{ url_for('restaurant_detail', id=review.restaurant.id) }}" class="text-decoration-none text-primary mb-2 d-block">{{ review.restaurant.name }}</a>
+                    <div class="rating mb-2">
+                        {% for i in range(5) %}
+                            {% if i < review.rating %}<span class="star filled">★</span>{% else %}<span class="star">☆</span>{% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted small mb-2">{{ review.formatted_date() }}</p>
+                    <p class="card-text">{{ review.content }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h5 class="text-muted">No reviews yet</h5>
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}

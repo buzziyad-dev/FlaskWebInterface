@@ -379,6 +379,31 @@ def get_admin_data():
         'feature_toggles': toggle_dict
     }
 
+def seed_default_badges():
+    """Seed default badges into the database if they don't exist"""
+    from models import Badge
+    
+    default_badges = [
+        {'name': 'Newcomer', 'color': '#6c757d', 'description': 'Just started exploring restaurants'},
+        {'name': 'Food Explorer', 'color': '#17a2b8', 'description': 'Visited and reviewed multiple restaurants'},
+        {'name': 'Rising Critic', 'color': '#ffc107', 'description': 'Active community member with helpful reviews'},
+        {'name': 'Experienced Diner', 'color': '#28a745', 'description': 'Trusted reviewer with extensive experience'},
+        {'name': 'Expert Reviewer', 'color': '#007bff', 'description': 'Highly influential food critic'},
+        {'name': 'Elite Foodie', 'color': '#e83e8c', 'description': 'Community leader and food connoisseur'},
+    ]
+    
+    for badge_data in default_badges:
+        existing = Badge.query.filter_by(name=badge_data['name']).first()
+        if not existing:
+            new_badge = Badge(
+                name=badge_data['name'],
+                color=badge_data['color'],
+                description=badge_data['description']
+            )
+            db.session.add(new_badge)
+    
+    db.session.commit()
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
@@ -403,7 +428,10 @@ def admin_api_data():
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
     from models import Badge, UserBadge
-    data = get_admin_data()
+    
+    # Ensure default badges exist
+    seed_default_badges()
+    
     def format_restaurant(r):
         return {
             'id': r.id,
@@ -466,6 +494,7 @@ def admin_api_data():
             'created_at': b.created_at.strftime('%b %d, %Y')
         }
     all_badges = Badge.query.all()
+    
     return jsonify({
         'pending': [format_restaurant(r) for r in data['pending']],
         'approved': [format_restaurant(r) for r in data['approved']],

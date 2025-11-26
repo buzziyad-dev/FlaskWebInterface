@@ -143,7 +143,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Assign Badges to User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <h6 id="assignBadgesUsername" class="fw-bold mb-3"></h6>
@@ -563,24 +563,83 @@ function attachEventListeners() {
         });
     }
 
-    // delegate assign badges button clicks
+    // Delegate assign badges button clicks and properly handle modal
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('assign-badges-btn')) {
             const userId = e.target.dataset.id;
             const username = e.target.dataset.username;
-            document.getElementById('assignBadgesUsername').textContent = `Assign badges to: ${username}`;
-            fetch(`/admin/api/user-badges/${userId}`).then(r => r.json()).then(userData => {
-                const badgesContainer = document.getElementById('badgesList');
-                const allBadges = adminData?.all_badges || [];
-                const userBadgeIds = (userData.custom_badges || []).map(b => b.id);
-                badgesContainer.innerHTML = allBadges.map(b => {
-                    const assigned = userBadgeIds.includes(b.id);
-                    return `<button type="button" class="btn btn-sm" style="background:${b.color};color:#fff;opacity:${assigned?1:0.5}" onclick="toggleUserBadge(${userId},${b.id},${!assigned})">${b.name}${assigned?' ✓':''}</button>`;
-                }).join('');
-            });
+            const usernameDisplay = document.getElementById('assignBadgesUsername');
+            if (usernameDisplay) usernameDisplay.textContent = `Assign badges to: ${username}`;
+            
+            fetch(`/admin/api/user-badges/${userId}`, { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(userData => {
+                    const badgesContainer = document.getElementById('badgesList');
+                    const allBadges = adminData?.all_badges || [];
+                    const userBadgeIds = (userData.custom_badges || []).map(b => b.id);
+                    
+                    badgesContainer.innerHTML = allBadges.map(b => {
+                        const assigned = userBadgeIds.includes(b.id);
+                        return `
+                            <button type="button" class="btn btn-sm badge-toggle-btn" 
+                                    data-user-id="${userId}"
+                                    data-badge-id="${b.id}"
+                                    data-assigned="${assigned}"
+                                    style="background:${b.color};color:#fff;opacity:${assigned?1:0.5};border:none;cursor:pointer;"
+                                    title="${b.description || b.name}">
+                                ${b.name}${assigned?' ✓':''}
+                            </button>
+                        `;
+                    }).join('');
+                    
+                    // Wire badge toggle buttons
+                    document.querySelectorAll('.badge-toggle-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const uid = this.dataset.userId;
+                            const bid = this.dataset.badgeId;
+                            const assigned = this.dataset.assigned === 'true';
+                            toggleUserBadge(Number(uid), Number(bid), !assigned, this);
+                        });
+                    });
+                })
+                .catch(err => console.error('Error fetching badges:', err));
         }
     });
-} // end attachEventListeners
+
+    async function toggleUserBadge(userId, badgeId, assign, btnElement) {
+        try {
+            const route = assign ? 'assign_badge' : 'remove_badge';
+            const url = `{{ url_for('assign_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`);
+            if (route === 'remove_badge') {
+                const url2 = `{{ url_for('remove_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`);
+            }
+            
+            const endpoint = assign ? 
+                `{{ url_for('assign_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`) :
+                `{{ url_for('remove_badge', user_id=0, badge_id=0) }}`.replace('/0/0', `/${userId}/${badgeId}`);
+            
+            const res = await fetch(endpoint, { 
+                method: 'POST',
+                headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
+                credentials: 'same-origin'
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.success) {
+                if (btnElement) {
+                    btnElement.dataset.assigned = assign;
+                    btnElement.style.opacity = assign ? '1' : '0.5';
+                    btnElement.textContent = btnElement.textContent.replace(' ✓', '') + (assign ? ' ✓' : '');
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to toggle badge'));
+            }
+        } catch (err) {
+            console.error('Error toggling badge:', err);
+            alert('Error: ' + err.message);
+        }
+    }
+}
 
 // Tab renderers return HTML strings; keep them simple and consistent
 function renderTab(tab) {
@@ -674,7 +733,7 @@ function renderRestaurantsTab() {
                         <td>${r.cuisine}</td>
                         <td>${r.review_count}</td>
                         <td>${[...Array(5)].map((_,i)=>`<span ${i<Math.floor(r.avg_rating)?'style="color:gold"':''}>★</span>`).join('')} <span class="text-muted small">(${r.avg_rating})</span></td>
-                        <td>${r.is_featured?'<span class="badge bg-warning">⭐ Featured</span>':'<span class="badge bg-secondary">Regular</span>'}</td>
+                        <td>${r.is_featured?'<span class="badge bg-warning">⭐ Featured</span>' : '<span class="badge bg-secondary">Regular</span>'}</td>
                         <td>
                             <button class="btn btn-sm btn-info edit-restaurant-btn" data-id="${r.id}" data-bs-toggle="modal" data-bs-target="#editRestaurantModal">Edit</button>
                             <form method="POST" action="{{ url_for('toggle_featured', id=0) }}" data-id="${r.id}" style="display:inline;">

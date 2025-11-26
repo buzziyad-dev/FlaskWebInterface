@@ -794,19 +794,43 @@ function renderReviewsTab() {
     <div class="card shadow-sm">
         <div class="card-header bg-white"><h4 class="mb-0 fw-bold">⭐ Manage Reviews</h4></div>
         <div class="card-body">
-            <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Date</th><th>Actions</th></tr></thead><tbody>
-            ${adminData.all_reviews.map(r=>`
-                <tr>
-                    <td>${r.author_username}</td>
-                    <td><a href="#" data-restaurant-id="${r.restaurant_id}">${r.restaurant_name}</a></td>
-                    <td>${[...Array(5)].map((_,i)=>`<span ${i<r.rating?'style="color:gold"':''}>★</span>`).join('')}</td>
-                    <td>${r.title?`<strong>${r.title}</strong><br>`:''}<small>${r.content}</small></td>
-                    <td><small>${r.created_at}</small></td>
-                    <td>
-                        <form method="POST" action="{{ url_for('delete_review', id=0) }}" data-id="${r.id}" style="display:inline;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>
-                    </td>
-                </tr>`).join('')}
-            </tbody></table></div>
+            <div class="mb-3">
+                <label class="form-check"><input type="checkbox" class="form-check-input" id="reviewSelectAll"> Select All</label>
+                <button class="btn btn-sm btn-danger ms-2" id="reviewBulkDelete" style="display:none;">Delete Selected</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Author</th>
+                            <th>Restaurant</th>
+                            <th>Rating</th>
+                            <th>Content</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${adminData.all_reviews.map(r => `
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input review-checkbox" value="${r.id}"></td>
+                            <td>${r.author_username}</td>
+                            <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
+                            <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
+                            <td><small>${r.content}</small></td>
+                            <td><small>${r.created_at}</small></td>
+                            <td>
+                                <form method="POST" action="{{ url_for('delete_review', id=0) }}" data-id="${r.id}" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>`;
 }
@@ -886,7 +910,7 @@ function renderSettingsTab() {
     if (!keys.length) return '<p class="text-center text-muted py-4">No settings available.</p>';
     return `<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h4 class="mb-0 fw-bold">⚙️ Website Settings</h4></div><div class="card-body"><div class="list-group">${keys.map(fn=>{
         const f = toggles[fn];
-        return `<div class="d-flex justify-content-between align-items-center p-3 border-bottom"><div><h6 class="mb-1 fw-bold">${featureDisplayNames[fn]||fn}</h6><p class="text-muted small mb-0">${f.description||''}</p></div><div class="d-flex align-items-center gap-3">${f.is_enabled?'<span class="badge bg-success">Enabled</span>':'<span class="badge bg-danger">Disabled</span>'}<button class="btn btn-sm ${f.is_enabled?'btn-danger':'btn-success'} feature-toggle-btn" data-feature="${fn}">${f.is_enabled?'Disable':'Enable'}</button></div></div>`;
+        return `<div class="d-flex justify-content-between align-items-center p-3 border-bottom"><div><h6 class="mb-1 fw-bold">${featureDisplayNames[fn]||fn}</h6><p class="text-muted small mb-0">${f.description||''}</p></div><div class="d-flex align-items-center gap-3">${f.is_enabled?'<span class="badge bg-success">Enabled</span>' : '<span class="badge bg-danger">Disabled</span>'}<button class="btn btn-sm ${f.is_enabled?'btn-danger':'btn-success'} feature-toggle-btn" data-feature="${fn}">${f.is_enabled?'Disable':'Enable'}</button></div></div>`;
     }).join('')}</div></div></div>`;
 }
 

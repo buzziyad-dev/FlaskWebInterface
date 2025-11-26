@@ -17,14 +17,14 @@
 </div>
 
 <!-- Featured Restaurants Carousel -->
-{% if promoted %}
+{% if promoted and promoted|length > 0 %}
 <section class="py-5 bg-white">
     <div class="container">
         <h2 class="animate-slide-up mb-4">⭐ Featured Restaurants</h2>
         
         <div class="carousel-container position-relative">
             <!-- Carousel Wrapper -->
-            <div class="carousel-wrapper overflow-hidden">
+            <div class="carousel-wrapper">
                 <div class="carousel-track" id="carouselTrack">
                     {% for restaurant in promoted %}
                     <div class="carousel-slide">
@@ -53,20 +53,24 @@
             </div>
 
             <!-- Navigation Buttons -->
+            {% if promoted|length > 1 %}
             <button class="carousel-btn carousel-btn-prev" id="prevBtn" aria-label="Previous slide">
                 <span class="carousel-icon">‹</span>
             </button>
             <button class="carousel-btn carousel-btn-next" id="nextBtn" aria-label="Next slide">
                 <span class="carousel-icon">›</span>
             </button>
+            {% endif %}
 
             <!-- Dots Navigation -->
+            {% if promoted|length > 1 %}
             <div class="carousel-dots mt-4" id="carouselDots"></div>
+            {% endif %}
         </div>
     </div>
 </section>
 
-<!-- Carousel Script -->
+<!-- Carousel JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const track = document.getElementById('carouselTrack');
@@ -78,19 +82,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const slides = track.querySelectorAll('.carousel-slide');
     const slideCount = slides.length;
-    let currentIndex = 0;
     
-    // Create dots
-    for (let i = 0; i < slideCount; i++) {
-        const dot = document.createElement('button');
-        dot.classList.add('carousel-dot');
-        if (i === 0) dot.classList.add('active');
-        dot.dataset.index = i;
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
+    if (slideCount === 0) return;
+    
+    let currentIndex = 0;
+    let autoPlayInterval = null;
+    
+    // Create dots if container exists
+    if (dotsContainer) {
+        for (let i = 0; i < slideCount; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('carousel-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.dataset.index = i;
+            dot.aria-label = `Go to slide ${i + 1}`;
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
     }
     
-    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+    const dots = dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : [];
     
     function updateCarousel() {
         const slideWidth = slides[0].offsetWidth + 24; // 24px gap
@@ -105,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function goToSlide(index) {
         currentIndex = index % slideCount;
         updateCarousel();
+        resetAutoPlay();
     }
     
     function nextSlide() {
@@ -117,19 +129,38 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCarousel();
     }
     
-    nextBtn.addEventListener('click', nextSlide);
-    prevBtn.addEventListener('click', prevSlide);
+    function startAutoPlay() {
+        if (slideCount > 1) {
+            autoPlayInterval = setInterval(nextSlide, 6000);
+        }
+    }
     
-    // Auto-advance carousel every 6 seconds
-    setInterval(nextSlide, 6000);
+    function resetAutoPlay() {
+        clearInterval(autoPlayInterval);
+        startAutoPlay();
+    }
+    
+    // Event listeners
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        prevSlide();
+        resetAutoPlay();
+    });
+    
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        nextSlide();
+        resetAutoPlay();
+    });
     
     // Update on window resize
     window.addEventListener('resize', updateCarousel);
+    
+    // Start auto-play
+    startAutoPlay();
 });
 </script>
 {% endif %}
 
-<!-- Promoted Restaurants (Non-Carousel Alternative) -->
+<!-- Regular Grid for 3 or fewer promoted restaurants -->
 {% if promoted and promoted|length <= 3 %}
 <section class="py-5 bg-white">
     <div class="container">

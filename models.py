@@ -35,11 +35,10 @@ class User(UserMixin, db.Model):
         return sum(r.rating for r in reviews) / len(reviews)
     
     def calculate_reputation(self):
-        review_count = self.review_count()
-        if review_count == 0:
+        rc = self.review_count()
+        if rc == 0:
             return 0
-        avg_rating = self.avg_rating_given()
-        return int(review_count * 10 + avg_rating * 5)
+        return int(rc * 10 + self.avg_rating_given() * 5)
     
     def get_badge(self):
         reputation = self.reputation_score if self.reputation_score else self.calculate_reputation()

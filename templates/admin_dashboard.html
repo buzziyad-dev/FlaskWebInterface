@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - Yalla{% endblock %}
-
 {% block content %}
 <!-- CSRF Token for AJAX -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -252,6 +250,39 @@
         </div>
     </div>
 
+    <!-- Edit Badge Modal -->
+    <div class="modal fade" id="editBadgeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" id="editBadgeForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Badge</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Badge Name</label>
+                            <input type="text" class="form-control" name="badge_name" id="editBadgeName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Badge Color</label>
+                            <input type="color" class="form-control" name="badge_color" id="editBadgeColor" value="#007bff" style="max-width:80px;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="badge_description" id="editBadgeDescription" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4" role="tablist" id="adminTabs">
         <li class="nav-item" role="presentation">
@@ -299,6 +330,36 @@
     <!-- Tab Content Container -->
     <div id="tabContent"></div>
 </div>
+
+{% set news_tab_html %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0 fw-bold">📰 News Management</h4>
+    </div>
+    <div class="card-body px-4 py-4">
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <h6 class="fw-bold mb-3">Quick Actions</h6>
+                <a href="{{ url_for('post_news') }}" class="btn btn-primary btn-sm me-2 mb-2">
+                    <span class="me-2">+</span>Post New Article
+                </a>
+                <a href="{{ url_for('news') }}" class="btn btn-outline-primary btn-sm mb-2">
+                    👁️ View All News
+                </a>
+            </div>
+        </div>
+        <hr>
+        <div class="mb-3">
+            <p class="text-muted small mb-2">
+                Use the News tab to share important updates with your community. News posts are published immediately and visible to all users on the News page.
+            </p>
+            <div class="alert alert-info small mb-0">
+                <strong>💡 Tip:</strong> Use news posts to announce new restaurants, community events, special promotions, or important platform updates.
+            </div>
+        </div>
+    </div>
+</div>
+{% endset %}
 
 <script>
 let adminData = null;
@@ -761,373 +822,6 @@ function renderCuisinesTab() {
     </div>`;
 }
 
-function attachEventListeners() {
-    // Update form action attributes with proper IDs - handle both inline and full URLs
-    document.querySelectorAll('form[data-id]').forEach(form => {
-        const id = form.dataset.id;
-        form.addEventListener('submit', function(e) {
-            const baseAction = this.action;
-            // Replace /0 with the actual ID anywhere in the URL
-            this.action = baseAction.replace(/\/0(?=\s|$|\/|#|\?|&)/, `/${id}`);
-        });
-    });
-    
-    // Update links with proper IDs
-    document.querySelectorAll('a[data-id]').forEach(link => {
-        const id = link.dataset.id;
-        link.href = `{{ url_for('restaurant_detail', id=0) }}`.replace('/0', `/${id}`);
-    });
-    
-    document.querySelectorAll('a[data-username]').forEach(link => {
-        const username = link.dataset.username;
-        link.href = `{{ url_for('profile', username='') }}${username}`;
-    });
-    
-    // Ban user button handler
-    document.querySelectorAll('.ban-user-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const username = this.dataset.username;
-            const userId = this.dataset.id;
-            document.getElementById('banUsername').value = username;
-            document.getElementById('banReason').value = '';
-            const banUserForm = document.getElementById('banUserForm');
-            const baseUrl = `{{ url_for('manage_user', id=0) }}`;
-            banUserForm.action = baseUrl.replace('/0', `/${userId}`);
-            const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
-            modal.show();
-        });
-    });
-    
-    // Restaurant filtering
-    const restaurantSearch = document.getElementById('restaurantSearch');
-    const restaurantFeatureFilter = document.getElementById('restaurantFeatureFilter');
-    if (restaurantSearch || restaurantFeatureFilter) {
-        const filterRestaurants = () => {
-            const searchTerm = (restaurantSearch?.value || '').toLowerCase();
-            const featureFilter = restaurantFeatureFilter?.value || '';
-            const rows = document.querySelectorAll('table tbody tr');
-            rows.forEach(row => {
-                const name = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
-                const isFeatured = row.textContent.includes('⭐ Featured');
-                
-                let matches = name.includes(searchTerm);
-                if (featureFilter === 'featured') matches = matches && isFeatured;
-                else if (featureFilter === 'regular') matches = matches && !isFeatured;
-                
-                row.style.display = matches ? '' : 'none';
-            });
-        };
-        restaurantSearch?.addEventListener('input', filterRestaurants);
-        restaurantFeatureFilter?.addEventListener('change', filterRestaurants);
-    }
-    
-    // User filtering
-    const userSearch = document.getElementById('userSearch');
-    const userRoleFilter = document.getElementById('userRoleFilter');
-    const userStatusFilter = document.getElementById('userStatusFilter');
-    if (userSearch || userRoleFilter || userStatusFilter) {
-        const filterUsers = () => {
-            const searchTerm = (userSearch?.value || '').toLowerCase();
-            const roleFilter = userRoleFilter?.value || '';
-            const statusFilter = userStatusFilter?.value || '';
-            const rows = document.querySelectorAll('table tbody tr');
-            rows.forEach(row => {
-                const username = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
-                const email = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-                const isAdmin = row.textContent.includes('Admin') && !row.textContent.includes('User');
-                const isBanned = row.textContent.includes('🚫 Banned');
-                
-                let matches = username.includes(searchTerm) || email.includes(searchTerm);
-                if (roleFilter === 'admin') matches = matches && isAdmin;
-                else if (roleFilter === 'user') matches = matches && !isAdmin;
-                if (statusFilter === 'active') matches = matches && !isBanned;
-                else if (statusFilter === 'banned') matches = matches && isBanned;
-                
-                row.style.display = matches ? '' : 'none';
-            });
-        };
-        userSearch?.addEventListener('input', filterUsers);
-        userRoleFilter?.addEventListener('change', filterUsers);
-        userStatusFilter?.addEventListener('change', filterUsers);
-    }
-    
-    // Review filtering
-    const reviewSearch = document.getElementById('reviewSearch');
-    const reviewRatingFilter = document.getElementById('reviewRatingFilter');
-    if (reviewSearch || reviewRatingFilter) {
-        const filterReviews = () => {
-            const searchTerm = (reviewSearch?.value || '').toLowerCase();
-            const ratingFilter = reviewRatingFilter?.value || '';
-            const rows = document.querySelectorAll('table tbody tr');
-            rows.forEach(row => {
-                const author = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
-                const restaurant = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-                const ratingStars = row.querySelectorAll('span[style*="gold"]').length;
-                
-                let matches = author.includes(searchTerm) || restaurant.includes(searchTerm);
-                if (ratingFilter) matches = matches && ratingStars === parseInt(ratingFilter);
-                
-                row.style.display = matches ? '' : 'none';
-            });
-        };
-        reviewSearch?.addEventListener('input', filterReviews);
-        reviewRatingFilter?.addEventListener('change', filterReviews);
-    }
-    
-    // Multi-select for restaurants
-    const restaurantSelectAll = document.getElementById('restaurantSelectAll');
-    const restaurantCheckboxes = document.querySelectorAll('.restaurant-checkbox');
-    const restaurantBulkDelete = document.getElementById('restaurantBulkDelete');
-    if (restaurantSelectAll) {
-        restaurantSelectAll.addEventListener('change', function() {
-            restaurantCheckboxes.forEach(cb => cb.checked = this.checked);
-            restaurantBulkDelete.style.display = document.querySelectorAll('.restaurant-checkbox:checked').length > 0 ? '' : 'none';
-        });
-        restaurantCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                restaurantBulkDelete.style.display = document.querySelectorAll('.restaurant-checkbox:checked').length > 0 ? '' : 'none';
-            });
-        });
-        restaurantBulkDelete?.addEventListener('click', function() {
-            const ids = Array.from(document.querySelectorAll('.restaurant-checkbox:checked')).map(cb => cb.value);
-            if (ids.length === 0) return;
-            if (confirm(`Delete ${ids.length} restaurant(s)?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ url_for("bulk_delete") }}';
-                form.innerHTML = `<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="type" value="restaurant">` + ids.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-    
-    // Multi-select for users
-    const userSelectAll = document.getElementById('userSelectAll');
-    const userCheckboxes = document.querySelectorAll('.user-checkbox');
-    const userBulkDelete = document.getElementById('userBulkDelete');
-    if (userSelectAll) {
-        userSelectAll.addEventListener('change', function() {
-            userCheckboxes.forEach(cb => cb.checked = this.checked);
-            userBulkDelete.style.display = document.querySelectorAll('.user-checkbox:checked').length > 0 ? '' : 'none';
-        });
-        userCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                userBulkDelete.style.display = document.querySelectorAll('.user-checkbox:checked').length > 0 ? '' : 'none';
-            });
-        });
-        userBulkDelete?.addEventListener('click', function() {
-            const ids = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
-            if (ids.length === 0) return;
-            if (confirm(`Delete ${ids.length} user(s)?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ url_for("bulk_delete") }}';
-                form.innerHTML = `<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="type" value="user">` + ids.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-    
-    // Edit restaurant button handler
-    document.querySelectorAll('.edit-restaurant-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const restaurant = adminData.approved.find(r => r.id === parseInt(this.dataset.id));
-            if (!restaurant) return;
-            document.getElementById('editRestaurantName').value = restaurant.name;
-            document.getElementById('editRestaurantDescription').value = restaurant.description;
-            document.getElementById('editRestaurantHours').value = restaurant.working_hours;
-            document.getElementById('editRestaurantPrice').value = restaurant.price_range;
-            document.getElementById('editRestaurantCuisine').value = restaurant.cuisine_id;
-            document.getElementById('editSmallBiz').checked = restaurant.is_small_business;
-            document.getElementById('editFoodCategories').value = (restaurant.food_categories || []).join(', ');
-            
-            // Show current image preview
-            const previewDiv = document.getElementById('editImagePreview');
-            if (restaurant.image_url) {
-                previewDiv.innerHTML = `<img src="${restaurant.image_url}" alt="${restaurant.name}" style="max-width: 200px; max-height: 150px; border-radius: 4px;">`;
-            } else {
-                previewDiv.innerHTML = '<p class="text-muted small">No image</p>';
-            }
-            
-            // Clear file input
-            document.getElementById('editRestaurantImage').value = '';
-            
-            document.getElementById('editRestaurantForm').action = `{{ url_for('edit_restaurant', id=0) }}`.replace('/0', `/${this.dataset.id}`);
-            adminData.all_cuisines.forEach(c => {
-                if (!document.querySelector(`#editRestaurantCuisine option[value="${c.id}"]`)) {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.name;
-                    document.getElementById('editRestaurantCuisine').appendChild(opt);
-                }
-            });
-        });
-    });
-    
-    // Image preview on file select
-    const editRestaurantImage = document.getElementById('editRestaurantImage');
-    if (editRestaurantImage) {
-        editRestaurantImage.addEventListener('change', function() {
-            const previewDiv = document.getElementById('editImagePreview');
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 4px;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-    
-    // Edit user button handler
-    document.querySelectorAll('.edit-user-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('editUsername').value = this.dataset.username;
-            document.getElementById('editEmail').value = this.dataset.email;
-            document.getElementById('editReputation').value = this.dataset.reputation;
-            document.getElementById('editUserForm').action = `{{ url_for('manage_user', id=0) }}`.replace('/0', `/${this.dataset.id}`);
-        });
-    });
-    
-    // Multi-select for cuisines
-    const cuisineSelectAll = document.getElementById('cuisineSelectAll');
-    const cuisineCheckboxes = document.querySelectorAll('.cuisine-checkbox');
-    const cuisineBulkDelete = document.getElementById('cuisineBulkDelete');
-    if (cuisineSelectAll) {
-        cuisineSelectAll.addEventListener('change', function() {
-            cuisineCheckboxes.forEach(cb => cb.checked = this.checked);
-            cuisineBulkDelete.style.display = document.querySelectorAll('.cuisine-checkbox:checked').length > 0 ? '' : 'none';
-        });
-        cuisineCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                cuisineBulkDelete.style.display = document.querySelectorAll('.cuisine-checkbox:checked').length > 0 ? '' : 'none';
-            });
-        });
-        cuisineBulkDelete?.addEventListener('click', function() {
-            const ids = Array.from(document.querySelectorAll('.cuisine-checkbox:checked')).map(cb => cb.value);
-            if (ids.length === 0) return;
-            if (confirm(`Delete ${ids.length} cuisine(s)?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ url_for("bulk_delete") }}';
-                form.innerHTML = `<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="type" value="cuisine">` + ids.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-    
-    // Edit cuisine button handler
-    document.querySelectorAll('.edit-cuisine-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('editCuisineName').value = this.dataset.name;
-            document.getElementById('editCuisineForm').action = `{{ url_for('edit_cuisine', id=0) }}`.replace('/0', `/${this.dataset.id}`);
-        });
-    });
-}
-
-// Show submission details in modal
-function showSubmissionDetails(restaurantId) {
-    const restaurant = adminData.pending.find(r => r.id === restaurantId);
-    if (!restaurant) return;
-    
-    const imageHtml = restaurant.image_url ? `
-        <div class="mb-4">
-            <h6 class="text-muted small">Restaurant Image</h6>
-            <img src="${restaurant.image_url}" alt="${restaurant.name}" style="max-width: 100%; height: auto; border-radius: 8px;">
-        </div>
-    ` : '';
-    
-    const content = `
-        ${imageHtml}
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h6 class="text-muted small">Restaurant Name</h6>
-                <p class="fw-bold">${restaurant.name}</p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-muted small">Cuisine</h6>
-                <p class="fw-bold">${restaurant.cuisine}</p>
-            </div>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h6 class="text-muted small">Working Hours</h6>
-                <p>${restaurant.working_hours || 'Not provided'}</p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-muted small">Price Range</h6>
-                <p>${'$'.repeat(restaurant.price_range)}</p>
-            </div>
-        </div>
-        
-        <div class="mb-4">
-            <h6 class="text-muted small">Description</h6>
-            <p>${restaurant.full_description}</p>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h6 class="text-muted small">Small Business</h6>
-                <p><span class="badge ${restaurant.is_small_business ? 'bg-success' : 'bg-secondary'}">${restaurant.is_small_business ? 'Yes' : 'No'}</span></p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-muted small">Submitted Date</h6>
-                <p>${restaurant.created_at}</p>
-            </div>
-        </div>
-        
-        <div class="mb-4 pb-3 border-bottom">
-            <h6 class="text-muted small">Food Categories</h6>
-            <div>
-                ${(restaurant.food_categories || []).length > 0 ? restaurant.food_categories.map(tag => `<span class="badge bg-info">${tag}</span>`).join(' ') : '<span class="text-muted">No food categories</span>'}
-            </div>
-        </div>
-        
-        <div class="alert alert-info">
-            <h6 class="alert-heading">Submitted By</h6>
-            <p class="mb-2"><strong>Username:</strong> ${restaurant.submitter_username}</p>
-            <p class="mb-0"><strong>Email:</strong> ${restaurant.submitter_email}</p>
-        </div>
-    `;
-    
-    document.getElementById('submissionDetailsContent').innerHTML = content;
-}
-
-function renderNewsTab() {
-    return `
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
-            <h4 class="mb-0 fw-bold">📰 News Management</h4>
-        </div>
-        <div class="card-body">
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h6 class="fw-bold mb-3">Quick Actions</h6>
-                    <a href="{{ url_for('post_news') }}" class="btn btn-primary btn-sm me-2">
-                        <span class="me-2">+</span>Post New Article
-                    </a>
-                    <a href="{{ url_for('news') }}" class="btn btn-outline-primary btn-sm">
-                        👁️ View All News
-                    </a>
-                </div>
-            </div>
-            <hr>
-            <p class="text-muted small">
-                Use the News tab to share important updates with your community. News posts are published immediately and visible to all users on the News page.
-            </p>
-            <div class="alert alert-info small mb-0">
-                <strong>💡 Tip:</strong> Use news posts to announce new restaurants, community events, special promotions, or important platform updates.
-            </div>
-        </div>
-    </div>
-    `;
-}
-
 function renderBadgesTab() {
     const badges = adminData.all_badges || [];
     
@@ -1140,10 +834,15 @@ function renderBadgesTab() {
                     <p class="text-muted small mb-0">${badge.description || 'No description'}</p>
                 </div>
             </div>
-            <form method="POST" action="{{ url_for('delete_badge', id=0) }}" style="display: inline;" data-id="${badge.id}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-            </form>
+            <div>
+                <button type="button" class="btn btn-sm btn-info edit-badge-btn" data-id="${badge.id}" data-name="${badge.name}" data-color="${badge.color}" data-description="${badge.description}" data-bs-toggle="modal" data-bs-target="#editBadgeModal">
+                    Edit
+                </button>
+                <form method="POST" action="{{ url_for('delete_badge', id=0) }}" style="display: inline;" data-id="${badge.id}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </div>
         </div>
     `).join('');
     
@@ -1339,5 +1038,10 @@ async function toggleUserBadge(userId, badgeId, assign) {
         console.error('Error:', error);
     }
 }
+
+function renderNewsTab() {
+    document.getElementById('tabContent').innerHTML = `{{ news_tab_html | safe }}`;
+}
 </script>
+
 {% endblock %}

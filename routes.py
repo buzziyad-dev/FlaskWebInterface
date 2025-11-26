@@ -1,12 +1,9 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle
 from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm
 import base64
-import os
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -15,7 +12,6 @@ def load_user(user_id):
 @app.before_request
 def check_banned_user():
     if current_user.is_authenticated:
-        # Refresh user data from database to check if they've been banned
         user = User.query.get(current_user.id)
         if user and user.is_banned:
             logout_user()
@@ -28,13 +24,16 @@ def index():
     promoted_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=True).order_by(Restaurant.created_at.desc()).all()
     regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=False, is_featured=False).order_by(Restaurant.created_at.desc()).all()
     cuisines = Cuisine.query.all()
-    # Get top reviewers by reputation score, excluding admin and banned users who have at least 1 review
-    top_reviewers = User.query.filter(
-        User.is_admin == False,
-        User.is_banned == False
-    ).join(Review).group_by(User.id).having(
-        func.count(Review.id) > 0
-    ).order_by(User.reputation_score.desc()).limit(4).all()
+    top_reviewers = (
+        User.query
+        .filter(User.is_admin == False, User.is_banned == False)
+        .join(Review)
+        .group_by(User.id)
+        .having(func.count(Review.id) > 0)
+        .order_by(User.reputation_score.desc())
+        .limit(4)
+        .all()
+    )
     return render_template('index.html', promoted=promoted_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -59,10 +58,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user_input = form.user_input.data
-        # Try to find user by username or email
         user = User.query.filter((User.username == user_input) | (User.email == user_input)).first()
         if user and user.check_password(form.password.data):
-            # Check if user is banned
             if user.is_banned:
                 flash('Your account has been banned.', 'danger')
                 return redirect(url_for('banned', username=user.username))
@@ -70,14 +67,13 @@ def login():
             next_page = request.args.get('next')
             flash(f'Welcome back, {user.username}!', 'success')
             return redirect(next_page) if next_page else redirect(url_for('index'))
-        else:
-            flash('Login failed. Please check your username/email and password.', 'danger')
+        flash('Login failed. Please check your username/email and password.', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/banned/<username>')
 def banned(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    if not user.is_banned:
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.is_banned:
         return redirect(url_for('index'))
     return render_template('banned.html', user=user)
 
@@ -93,33 +89,21 @@ def restaurants():
     if not FeatureToggle.get_feature_status('restaurant_filtering_enabled'):
         flash('Restaurant browsing is temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    
-    from sqlalchemy import func
-    
     cuisine_filter = request.args.get('cuisine', type=int)
     price_filter = request.args.get('price', type=int)
     rating_filter = request.args.get('rating', type=int)
     search_query = request.args.get('search', '')
-    
     query = Restaurant.query.filter_by(is_approved=True)
-    
     if cuisine_filter:
         query = query.filter_by(cuisine_id=cuisine_filter)
-    
     if price_filter:
         query = query.filter_by(price_range=price_filter)
-    
     if search_query:
         query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
-    
     all_restaurants = query.all()
-    
-    # Filter by rating using average calculation (done in Python to avoid complex SQL)
     if rating_filter:
         all_restaurants = [r for r in all_restaurants if r.avg_rating() >= rating_filter]
-    
     cuisines = Cuisine.query.all()
-    
     return render_template('restaurants.html', restaurants=all_restaurants, cuisines=cuisines, 
                          current_cuisine=cuisine_filter, current_price=price_filter, 
                          current_rating=rating_filter, search_query=search_query)
@@ -127,7 +111,6 @@ def restaurants():
 @app.route('/restaurant/<int:id>')
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
-    # Sort reviews: admin reviews first, then by date (newest first)
     reviews = restaurant.reviews.all()
     reviews = sorted(reviews, key=lambda r: (not (r.author and r.author.is_admin), -r.created_at.timestamp()))
     photo_form = PhotoUploadForm()
@@ -139,42 +122,29 @@ def upload_restaurant_photo(id):
     if not FeatureToggle.get_feature_status('photo_uploads_enabled'):
         flash('Photo uploads are currently disabled.', 'warning')
         return redirect(url_for('restaurant_detail', id=id))
-    
     from datetime import datetime
     restaurant = Restaurant.query.get_or_404(id)
-    
     if 'photo' not in request.files:
         flash('No file part', 'danger')
         return redirect(url_for('restaurant_detail', id=id))
-    
     file = request.files['photo']
     if file.filename == '':
         flash('No selected file', 'danger')
         return redirect(url_for('restaurant_detail', id=id))
-    
-    # Validate file upload more strictly
     ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-    
     if file and file.filename:
-        # Validate MIME type
         if file.content_type not in ALLOWED_MIME_TYPES:
             flash('Only JPEG, PNG, GIF, and WebP images are allowed', 'danger')
         else:
             try:
                 photo_data = file.read()
-                
-                # Validate file size
                 if len(photo_data) > MAX_FILE_SIZE:
                     flash('File size exceeds 5MB limit', 'danger')
                 else:
                     encoded_photo = base64.b64encode(photo_data).decode('utf-8')
-                    
-                    # Initialize photos list if it doesn't exist
                     if restaurant.photos is None:
                         restaurant.photos = []
-                    
-                    # Create a new list with the new photo added (instead of appending)
                     new_photo = {
                         'data': encoded_photo,
                         'content_type': file.content_type,
@@ -182,18 +152,14 @@ def upload_restaurant_photo(id):
                         'uploaded_at': datetime.utcnow().isoformat()
                     }
                     restaurant.photos = restaurant.photos + [new_photo]
-                    
-                    # Mark the column as modified so SQLAlchemy tracks the change
                     from sqlalchemy.orm.attributes import flag_modified
                     flag_modified(restaurant, 'photos')
-                    
                     db.session.commit()
                     flash('Photo uploaded successfully!', 'success')
             except Exception as e:
                 flash('Error uploading photo. Please try again.', 'danger')
     else:
         flash('Please select a file to upload', 'danger')
-    
     return redirect(url_for('restaurant_detail', id=id))
 
 @app.route('/restaurant/<int:id>/review', methods=['GET', 'POST'])
@@ -202,21 +168,16 @@ def add_review(id):
     if not FeatureToggle.get_feature_status('reviews_enabled'):
         flash('Reviews are currently disabled by administrators.', 'warning')
         return redirect(url_for('restaurant_detail', id=id))
-    
     restaurant = Restaurant.query.get_or_404(id)
-    
     existing_review = Review.query.filter_by(user_id=current_user.id, restaurant_id=id).first()
     if existing_review:
         flash('You have already reviewed this restaurant.', 'warning')
         return redirect(url_for('restaurant_detail', id=id))
-    
     form = ReviewForm()
-    # Populate food category choices from restaurant's food_categories
     if restaurant.food_categories:
         form.food_category.choices = [(tag, tag) for tag in restaurant.food_categories]
     else:
         form.food_category.choices = [('', 'No food categories available')]
-    
     if form.validate_on_submit():
         review = Review(
             rating=form.rating.data,
@@ -231,7 +192,6 @@ def add_review(id):
         db.session.commit()
         flash('Your review has been posted!', 'success')
         return redirect(url_for('restaurant_detail', id=id))
-    
     return render_template('add_review.html', form=form, restaurant=restaurant)
 
 @app.route('/add-restaurant', methods=['GET', 'POST'])
@@ -240,26 +200,17 @@ def add_restaurant():
     if not FeatureToggle.get_feature_status('restaurants_enabled'):
         flash('Adding restaurants is currently disabled by administrators.', 'warning')
         return redirect(url_for('restaurants'))
-    
     form = RestaurantForm()
     form.cuisine_id.choices = [(c.id, c.name) for c in Cuisine.query.all()]
-    
-    # Load food categories from database
     food_categories = FoodCategory.query.order_by(FoodCategory.name).all()
-    # Create choices with category ID and name
     form.food_categories.choices = [(c.id, c.name) for c in food_categories]
-    
     if form.validate_on_submit():
-        # Get selected food categories
         selected_category_ids = [int(idx) for idx in form.food_categories.data]
         selected_categories = []
-        
         for cat_id in selected_category_ids:
             category = FoodCategory.query.get(cat_id)
             if category:
                 selected_categories.append(category.name)
-        
-        # Build working hours dict
         working_hours = {
             'monday': form.monday_hours.data,
             'tuesday': form.tuesday_hours.data,
@@ -269,8 +220,6 @@ def add_restaurant():
             'saturday': form.saturday_hours.data,
             'sunday': form.sunday_hours.data,
         }
-        
-        # Handle image upload
         image_url = None
         if form.restaurant_image.data:
             file = form.restaurant_image.data
@@ -278,11 +227,9 @@ def add_restaurant():
                 from PIL import Image
                 from io import BytesIO
                 import base64
-                
                 try:
                     img = Image.open(file)
                     img.thumbnail((400, 300), Image.Resampling.LANCZOS)
-                    
                     img_io = BytesIO()
                     img.save(img_io, 'PNG')
                     img_io.seek(0)
@@ -291,9 +238,7 @@ def add_restaurant():
                 except Exception as e:
                     flash('Invalid image file. Please upload a valid PNG or JPG.', 'danger')
                     return redirect(url_for('add_restaurant'))
-        
         import json
-        
         restaurant = Restaurant(
             name=form.name.data,
             description=form.description.data,
@@ -306,12 +251,10 @@ def add_restaurant():
             food_categories=selected_categories,
             is_approved=False
         )
-        
         db.session.add(restaurant)
         db.session.commit()
         flash('Restaurant submitted for review! An admin will approve it shortly.', 'success')
         return redirect(url_for('restaurants'))
-    
     return render_template('add_restaurant.html', form=form)
 
 @app.route('/create-food-category', methods=['POST'])
@@ -319,20 +262,14 @@ def add_restaurant():
 def create_food_category():
     data = request.get_json()
     category_name = data.get('name', '').strip()
-    
     if not category_name or len(category_name) < 2 or len(category_name) > 50:
         return jsonify({'success': False, 'error': 'Category name must be between 2 and 50 characters'}), 400
-    
-    # Check if category already exists
     existing = FoodCategory.query.filter_by(name=category_name).first()
     if existing:
         return jsonify({'success': True, 'id': existing.id, 'name': existing.name})
-    
-    # Create new category
     new_category = FoodCategory(name=category_name)
     db.session.add(new_category)
     db.session.commit()
-    
     return jsonify({'success': True, 'id': new_category.id, 'name': new_category.name})
 
 @app.route('/profile/<username>')
@@ -340,8 +277,7 @@ def profile(username):
     if not FeatureToggle.get_feature_status('profiles_enabled'):
         flash('User profiles are temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    
-    user = User.query.filter_by(username=username).first_or_404()
+    user = User.query.filter_by(username=username).first()
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
     return render_template('profile.html', user=user, reviews=reviews, is_own_profile=is_own_profile)
@@ -349,25 +285,21 @@ def profile(username):
 @app.route('/profile/<username>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile(username):
-    user = User.query.filter_by(username=username).first_or_404()
+    user = User.query.filter_by(username=username).first()
     if user.id != current_user.id and not current_user.is_admin:
         flash('You can only edit your own profile.', 'danger')
         return redirect(url_for('profile', username=username))
-    
     form = ProfileEditForm()
     if form.validate_on_submit():
         user.bio = form.bio.data
-        
         if form.profile_picture.data:
             file = form.profile_picture.data
             if file.filename:
                 from PIL import Image
                 from io import BytesIO
-                
                 try:
                     img = Image.open(file)
                     img.thumbnail((200, 200), Image.Resampling.LANCZOS)
-                    
                     img_io = BytesIO()
                     img.save(img_io, 'PNG')
                     img_io.seek(0)
@@ -375,14 +307,11 @@ def edit_profile(username):
                 except Exception as e:
                     flash('Invalid image file. Please upload a valid PNG or JPG.', 'danger')
                     return redirect(url_for('edit_profile', username=user.username))
-        
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile', username=user.username))
-    
     if request.method == 'GET':
         form.bio.data = user.bio
-    
     return render_template('edit_profile.html', user=user, form=form)
 
 @app.route('/search')
@@ -390,21 +319,15 @@ def search():
     if not FeatureToggle.get_feature_status('search_enabled'):
         flash('Search is temporarily disabled.', 'warning')
         return redirect(url_for('restaurants'))
-    
     query = request.args.get('q', '').strip()
     restaurants = []
-    
     if query:
-        # First, search by exact name match (highest priority)
         name_matches = Restaurant.query.filter(
             Restaurant.is_approved == True,
             Restaurant.name.ilike(f'%{query}%')
         ).all()
         restaurants.extend(name_matches)
-        
-        # If no name matches, search by cuisine type or description (related results)
         if not name_matches:
-            # Search in cuisine names
             from sqlalchemy import or_
             related = Restaurant.query.join(Cuisine).filter(
                 Restaurant.is_approved == True,
@@ -414,13 +337,10 @@ def search():
                 )
             ).all()
             restaurants.extend(related)
-            
-            # If still no results, show promoted/popular restaurants as suggestions
             if not related:
                 restaurants = Restaurant.query.filter(
                     Restaurant.is_approved == True
                 ).order_by(Restaurant.is_promoted.desc(), Restaurant.created_at.desc()).limit(10).all()
-    
     return render_template('search_results.html', restaurants=restaurants, query=query, is_suggestion=bool(query and not any(query.lower() in r.name.lower() for r in restaurants)))
 
 def get_admin_data():
@@ -430,12 +350,8 @@ def get_admin_data():
     all_users = User.query.all()
     all_reviews = Review.query.order_by(Review.created_at.desc()).all()
     all_cuisines = Cuisine.query.all()
-    
-    # Get or create feature toggles
     feature_toggles = FeatureToggle.query.all()
     toggle_dict = {t.feature_name: {'is_enabled': t.is_enabled, 'description': t.description} for t in feature_toggles}
-    
-    # Ensure default toggles exist
     default_toggles = {
         'restaurants_enabled': 'Allow users to add new restaurants',
         'reviews_enabled': 'Allow users to post reviews',
@@ -446,15 +362,12 @@ def get_admin_data():
         'photo_uploads_enabled': 'Allow photo uploads for restaurants',
         'restaurant_filtering_enabled': 'Enable cuisine and price filtering'
     }
-    
     for feature_name, description in default_toggles.items():
         if feature_name not in toggle_dict:
             new_toggle = FeatureToggle(feature_name=feature_name, is_enabled=True, description=description)
             db.session.add(new_toggle)
             toggle_dict[feature_name] = {'is_enabled': True, 'description': description}
-    
     db.session.commit()
-    
     return {
         'pending': pending_restaurants,
         'approved': approved_restaurants,
@@ -472,10 +385,8 @@ def admin_dashboard():
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     tab = request.args.get('tab', 'overview')
     data = get_admin_data()
-    
     return render_template('admin_dashboard.html',
                          tab=tab,
                          pending=data['pending'],
@@ -491,11 +402,8 @@ def admin_dashboard():
 def admin_api_data():
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
-    
     from models import Badge, UserBadge
     data = get_admin_data()
-    
-    # Format data for JSON response
     def format_restaurant(r):
         return {
             'id': r.id,
@@ -516,7 +424,6 @@ def admin_api_data():
             'submitter_username': r.submitter.username if r.submitter else 'Unknown',
             'submitter_email': r.submitter.email if r.submitter else 'Unknown'
         }
-    
     def format_user(u, include_badges=False):
         user_data = {
             'id': u.id,
@@ -533,7 +440,6 @@ def admin_api_data():
             user_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in u.custom_badges.all()]
             user_data['custom_badges'] = user_badges
         return user_data
-    
     def format_review(r):
         return {
             'id': r.id,
@@ -546,13 +452,11 @@ def admin_api_data():
             'content': r.content[:80] + '...' if len(r.content) > 80 else r.content,
             'created_at': r.created_at.strftime('%b %d, %Y')
         }
-    
     def format_cuisine(c):
         return {
             'id': c.id,
             'name': c.name
         }
-    
     def format_badge(b):
         return {
             'id': b.id,
@@ -561,9 +465,7 @@ def admin_api_data():
             'description': b.description,
             'created_at': b.created_at.strftime('%b %d, %Y')
         }
-    
     all_badges = Badge.query.all()
-    
     return jsonify({
         'pending': [format_restaurant(r) for r in data['pending']],
         'approved': [format_restaurant(r) for r in data['approved']],
@@ -582,7 +484,6 @@ def approve_restaurant(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     restaurant = Restaurant.query.get_or_404(id)
     restaurant.is_approved = True
     db.session.commit()
@@ -595,7 +496,6 @@ def reject_restaurant(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     restaurant = Restaurant.query.get_or_404(id)
     db.session.delete(restaurant)
     db.session.commit()
@@ -607,16 +507,15 @@ def leaderboard():
     if not FeatureToggle.get_feature_status('leaderboard_enabled'):
         flash('Leaderboard is temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    
-    # Only show non-admin, non-banned users who have written at least one review
     from sqlalchemy import func
-    all_users = User.query.filter(
-        User.is_admin == False,
-        User.is_banned == False
-    ).join(Review).group_by(User.id).having(
-        func.count(Review.id) > 0
-    ).all()
-    # Sort by reputation score in memory
+    all_users = (
+        User.query
+        .filter(User.is_admin == False, User.is_banned == False)
+        .join(Review)
+        .group_by(User.id)
+        .having(func.count(Review.id) > 0)
+        .all()
+    )
     all_users.sort(key=lambda u: u.reputation_score or u.calculate_reputation(), reverse=True)
     return render_template('leaderboard.html', users=all_users)
 
@@ -626,7 +525,6 @@ def toggle_featured(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     restaurant = Restaurant.query.get_or_404(id)
     restaurant.is_featured = not restaurant.is_featured
     db.session.commit()
@@ -640,7 +538,6 @@ def delete_restaurant(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     restaurant = Restaurant.query.get_or_404(id)
     name = restaurant.name
     db.session.delete(restaurant)
@@ -654,22 +551,19 @@ def manage_user(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     user = User.query.get_or_404(id)
     action = request.form.get('action')
-    
     if action == 'toggle_admin':
         user.is_admin = not user.is_admin
         status = 'promoted to admin' if user.is_admin else 'demoted from admin'
         flash(f'{user.username} has been {status}.', 'success')
     elif action == 'delete':
         username = user.username
-        # Set all reviews to have NULL user_id instead of deleting them
         Review.query.filter_by(user_id=id).update({'user_id': None})
         db.session.delete(user)
         flash(f'{username} has been deleted.', 'success')
     elif action == 'ban':
-        ban_reason = request.form.get('ban_reason', '').strip()[:500]  # Limit length & strip whitespace
+        ban_reason = request.form.get('ban_reason', '').strip()[:500]
         user.is_banned = True
         user.ban_reason = ban_reason if ban_reason else 'No reason provided'
         flash(f'{user.username} has been banned.', 'success')
@@ -680,22 +574,16 @@ def manage_user(id):
     elif action == 'edit':
         new_username = request.form.get('username', '').strip()
         new_email = request.form.get('email', '').strip()
-        
-        # Validate new username uniqueness (excluding current user)
         if new_username and new_username != user.username:
             existing = User.query.filter_by(username=new_username).first()
             if existing:
                 flash('Username already taken.', 'danger')
                 return redirect(url_for('admin_dashboard', tab='users'))
-        
-        # Validate new email uniqueness (excluding current user)
         if new_email and new_email != user.email:
             existing = User.query.filter_by(email=new_email).first()
             if existing:
                 flash('Email already registered.', 'danger')
                 return redirect(url_for('admin_dashboard', tab='users'))
-        
-        # Update fields
         if new_username:
             user.username = new_username
         if new_email:
@@ -704,9 +592,7 @@ def manage_user(id):
             user.reputation_score = int(request.form.get('reputation_score', user.reputation_score))
         except (ValueError, TypeError):
             user.reputation_score = user.reputation_score
-        
         flash(f'User has been updated.', 'success')
-    
     db.session.commit()
     return redirect(url_for('admin_dashboard', tab='users'))
 
@@ -716,30 +602,23 @@ def edit_restaurant(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     restaurant = Restaurant.query.get_or_404(id)
-    
-    # Validate and sanitize inputs
     try:
         restaurant.name = request.form.get('name', restaurant.name).strip()[:100] or restaurant.name
         restaurant.description = request.form.get('description', restaurant.description).strip()[:1000] or restaurant.description
         restaurant.working_hours = request.form.get('working_hours', restaurant.working_hours).strip()[:500] or restaurant.working_hours
-        
-        # Handle image upload
         if 'restaurant_image' in request.files:
             file = request.files['restaurant_image']
             if file and file.filename:
                 from PIL import Image
                 from io import BytesIO
                 import base64
-                
                 allowed_extensions = {'png', 'jpg', 'jpeg'}
                 filename = file.filename.lower()
                 if any(filename.endswith('.' + ext) for ext in allowed_extensions):
                     try:
                         img = Image.open(file)
                         img.thumbnail((400, 300), Image.Resampling.LANCZOS)
-                        
                         img_io = BytesIO()
                         img.save(img_io, 'PNG')
                         img_io.seek(0)
@@ -747,31 +626,22 @@ def edit_restaurant(id):
                         restaurant.image_url = f"data:image/png;base64,{image_data}"
                     except Exception as e:
                         pass
-        
-        # Validate cuisine exists
         cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
         if not Cuisine.query.get(cuisine_id):
             flash('Invalid cuisine selected.', 'danger')
             return redirect(url_for('admin_dashboard', tab='restaurants'))
         restaurant.cuisine_id = cuisine_id
-        
-        # Validate price range
         price_range = int(request.form.get('price_range', restaurant.price_range))
         if price_range not in [1, 2, 3, 4]:
             price_range = restaurant.price_range
         restaurant.price_range = price_range
-        
         restaurant.is_small_business = request.form.get('is_small_business') == 'on'
-        
-        # Parse food categories from comma-separated input
         food_categories_input = request.form.get('food_categories', '').strip()
         restaurant.food_categories = [tag.strip() for tag in food_categories_input.split(',') if tag.strip()] if food_categories_input else []
-        
         db.session.commit()
         flash(f'{restaurant.name} has been updated.', 'success')
     except (ValueError, TypeError) as e:
         flash('Error updating restaurant. Please check your input.', 'danger')
-    
     return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 @app.route('/admin/bulk-delete', methods=['POST'])
@@ -779,15 +649,11 @@ def edit_restaurant(id):
 def bulk_delete():
     if not current_user.is_admin:
         return jsonify({'error': 'Access denied'}), 403
-    
     item_type = request.form.get('type')
     ids = request.form.getlist('ids[]')
-    
-    # Validate item_type to prevent errors
     if not item_type or item_type not in ['user', 'restaurant', 'review', 'cuisine']:
         flash('Invalid item type.', 'danger')
         return redirect(url_for('admin_dashboard'))
-    
     if item_type == 'user':
         for user_id in ids:
             Review.query.filter_by(user_id=int(user_id)).update({'user_id': None})
@@ -802,7 +668,6 @@ def bulk_delete():
     elif item_type == 'cuisine':
         Cuisine.query.filter(Cuisine.id.in_([int(id) for id in ids])).delete()
         flash(f'Deleted {len(ids)} cuisine(s).', 'success')
-    
     db.session.commit()
     tab_mapping = {'review': 'reviews', 'cuisine': 'cuisines', 'user': 'users', 'restaurant': 'restaurants'}
     return redirect(url_for('admin_dashboard', tab=tab_mapping.get(item_type, 'overview')))
@@ -813,7 +678,6 @@ def delete_review(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     review = Review.query.get_or_404(id)
     db.session.delete(review)
     db.session.commit()
@@ -826,7 +690,6 @@ def add_cuisine():
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     cuisine_name = request.form.get('name')
     if cuisine_name:
         cuisine = Cuisine(name=cuisine_name)
@@ -835,7 +698,6 @@ def add_cuisine():
         flash(f'{cuisine_name} has been added.', 'success')
     else:
         flash('Please enter a cuisine name.', 'danger')
-    
     return redirect(url_for('admin_dashboard', tab='cuisines'))
 
 @app.route('/admin/delete-cuisine/<int:id>', methods=['POST'])
@@ -844,7 +706,6 @@ def delete_cuisine(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     cuisine = Cuisine.query.get_or_404(id)
     name = cuisine.name
     db.session.delete(cuisine)
@@ -858,26 +719,21 @@ def edit_cuisine(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     cuisine = Cuisine.query.get_or_404(id)
     new_name = request.form.get('name', cuisine.name)
-    
     if new_name:
         cuisine.name = new_name
         db.session.commit()
         flash(f'Cuisine has been updated to {new_name}.', 'success')
     else:
         flash('Please enter a cuisine name.', 'danger')
-    
     return redirect(url_for('admin_dashboard', tab='cuisines'))
 
-# News Routes
 @app.route('/news')
 def news():
     if not FeatureToggle.get_feature_status('news_enabled'):
         flash('News is temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    
     page = request.args.get('page', 1, type=int)
     news_posts = News.query.order_by(News.created_at.desc()).paginate(page=page, per_page=10)
     return render_template('news.html', news_posts=news_posts)
@@ -888,11 +744,9 @@ def post_news():
     if not FeatureToggle.get_feature_status('news_enabled'):
         flash('News posting is temporarily disabled.', 'warning')
         return redirect(url_for('news'))
-    
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    
     form = NewsForm()
     if form.validate_on_submit():
         news_post = News(title=form.title.data, content=form.content.data, user_id=current_user.id)
@@ -900,7 +754,6 @@ def post_news():
         db.session.commit()
         flash('News posted successfully!', 'success')
         return redirect(url_for('news'))
-    
     return render_template('post_news.html', form=form)
 
 @app.route('/admin/toggle-feature/<feature_name>', methods=['POST'])
@@ -908,20 +761,15 @@ def post_news():
 def toggle_feature(feature_name):
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
-    
     feature = FeatureToggle.query.filter_by(feature_name=feature_name).first()
-    
     if not feature:
         feature = FeatureToggle(feature_name=feature_name, is_enabled=False)
         db.session.add(feature)
     else:
         feature.is_enabled = not feature.is_enabled
-    
     db.session.commit()
-    
     return jsonify({'success': True, 'feature_name': feature_name, 'is_enabled': feature.is_enabled})
 
-# Badge Management Routes
 @app.route('/admin/create-badge', methods=['POST'])
 @login_required
 def create_badge():
@@ -929,23 +777,18 @@ def create_badge():
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('admin_dashboard'))
-    
     name = request.form.get('badge_name', '').strip()
     color = request.form.get('badge_color', '#007bff')
     description = request.form.get('badge_description', '').strip()
-    
     if not name:
         flash('Please enter a badge name.', 'danger')
         return redirect(url_for('admin_dashboard', tab='badges'))
-    
     if Badge.query.filter_by(name=name).first():
         flash(f'Badge "{name}" already exists.', 'warning')
         return redirect(url_for('admin_dashboard', tab='badges'))
-    
     badge = Badge(name=name, color=color, description=description)
     db.session.add(badge)
     db.session.commit()
-    
     flash(f'Badge "{name}" created successfully!', 'success')
     return redirect(url_for('admin_dashboard', tab='badges'))
 
@@ -956,12 +799,10 @@ def delete_badge(id):
     if not current_user.is_admin:
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_dashboard'))
-    
     badge = Badge.query.get_or_404(id)
     name = badge.name
     db.session.delete(badge)
     db.session.commit()
-    
     flash(f'Badge "{name}" deleted.', 'success')
     return redirect(url_for('admin_dashboard', tab='badges'))
 
@@ -971,17 +812,13 @@ def assign_badge(user_id, badge_id):
     from models import Badge, UserBadge
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
-    
     user = User.query.get_or_404(user_id)
     badge = Badge.query.get_or_404(badge_id)
-    
     if UserBadge.query.filter_by(user_id=user_id, badge_id=badge_id).first():
         return jsonify({'error': 'Badge already assigned'}), 400
-    
     user_badge = UserBadge(user_id=user_id, badge_id=badge_id)
     db.session.add(user_badge)
     db.session.commit()
-    
     return jsonify({'success': True, 'message': f'Badge assigned to {user.username}'})
 
 @app.route('/admin/remove-badge/<int:user_id>/<int:badge_id>', methods=['POST'])
@@ -990,11 +827,9 @@ def remove_badge(user_id, badge_id):
     from models import UserBadge
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
-    
     ub = UserBadge.query.filter_by(user_id=user_id, badge_id=badge_id).first_or_404()
     db.session.delete(ub)
     db.session.commit()
-    
     return jsonify({'success': True, 'message': 'Badge removed'})
 
 @app.route('/admin/api/user-badges/<int:user_id>')
@@ -1003,13 +838,36 @@ def user_badges_api(user_id):
     from models import UserBadge
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
-    
     user = User.query.get_or_404(user_id)
     custom_badges = [{'id': ub.badge_id, 'name': ub.badge.name, 'color': ub.badge.color} for ub in user.custom_badges.all()]
-    
     return jsonify({'custom_badges': custom_badges})
 
-# Error Handlers
+@app.route('/admin/edit-badge/<int:id>', methods=['POST'])
+@login_required
+def edit_badge(id):
+    from models import Badge
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='badges')
+    )
+    badge = Badge.query.get_or_404(id)
+    name = request.form.get('badge_name', '').strip()
+    color = request.form.get('badge_color', '#007bff')
+    description = request.form.get('badge_description', '').strip()
+    if not name:
+        flash('Badge name required.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='badges'))
+    # Check for duplicate name (excluding current badge)
+    if Badge.query.filter(Badge.name == name, Badge.id != id).first():
+        flash('Badge name already exists.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='badges'))
+    badge.name = name
+    badge.color = color
+    badge.description = description
+    db.session.commit()
+    flash('Badge updated.', 'success')
+    return redirect(url_for('admin_dashboard', tab='badges'))
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('error.html',

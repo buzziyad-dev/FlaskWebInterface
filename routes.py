@@ -277,7 +277,7 @@ def profile(username):
     if not FeatureToggle.get_feature_status('profiles_enabled'):
         flash('User profiles are temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first_or_404()
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
     return render_template('profile.html', user=user, reviews=reviews, is_own_profile=is_own_profile)
@@ -285,7 +285,7 @@ def profile(username):
 @app.route('/profile/<username>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile(username):
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first_or_404()
     if user.id != current_user.id and not current_user.is_admin:
         flash('You can only edit your own profile.', 'danger')
         return redirect(url_for('profile', username=username))
@@ -848,8 +848,7 @@ def edit_badge(id):
     from models import Badge
     if not current_user.is_admin:
         flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard', tab='badges')
-    )
+        return redirect(url_for('admin_dashboard', tab='badges'))
     badge = Badge.query.get_or_404(id)
     name = request.form.get('badge_name', '').strip()
     color = request.form.get('badge_color', '#007bff')

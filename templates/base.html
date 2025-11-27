@@ -160,26 +160,28 @@
         if (darkModeToggle) {
             darkModeToggle.addEventListener('click', async function(e) {
                 e.preventDefault();
-                {% if current_user.is_authenticated %}
+                const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
+                
+                if (!isAuthenticated) {
+                    showNotification('Please login to enable dark mode', 'info');
+                    return;
+                }
+                
                 try {
-                    const response = await fetch('{{ url_for("toggle_dark_mode") }}', {
+                    const response = await fetch('/toggle-dark-mode', {
                         method: 'POST',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                        },
                         credentials: 'same-origin'
                     });
                     
                     if (response.ok) {
                         appBody.classList.toggle('dark-mode');
                         darkModeIcon.textContent = appBody.classList.contains('dark-mode') ? '☀️' : '🌙';
+                    } else {
+                        console.error('Failed to toggle dark mode:', response.status);
                     }
                 } catch (err) {
                     console.error('Dark mode toggle error:', err);
                 }
-                {% else %}
-                showNotification('Please login to enable dark mode', 'info');
-                {% endif %}
             });
         }
 

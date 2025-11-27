@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     badge = db.Column(db.String(50))
     bio = db.Column(db.Text, default='')
     profile_picture = db.Column(db.LargeBinary)
+    dark_mode = db.Column(db.Boolean, default=False)
     
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
     

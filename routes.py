@@ -84,6 +84,13 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/toggle-dark-mode', methods=['POST'])
+@login_required
+def toggle_dark_mode():
+    current_user.dark_mode = not current_user.dark_mode
+    db.session.commit()
+    return jsonify({'success': True, 'dark_mode': current_user.dark_mode})
+
 @app.route('/restaurants')
 def restaurants():
     if not FeatureToggle.get_feature_status('restaurant_filtering_enabled'):

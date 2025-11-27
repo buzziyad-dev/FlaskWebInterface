@@ -95,7 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
             dot.classList.add('carousel-dot');
             if (i === 0) dot.classList.add('active');
             dot.dataset.index = i;
-            dot.aria-label = `Go to slide ${i + 1}`;
+            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+            dot.type = 'button';
             dot.addEventListener('click', () => goToSlide(i));
             dotsContainer.appendChild(dot);
         }
@@ -103,8 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const dots = dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : [];
     
-    function updateCarousel() {
-        const slideWidth = slides[0].offsetWidth + 24; // 24px gap
+    function calculateSlideWidth() {
+        if (!slides[0]) return 0;
+        const gap = window.getComputedStyle(track).gap || '24px';
+        const gapValue = parseInt(gap) || 24;
+        return slides[0].offsetWidth + gapValue;
+    }
+    
+    function updateCarousel(smooth = true) {
+        const slideWidth = calculateSlideWidth();
+        if (slideWidth === 0) return;
+        
+        if (smooth) {
+            track.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        } else {
+            track.style.transition = 'none';
+        }
+        
         track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
         
         // Update dots
@@ -115,18 +131,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function goToSlide(index) {
         currentIndex = index % slideCount;
-        updateCarousel();
+        updateCarousel(true);
         resetAutoPlay();
     }
     
     function nextSlide() {
         currentIndex = (currentIndex + 1) % slideCount;
-        updateCarousel();
+        updateCarousel(true);
     }
     
     function prevSlide() {
         currentIndex = (currentIndex - 1 + slideCount) % slideCount;
-        updateCarousel();
+        updateCarousel(true);
     }
     
     function startAutoPlay() {
@@ -141,18 +157,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Event listeners
-    if (prevBtn) prevBtn.addEventListener('click', () => {
-        prevSlide();
-        resetAutoPlay();
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            prevSlide();
+            resetAutoPlay();
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            nextSlide();
+            resetAutoPlay();
+        });
+    }
+    
+    // Update on window resize with debounce
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            updateCarousel(false);
+        }, 250);
     });
     
-    if (nextBtn) nextBtn.addEventListener('click', () => {
-        nextSlide();
-        resetAutoPlay();
-    });
-    
-    // Update on window resize
-    window.addEventListener('resize', updateCarousel);
+    // Initial carousel setup
+    setTimeout(() => {
+        updateCarousel(false);
+    }, 100);
     
     // Start auto-play
     startAutoPlay();

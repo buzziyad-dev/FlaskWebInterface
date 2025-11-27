@@ -25,7 +25,7 @@ Drawing inspiration from Zomato, Yelp, and modern food discovery apps, adapted f
 
 ### Homepage
 1. **Hero Section** (80vh): Full-width food photography hero with search bar overlay, headline "Discover Jeddah's Hidden Culinary Gems" in both Arabic/English, blurred-background CTA buttons
-2. **Featured Restaurants Grid**: 3-column grid (lg:grid-cols-3 md:grid-cols-2) with restaurant cards showing image, name, cuisine type, rating stars, review count
+2. **Promoted Restaurants Grid**: 3-column grid (lg:grid-cols-3 md:grid-cols-2) with restaurant cards showing image, name, cuisine type, rating stars, review count
 3. **Cuisine Categories**: Horizontal scrollable cards with cuisine type icons and names (Saudi, Italian, Mexican, Asian, etc.)
 4. **Top Reviewers**: 4-column grid showcasing community leaders with avatar, name, review count, badge
 5. **How It Works**: 3-column feature explanation with icons (Discover → Review → Share)

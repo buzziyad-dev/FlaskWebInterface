@@ -21,7 +21,7 @@ def check_banned_user():
 @app.route('/')
 def index():
     from sqlalchemy import func
-    recent_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).limit(6).all()
+    promoted_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=True).order_by(Restaurant.created_at.desc()).limit(6).all()
     regular_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).all()
     cuisines = Cuisine.query.all()
     top_reviewers = (
@@ -34,7 +34,7 @@ def index():
         .limit(4)
         .all()
     )
-    return render_template('index.html', promoted=recent_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
+    return render_template('index.html', promoted=promoted_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

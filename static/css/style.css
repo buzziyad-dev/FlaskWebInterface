@@ -1330,18 +1330,27 @@ body.dark-mode .dropdown-item:focus {
     color: #f1f5f9;
 }
 
-body.dark-mode .btn-dark-mode {
-    background: none;
-    border: none;
-    color: #cbd5e1;
+.btn-dark-mode {
+    background: none !important;
+    border: none !important;
+    color: var(--text) !important;
     cursor: pointer;
     padding: 0.5rem;
     font-size: 1.2rem;
     transition: color 0.3s ease;
+    display: inline-block;
+}
+
+.btn-dark-mode:hover {
+    color: var(--primary) !important;
+}
+
+body.dark-mode .btn-dark-mode {
+    color: #cbd5e1 !important;
 }
 
 body.dark-mode .btn-dark-mode:hover {
-    color: #f1f5f9;
+    color: #f1f5f9 !important;
 }
 
 body.dark-mode .form-control,

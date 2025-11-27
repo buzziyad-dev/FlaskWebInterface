@@ -133,6 +133,29 @@
             {% endif %}
         }
 
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const container = document.querySelector('.container');
+            if (!container) return;
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-slide-down`;
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const firstContainer = document.querySelector('.container');
+            if (firstContainer && firstContainer.parentNode) {
+                firstContainer.parentNode.insertBefore(alertDiv, firstContainer.nextSibling);
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 4000);
+            }
+        }
+
         // Toggle dark mode
         if (darkModeToggle) {
             darkModeToggle.addEventListener('click', async function(e) {
@@ -155,7 +178,7 @@
                     console.error('Dark mode toggle error:', err);
                 }
                 {% else %}
-                alert('Please login to use dark mode');
+                showNotification('Please login to enable dark mode', 'info');
                 {% endif %}
             });
         }

@@ -373,14 +373,37 @@ let adminData = null;
 let currentTab = '{{ tab }}' || 'overview';
 let autoRefreshEnabled = true;
 let refreshInterval = null;
+let checkboxStates = {}; // Store checkbox states
+
+// Save current checkbox states before re-rendering
+function saveCheckboxStates() {
+    checkboxStates = {};
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        if (cb.className.includes('checkbox') && !cb.id.includes('autoRefresh') && !cb.id.includes('SelectAll') && !cb.id.includes('badgeCheckbox')) {
+            checkboxStates[cb.value] = cb.checked;
+        }
+    });
+}
+
+// Restore checkbox states after re-rendering
+function restoreCheckboxStates() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        if (cb.className.includes('checkbox') && checkboxStates.hasOwnProperty(cb.value)) {
+            cb.checked = checkboxStates[cb.value];
+        }
+    });
+}
 
 // Load admin data from API
 async function loadAdminData() {
     try {
+        saveCheckboxStates();
         const res = await fetch('{{ url_for("admin_api_data") }}', { credentials: 'same-origin' });
         if (!res.ok) throw new Error('Failed to load admin data');
         adminData = await res.json();
         renderTab(currentTab);
+        // Restore states after a small delay to ensure rendering is complete
+        setTimeout(restoreCheckboxStates, 0);
     } catch (err) {
         console.error('loadAdminData error:', err);
     }

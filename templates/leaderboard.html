@@ -4,159 +4,176 @@
 
 {% block content %}
 <!-- Hero Header -->
-<div class="leaderboard-header text-white py-5">
-    <div class="container leaderboard-header-content">
-        <div class="text-center animate-slide-up">
-            <h1 class="display-4 fw-bold mb-3">🏆 Community Leaderboard</h1>
-            <p class="lead mb-0 opacity-90">Celebrating our top food enthusiasts and reviewers</p>
-        </div>
+<div class="leaderboard-hero">
+    <div class="leaderboard-hero-content">
+        <h1 class="leaderboard-title animate-slide-up">🏆 Top Reviewers</h1>
+        <p class="leaderboard-subtitle animate-slide-up">Join the elite community of food critics</p>
     </div>
+    <div class="leaderboard-hero-bg"></div>
 </div>
 
 <div class="container py-5">
     {% if users %}
-    <!-- Top 3 Reviewers -->
-    <div class="mb-5 animate-stagger">
+    <!-- Podium Section - Top 3 -->
+    <div class="leaderboard-podium-section mb-5">
+        <div class="leaderboard-podium">
+            <!-- 2nd Place (Silver) -->
+            {% if users|length >= 2 %}
+            <div class="podium-position second-place animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="podium-rank-label">2nd</div>
+                <div class="podium-card">
+                    <div class="podium-avatar silver">{{ users[1].username[0].upper() }}</div>
+                    <div class="podium-username">{{ users[1].username }}</div>
+                    <div class="podium-score">{{ users[1].reputation_score }}</div>
+                    <div class="podium-medal">🥈</div>
+                </div>
+                <div class="podium-bar" style="height: 140px;"></div>
+            </div>
+            {% endif %}
+
+            <!-- 1st Place (Gold) -->
+            {% if users|length >= 1 %}
+            <div class="podium-position first-place animate-slide-up">
+                <div class="podium-rank-label">1st</div>
+                <div class="podium-card">
+                    <div class="podium-avatar gold">{{ users[0].username[0].upper() }}</div>
+                    <div class="podium-username">{{ users[0].username }}</div>
+                    <div class="podium-score">{{ users[0].reputation_score }}</div>
+                    <div class="podium-medal">🥇</div>
+                </div>
+                <div class="podium-bar" style="height: 180px;"></div>
+            </div>
+            {% endif %}
+
+            <!-- 3rd Place (Bronze) -->
+            {% if users|length >= 3 %}
+            <div class="podium-position third-place animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="podium-rank-label">3rd</div>
+                <div class="podium-card">
+                    <div class="podium-avatar bronze">{{ users[2].username[0].upper() }}</div>
+                    <div class="podium-username">{{ users[2].username }}</div>
+                    <div class="podium-score">{{ users[2].reputation_score }}</div>
+                    <div class="podium-medal">🥉</div>
+                </div>
+                <div class="podium-bar" style="height: 110px;"></div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Top 3 Details Section -->
+    <div class="row mb-5 g-4">
         {% for user in users[:3] %}
-        <div class="card shadow-lg top-reviewer-card mb-4 animate-slide-up">
-            <div class="card-body p-5">
-                <div class="row align-items-center">
-                    <!-- Rank Circle -->
-                    <div class="col-auto">
-                        <div class="leaderboard-rank rank-{{ loop.index }}">
-                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
-                            <div class="rank-number">#{{ loop.index }}</div>
+        <div class="col-md-4 animate-slide-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
+            <div class="top-reviewer-detail-card">
+                <div class="detail-card-header {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% else %}bronze{% endif %}">
+                    <div class="detail-rank-badge">#{{ loop.index }}</div>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-avatar">{{ user.username[0].upper() }}</div>
+                    <h4 class="detail-username">{{ user.username }}</h4>
+                    
+                    {% if user.is_admin %}
+                    <span class="badge bg-danger mb-3">Admin</span>
+                    {% else %}
+                    <span class="badge" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin-bottom: 1rem;">{{ user.get_badge() }}</span>
+                    {% endif %}
+                    
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">{{ user.reputation_score }}</div>
+                            <div class="detail-stat-label">Rep Score</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">{{ user.review_count() }}</div>
+                            <div class="detail-stat-label">Reviews</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">{{ '%.1f'|format(user.avg_rating_given()) }}/5</div>
+                            <div class="detail-stat-label">Avg Rating</div>
                         </div>
                     </div>
                     
-                    <!-- Avatar -->
-                    <div class="col-auto">
-                        <div class="profile-avatar-large">{{ user.username[0].upper() }}</div>
-                    </div>
-                    
-                    <!-- User Info & Stats -->
-                    <div class="col">
-                        <!-- Username & Badge -->
-                        <div class="mb-4">
-                            <h3 class="fw-bold mb-2" style="font-size: 24px;">
-                                {{ user.username }}
-                                {% if user.is_admin %}
-                                <span class="badge bg-danger badge-with-tooltip admin-badge">
-                                    Admin
-                                    <span class="badge-tooltip">This user is an Admin</span>
-                                </span>
-                                {% else %}
-                                <span class="badge badge-with-tooltip user-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                                    {{ user.get_badge() }}
-                                    <span class="badge-tooltip">This user is a {{ user.get_badge() }}</span>
-                                </span>
-                                {% endif %}
-                            </h3>
-                        </div>
-                        
-                        <!-- Stats Row -->
-                        <div class="row g-4">
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-label">Reputation</div>
-                                    <div class="stat-value">{{ user.reputation_score }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-label">Reviews</div>
-                                    <div class="stat-value">{{ user.review_count() }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-label">Avg Rating</div>
-                                    <div class="stat-value">{{ '%.1f'|format(user.avg_rating_given()) }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 d-flex align-items-center justify-content-center">
-                                <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-primary btn-lg">View Profile →</a>
-                            </div>
-                        </div>
-                    </div>
+                    <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-primary w-100 mt-3">View Profile</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-    
-    <!-- Other Reviewers Section -->
+
+    <!-- All Reviewers Table -->
     {% if users|length > 3 %}
-    <div class="mt-5 animate-slide-up">
-        <div class="mb-4">
-            <h3 class="fw-bold mb-1">📊 Other Top Reviewers</h3>
-            <p class="text-muted">Discover more community members</p>
+    <div class="leaderboard-section animate-slide-up">
+        <div class="section-header">
+            <h3 class="section-title">📊 All Reviewers</h3>
+            <p class="section-subtitle">Complete rankings of community members</p>
         </div>
-        
-        <!-- Grid Layout -->
-        <div class="other-reviewers-grid">
-            {% for user in users[3:] %}
-            <div class="reviewer-card animate-scale-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
-                <!-- Rank Badge -->
-                <div class="reviewer-rank-badge">#{{ loop.index + 3 }}</div>
-                
-                <!-- Avatar -->
-                <div class="reviewer-avatar-small mx-auto mb-2">{{ user.username[0].upper() }}</div>
-                
-                <!-- Username & Badge -->
-                <h5 class="reviewer-card-title">{{ user.username }}</h5>
-                <div class="mb-3">
-                    {% if user.is_admin %}
-                    <span class="badge bg-danger badge-with-tooltip admin-badge">
-                        Admin
-                        <span class="badge-tooltip">This user is an Admin</span>
-                    </span>
-                    {% else %}
-                    <span class="badge bg-light text-dark badge-with-tooltip user-badge">
-                        {{ user.get_badge() }}
-                        <span class="badge-tooltip">This user is a {{ user.get_badge() }}</span>
-                    </span>
-                    {% endif %}
-                </div>
-                
-                <!-- Stats -->
-                <div class="reviewer-card-stats">
-                    <div class="reviewer-card-stat">
-                        Reputation
-                        <strong>{{ user.reputation_score }}</strong>
-                    </div>
-                    <div class="reviewer-card-stat">
-                        Reviews
-                        <strong>{{ user.review_count() }}</strong>
-                    </div>
-                </div>
-                
-                <!-- Rating -->
-                <div class="rating-small mb-3">
-                    {% set rating = user.avg_rating_given() %}
-                    {% for i in range(5) %}
-                        {% if i < rating %}
-                        <span class="star filled">★</span>
-                        {% else %}
-                        <span class="star">☆</span>
-                        {% endif %}
+
+        <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="rank-col">Rank</th>
+                        <th class="user-col">User</th>
+                        <th class="stat-col">Reputation</th>
+                        <th class="stat-col">Reviews</th>
+                        <th class="stat-col">Avg Rating</th>
+                        <th class="action-col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="leaderboard-row" style="animation-delay: {{ loop.index * 0.05 }}s;">
+                        <td class="rank-cell">
+                            <span class="rank-badge">
+                                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}#{{ loop.index }}{% endif %}
+                            </span>
+                        </td>
+                        <td class="user-cell">
+                            <div class="user-info">
+                                <div class="user-avatar-small">{{ user.username[0].upper() }}</div>
+                                <div>
+                                    <div class="user-name">{{ user.username }}</div>
+                                    {% if user.is_admin %}
+                                    <span class="badge bg-danger badge-sm">Admin</span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark badge-sm">{{ user.get_badge() }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="stat-cell">
+                            <span class="stat-badge reputation">{{ user.reputation_score }}</span>
+                        </td>
+                        <td class="stat-cell">
+                            <span class="stat-badge reviews">{{ user.review_count() }}</span>
+                        </td>
+                        <td class="stat-cell">
+                            <div class="rating-display">
+                                {% for i in range(5) %}
+                                    <span class="star-sm {% if i < user.avg_rating_given() %}filled{% endif %}">★</span>
+                                {% endfor %}
+                                <span class="rating-value">({{ '%.1f'|format(user.avg_rating_given()) }})</span>
+                            </div>
+                        </td>
+                        <td class="action-cell">
+                            <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">Profile</a>
+                        </td>
+                    </tr>
                     {% endfor %}
-                </div>
-                
-                <!-- Action Button -->
-                <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-outline-primary btn-sm w-100">View Profile</a>
-            </div>
-            {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     {% endif %}
-    
+
     {% else %}
     <!-- Empty State -->
-    <div class="text-center py-5 animate-slide-up">
-        <h2 class="display-5 fw-bold text-muted mb-3">🌟 No reviewers yet</h2>
-        <p class="text-muted lead mb-4">Be the first to write reviews and earn your spot on the leaderboard!</p>
-        <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg">Start Reviewing Restaurants</a>
+    <div class="leaderboard-empty animate-slide-up">
+        <div class="empty-icon">🌟</div>
+        <h2 class="empty-title">No Reviewers Yet</h2>
+        <p class="empty-description">Be the first to write reviews and earn your spot on the leaderboard!</p>
+        <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg mt-4">Start Reviewing Restaurants</a>
     </div>
     {% endif %}
 </div>

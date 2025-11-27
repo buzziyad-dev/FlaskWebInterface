@@ -526,7 +526,7 @@ def approve_restaurant(id):
     restaurant.is_approved = True
     db.session.commit()
     flash(f'{restaurant.name} has been approved!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 @app.route('/admin/reject/<int:id>', methods=['POST'])
 @login_required
@@ -538,7 +538,7 @@ def reject_restaurant(id):
     db.session.delete(restaurant)
     db.session.commit()
     flash(f'{restaurant.name} has been rejected and removed.', 'warning')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard', tab='overview'))
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -691,7 +691,8 @@ def bulk_delete():
     ids = request.form.getlist('ids[]')
     if not item_type or item_type not in ['user', 'restaurant', 'review', 'cuisine']:
         flash('Invalid item type.', 'danger')
-        return redirect(url_for('admin_dashboard'))
+        tab_mapping = {'review': 'reviews', 'cuisine': 'cuisines', 'user': 'users', 'restaurant': 'restaurants'}
+        return redirect(url_for('admin_dashboard', tab=tab_mapping.get(item_type, 'overview')))
     if item_type == 'user':
         for user_id in ids:
             Review.query.filter_by(user_id=int(user_id)).update({'user_id': None})
@@ -814,7 +815,7 @@ def create_badge():
     from models import Badge
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_dashboard', tab='badges'))
     name = request.form.get('badge_name', '').strip()
     color = request.form.get('badge_color', '#007bff')
     description = request.form.get('badge_description', '').strip()
@@ -836,7 +837,7 @@ def delete_badge(id):
     from models import Badge
     if not current_user.is_admin:
         flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_dashboard', tab='badges'))
     badge = Badge.query.get_or_404(id)
     name = badge.name
     db.session.delete(badge)

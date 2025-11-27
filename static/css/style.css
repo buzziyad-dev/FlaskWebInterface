@@ -572,6 +572,24 @@ footer a:hover {
         height: 100px;
         font-size: 2rem;
     }
+
+    .carousel-container {
+        padding: 0 40px;
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .carousel-btn-prev {
+        left: 0;
+    }
+
+    .carousel-btn-next {
+        right: 0;
+    }
 }
 
 /* === CAROUSEL === */

@@ -21,8 +21,8 @@ def check_banned_user():
 @app.route('/')
 def index():
     from sqlalchemy import func
-    promoted_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=True).order_by(Restaurant.created_at.desc()).all()
-    regular_restaurants = Restaurant.query.filter_by(is_approved=True, is_promoted=False, is_featured=False).order_by(Restaurant.created_at.desc()).all()
+    recent_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).limit(6).all()
+    regular_restaurants = Restaurant.query.filter_by(is_approved=True).order_by(Restaurant.created_at.desc()).all()
     cuisines = Cuisine.query.all()
     top_reviewers = (
         User.query
@@ -34,7 +34,7 @@ def index():
         .limit(4)
         .all()
     )
-    return render_template('index.html', promoted=promoted_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
+    return render_template('index.html', promoted=recent_restaurants, restaurants=regular_restaurants, cuisines=cuisines, top_reviewers=top_reviewers)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -445,7 +445,7 @@ def admin_api_data():
             'working_hours': r.working_hours,
             'price_range': r.price_range,
             'is_small_business': r.is_small_business,
-            'is_featured': r.is_featured,
+            'is_promoted': r.is_promoted,
             'is_approved': r.is_approved,
             'food_categories': r.food_categories if r.food_categories else [],
             'image_url': r.image_url,
@@ -557,16 +557,16 @@ def leaderboard():
     all_users.sort(key=lambda u: u.reputation_score or u.calculate_reputation(), reverse=True)
     return render_template('leaderboard.html', users=all_users)
 
-@app.route('/admin/toggle-featured/<int:id>', methods=['POST'])
+@app.route('/admin/toggle-promoted/<int:id>', methods=['POST'])
 @login_required
-def toggle_featured(id):
+def toggle_promoted(id):
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
     restaurant = Restaurant.query.get_or_404(id)
-    restaurant.is_featured = not restaurant.is_featured
+    restaurant.is_promoted = not restaurant.is_promoted
     db.session.commit()
-    status = 'featured' if restaurant.is_featured else 'unfeatured'
+    status = 'promoted' if restaurant.is_promoted else 'unpromoted'
     flash(f'{restaurant.name} is now {status}!', 'success')
     return redirect(url_for('admin_dashboard', tab='restaurants'))
 

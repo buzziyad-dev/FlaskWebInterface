@@ -116,7 +116,6 @@ class Restaurant(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     is_small_business = db.Column(db.Boolean, default=False)
     is_approved = db.Column(db.Boolean, default=True, index=True)
-    is_featured = db.Column(db.Boolean, default=False, index=True)
     is_promoted = db.Column(db.Boolean, default=False, index=True)
     food_categories = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)

@@ -733,12 +733,12 @@ function renderRestaurantsTab() {
                         <td>${r.cuisine}</td>
                         <td>${r.review_count}</td>
                         <td>${[...Array(5)].map((_,i)=>`<span ${i<Math.floor(r.avg_rating)?'style="color:gold"':''}>★</span>`).join('')} <span class="text-muted small">(${r.avg_rating})</span></td>
-                        <td>${r.is_featured?'<span class="badge bg-warning">⭐ Featured</span>' : '<span class="badge bg-secondary">Regular</span>'}</td>
+                        <td>${r.is_promoted?'<span class="badge bg-warning">⭐ Promoted</span>' : '<span class="badge bg-secondary">Regular</span>'}</td>
                         <td>
                             <button class="btn btn-sm btn-info edit-restaurant-btn" data-id="${r.id}" data-bs-toggle="modal" data-bs-target="#editRestaurantModal">Edit</button>
-                            <form method="POST" action="{{ url_for('toggle_featured', id=0) }}" data-id="${r.id}" style="display:inline;">
+                            <form method="POST" action="{{ url_for('toggle_promoted', id=0) }}" data-id="${r.id}" style="display:inline;">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button class="btn btn-sm btn-outline-warning" type="submit">${r.is_featured?'Unfeature':'Feature'}</button>
+                                <button class="btn btn-sm btn-outline-warning" type="submit">${r.is_promoted?'Unpromote':'Promote'}</button>
                             </form>
                             <form method="POST" action="{{ url_for('delete_restaurant', id=0) }}" data-id="${r.id}" style="display:inline;">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -21,7 +21,7 @@
             {% if users|length >= 2 %}
             <div class="podium-position second-place animate-slide-up" style="animation-delay: 0.1s;">
                 <div class="podium-rank-label">2nd</div>
-                <div class="podium-card" ; display=none>
+                <div class="podium-card" ; display: none>
                     <div class="podium-avatar silver">{{ users[1].username[0].upper() }}</div>
                     <div class="podium-username">{{ users[1].username }}</div>
                     <div class="podium-score">{{ users[1].reputation_score }}</div>

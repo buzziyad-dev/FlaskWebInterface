@@ -11,7 +11,7 @@
                     <h5 class="mb-0">📝 Post News</h5>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" novalidate>
+                    <form method="POST" novalidate onsubmit="syncNewsContent()">
                         {{ form.hidden_tag() }}
 
                         <!-- Title Field -->
@@ -35,9 +35,9 @@
                             <label for="content" class="form-label fw-bold">📝 News Content (Rich Editor)</label>
                             <div id="editor-toolbar" class="mb-2 quill-toolbar-dark" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
                                 <!-- Text Formatting -->
-                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Bold (Ctrl+B)"><strong>B</strong></button>
-                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Italic (Ctrl+I)"><em>I</em></button>
-                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Underline (Ctrl+U)"><u>U</u></button>
+                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Bold"><strong>B</strong></button>
+                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Italic"><em>I</em></button>
+                                <button type="button" class="btn btn-sm btn-light quill-btn" title="Underline"><u>U</u></button>
                                 <button type="button" class="btn btn-sm btn-light quill-btn" title="Strikethrough">S̶</button>
                                 <button type="button" class="btn btn-sm btn-light quill-btn" title="Subscript">X₂</button>
                                 <button type="button" class="btn btn-sm btn-light quill-btn" title="Superscript">X²</button>
@@ -206,238 +206,114 @@ body.dark-mode .quill-editor-dark .ql-container {
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editor
-    const quill = new Quill('#editor', {
-        theme: 'snow',
-        placeholder: 'Write your news content here...',
-        modules: {
-            toolbar: false,
-            history: {
-                delay: 1000,
-                maxStack: 50,
-                userOnly: true
-            }
-        }
-    });
+var quill = null;
 
-    // Wire up bold button
-    document.querySelector('.quill-btn[title="Bold"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('bold', !quill.getFormat().bold);
-        quill.focus();
-    });
-
-    // Wire up italic button
-    document.querySelector('.quill-btn[title="Italic"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('italic', !quill.getFormat().italic);
-        quill.focus();
-    });
-
-    // Wire up underline button
-    document.querySelector('.quill-btn[title="Underline"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('underline', !quill.getFormat().underline);
-        quill.focus();
-    });
-
-    // Wire up strikethrough button
-    document.querySelector('.quill-btn[title="Strikethrough"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('strike', !quill.getFormat().strike);
-        quill.focus();
-    });
-
-    // Wire up subscript button
-    document.querySelector('.quill-btn[title="Subscript"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('script', quill.getFormat().script ? false : 'sub');
-        quill.focus();
-    });
-
-    // Wire up superscript button
-    document.querySelector('.quill-btn[title="Superscript"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('script', quill.getFormat().script ? false : 'super');
-        quill.focus();
-    });
-
-    // Wire up color picker
-    document.querySelector('.quill-color')?.addEventListener('change', function() {
-        quill.format('color', this.value);
-        quill.focus();
-    });
-
-    // Wire up background picker
-    document.querySelector('.quill-bg')?.addEventListener('change', function() {
-        quill.format('background', this.value);
-        quill.focus();
-    });
-
-    // Wire up header select
-    document.querySelector('.quill-header')?.addEventListener('change', function() {
-        quill.format('header', this.value ? parseInt(this.value) : false);
-        quill.focus();
-    });
-
-    // Wire up size select
-    document.querySelector('.quill-size')?.addEventListener('change', function() {
-        quill.format('size', this.value || false);
-        quill.focus();
-    });
-
-    // Wire up unordered list button
-    document.querySelector('.quill-btn[title="Unordered List"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('list', quill.getFormat().list === 'bullet' ? false : 'bullet');
-        quill.focus();
-    });
-
-    // Wire up ordered list button
-    document.querySelector('.quill-btn[title="Ordered List"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('list', quill.getFormat().list === 'ordered' ? false : 'ordered');
-        quill.focus();
-    });
-
-    // Wire up checklist button
-    document.querySelector('.quill-btn[title="Checklist"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('list', quill.getFormat().list === 'check' ? false : 'check');
-        quill.focus();
-    });
-
-    // Wire up alignment
-    document.querySelector('.quill-align')?.addEventListener('change', function() {
-        quill.format('align', this.value || false);
-        quill.focus();
-    });
-
-    // Wire up quote button
-    document.querySelector('.quill-btn[title="Quote"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('blockquote', !quill.getFormat().blockquote);
-        quill.focus();
-    });
-
-    // Wire up code block button
-    document.querySelector('.quill-btn[title="Code Block"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('code-block', !quill.getFormat()['code-block']);
-        quill.focus();
-    });
-
-    // Wire up link button
-    document.querySelector('.quill-btn[title="Insert Link"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = prompt('Enter URL:');
-        if (url) {
-            quill.format('link', url);
-            quill.focus();
-        }
-    });
-
-    // Wire up image button
-    document.querySelector('.quill-btn[title="Insert Image"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = prompt('Enter image URL:');
-        if (url) {
-            quill.insertEmbed(quill.getLength() - 1, 'image', url);
-            quill.focus();
-        }
-    });
-
-    // Wire up indent button
-    document.querySelector('.quill-btn[title="Increase Indent"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('indent', '+1');
-        quill.focus();
-    });
-
-    // Wire up outdent button
-    document.querySelector('.quill-btn[title="Decrease Indent"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.format('indent', '-1');
-        quill.focus();
-    });
-
-    // Wire up HR button
-    document.querySelector('.quill-btn[title="Horizontal Rule"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.insertEmbed(quill.getLength() - 1, 'divider', true);
-        quill.focus();
-    });
-
-    // Wire up undo button
-    document.querySelector('.quill-btn[title="Undo"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.history.undo();
-        quill.focus();
-    });
-
-    // Wire up redo button
-    document.querySelector('.quill-btn[title="Redo"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.history.redo();
-        quill.focus();
-    });
-
-    // Wire up clear formatting button
-    document.querySelector('.quill-btn[title="Clear Formatting"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        quill.removeFormat(0, quill.getLength());
-        quill.focus();
-    });
-
-    // Sync Quill content with hidden input on form submit
-    document.querySelector('form')?.addEventListener('submit', function(e) {
-        const contentField = document.getElementById('content');
+function syncNewsContent() {
+    if (quill) {
+        var contentField = document.getElementById('content');
         if (contentField) {
             contentField.value = quill.root.innerHTML;
-        }
-    });
-
-    // Load existing content if available
-    const contentField = document.getElementById('content');
-    if (contentField?.value) {
-        quill.root.innerHTML = contentField.value;
-    }
-
-    // Dark mode support
-    function applyDarkModeToQuill() {
-        const toolbar = document.getElementById('editor-toolbar');
-        const editor = document.getElementById('editor');
-        if (toolbar) toolbar.style.background = '#2a2a2a';
-        if (editor?.querySelector('.ql-editor')) {
-            editor.querySelector('.ql-editor').style.background = '#1e1e1e';
-            editor.querySelector('.ql-editor').style.color = '#e0e0e0';
+            console.log('Content synced on form submit');
         }
     }
+    return true;
+}
 
-    function removeDarkModeFromQuill() {
-        const toolbar = document.getElementById('editor-toolbar');
-        const editor = document.getElementById('editor');
-        if (toolbar) toolbar.style.background = '#f8f9fa';
-        if (editor?.querySelector('.ql-editor')) {
-            editor.querySelector('.ql-editor').style.background = 'white';
-            editor.querySelector('.ql-editor').style.color = '#000';
-        }
-    }
-
-    if (document.getElementById('appBody')?.classList.contains('dark-mode')) {
-        applyDarkModeToQuill();
-    }
-
-    document.getElementById('darkModeToggle')?.addEventListener('click', function() {
-        setTimeout(() => {
-            if (document.getElementById('appBody')?.classList.contains('dark-mode')) {
-                applyDarkModeToQuill();
-            } else {
-                removeDarkModeFromQuill();
+try {
+    document.addEventListener('DOMContentLoaded', function() {
+        quill = new Quill('#editor', {
+            theme: 'snow',
+            placeholder: 'Write your news content here...',
+            modules: {
+                toolbar: false,
+                history: {delay: 1000, maxStack: 50, userOnly: true}
             }
-        }, 100);
+        });
+
+        // Formatting buttons
+        var boldBtn = document.querySelector('.quill-btn[title="Bold"]');
+        if (boldBtn) boldBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('bold', !quill.getFormat().bold); quill.focus(); });
+
+        var italicBtn = document.querySelector('.quill-btn[title="Italic"]');
+        if (italicBtn) italicBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('italic', !quill.getFormat().italic); quill.focus(); });
+
+        var underlineBtn = document.querySelector('.quill-btn[title="Underline"]');
+        if (underlineBtn) underlineBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('underline', !quill.getFormat().underline); quill.focus(); });
+
+        var strikeBtn = document.querySelector('.quill-btn[title="Strikethrough"]');
+        if (strikeBtn) strikeBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('strike', !quill.getFormat().strike); quill.focus(); });
+
+        // Color pickers
+        var colorPicker = document.querySelector('.quill-color');
+        if (colorPicker) colorPicker.addEventListener('change', function() { quill.format('color', this.value); quill.focus(); });
+
+        var bgPicker = document.querySelector('.quill-bg');
+        if (bgPicker) bgPicker.addEventListener('change', function() { quill.format('background', this.value); quill.focus(); });
+
+        // Selects
+        var headerSelect = document.querySelector('.quill-header');
+        if (headerSelect) headerSelect.addEventListener('change', function() { quill.format('header', this.value ? parseInt(this.value) : false); quill.focus(); });
+
+        var sizeSelect = document.querySelector('.quill-size');
+        if (sizeSelect) sizeSelect.addEventListener('change', function() { quill.format('size', this.value || false); quill.focus(); });
+
+        var alignSelect = document.querySelector('.quill-align');
+        if (alignSelect) alignSelect.addEventListener('change', function() { quill.format('align', this.value || false); quill.focus(); });
+
+        // List buttons
+        var ulBtn = document.querySelector('.quill-btn[title="Unordered List"]');
+        if (ulBtn) ulBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('list', quill.getFormat().list === 'bullet' ? false : 'bullet'); quill.focus(); });
+
+        var olBtn = document.querySelector('.quill-btn[title="Ordered List"]');
+        if (olBtn) olBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('list', quill.getFormat().list === 'ordered' ? false : 'ordered'); quill.focus(); });
+
+        // Special formatting
+        var quoteBtn = document.querySelector('.quill-btn[title="Quote"]');
+        if (quoteBtn) quoteBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('blockquote', !quill.getFormat().blockquote); quill.focus(); });
+
+        var codeBtn = document.querySelector('.quill-btn[title="Code Block"]');
+        if (codeBtn) codeBtn.addEventListener('click', function(e) { e.preventDefault(); quill.format('code-block', !quill.getFormat()['code-block']); quill.focus(); });
+
+        // Link & Image
+        var linkBtn = document.querySelector('.quill-btn[title="Insert Link"]');
+        if (linkBtn) linkBtn.addEventListener('click', function(e) { e.preventDefault(); var url = prompt('Enter URL:'); if (url) { quill.format('link', url); quill.focus(); } });
+
+        var imgBtn = document.querySelector('.quill-btn[title="Insert Image"]');
+        if (imgBtn) imgBtn.addEventListener('click', function(e) { e.preventDefault(); var url = prompt('Enter image URL:'); if (url) { quill.insertEmbed(quill.getLength() - 1, 'image', url); quill.focus(); } });
+
+        // Undo/Redo
+        var undoBtn = document.querySelector('.quill-btn[title="Undo"]');
+        if (undoBtn) undoBtn.addEventListener('click', function(e) { e.preventDefault(); quill.history.undo(); quill.focus(); });
+
+        var redoBtn = document.querySelector('.quill-btn[title="Redo"]');
+        if (redoBtn) redoBtn.addEventListener('click', function(e) { e.preventDefault(); quill.history.redo(); quill.focus(); });
+
+        // Form sync - also handles the onsubmit
+        syncNewsContent();
+
+        // Load existing content
+        var contentField = document.getElementById('content');
+        if (contentField && contentField.value) {
+            quill.root.innerHTML = contentField.value;
+        }
+
+        // Dark mode
+        var appBody = document.getElementById('appBody');
+        if (appBody && appBody.classList.contains('dark-mode')) {
+            var toolbar = document.getElementById('editor-toolbar');
+            var editor = document.getElementById('editor');
+            if (toolbar) toolbar.style.background = '#2a2a2a';
+            if (editor) {
+                var editorContent = editor.querySelector('.ql-editor');
+                if (editorContent) {
+                    editorContent.style.background = '#1e1e1e';
+                    editorContent.style.color = '#e0e0e0';
+                }
+            }
+        }
     });
-});
+} catch(err) {
+    console.error('News editor error:', err);
+}
 </script>
 {% endblock %}

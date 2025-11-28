@@ -85,11 +85,14 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/toggle-dark-mode', methods=['POST'])
-@login_required
 def toggle_dark_mode():
-    current_user.dark_mode = not current_user.dark_mode
-    db.session.commit()
-    return jsonify({'success': True, 'dark_mode': current_user.dark_mode})
+    if current_user.is_authenticated:
+        current_user.dark_mode = not current_user.dark_mode
+        db.session.commit()
+        return jsonify({'success': True, 'dark_mode': current_user.dark_mode})
+    else:
+        # For non-authenticated users, return success (they'll use localStorage)
+        return jsonify({'success': True})
 
 @app.route('/restaurants')
 def restaurants():

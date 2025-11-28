@@ -126,10 +126,25 @@
             const isDarkMode = {{ 'true' if current_user.dark_mode else 'false' }};
 
             // Initialize dark mode on load
-            if (isAuthenticated && isDarkMode) {
-                appBody.classList.add('dark-mode');
-                if (darkModeIcon) darkModeIcon.textContent = '☀️';
+            function initDarkMode() {
+                let shouldBeDark = false;
+                
+                if (isAuthenticated) {
+                    // Use database preference for authenticated users
+                    shouldBeDark = isDarkMode;
+                } else {
+                    // Use localStorage for non-authenticated users
+                    const saved = localStorage.getItem('darkMode');
+                    shouldBeDark = saved === 'true';
+                }
+                
+                if (shouldBeDark) {
+                    appBody.classList.add('dark-mode');
+                    if (darkModeIcon) darkModeIcon.textContent = '☀️';
+                }
             }
+
+            initDarkMode();
 
             // Show notification function
             function showNotification(message, type = 'info') {
@@ -160,22 +175,25 @@
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    if (!isAuthenticated) {
-                        showNotification('Please login to enable dark mode', 'info');
-                        return;
-                    }
-                    
                     // Toggle UI immediately
                     appBody.classList.toggle('dark-mode');
+                    const isDarkNow = appBody.classList.contains('dark-mode');
+                    
                     if (darkModeIcon) {
-                        darkModeIcon.textContent = appBody.classList.contains('dark-mode') ? '☀️' : '🌙';
+                        darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
                     }
                     
-                    // Send to server
-                    fetch('/toggle-dark-mode', {
-                        method: 'POST',
-                        credentials: 'same-origin'
-                    }).catch(err => console.error('Dark mode save error:', err));
+                    // Save preference
+                    if (isAuthenticated) {
+                        // Send to server for authenticated users
+                        fetch('/toggle-dark-mode', {
+                            method: 'POST',
+                            credentials: 'same-origin'
+                        }).catch(err => console.error('Dark mode save error:', err));
+                    } else {
+                        // Save to localStorage for non-authenticated users
+                        localStorage.setItem('darkMode', isDarkNow.toString());
+                    }
                 });
             }
 

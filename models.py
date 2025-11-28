@@ -129,15 +129,15 @@ class User(UserMixin, db.Model):
     
     def is_following(self, user):
         """Check if following another user"""
-        return self.following.filter(user_follow.c.following_id == user.id).first() is not None
+        return user in self.following
     
     def follower_count(self):
         """Get count of followers"""
-        return self.followers.count()
+        return len(self.followers)
     
     def following_count(self):
         """Get count of users this user is following"""
-        return self.following.count()
+        return len(self.following)
 
 
 class Cuisine(db.Model):

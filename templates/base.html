@@ -133,9 +133,8 @@
             const darkModeToggle = document.getElementById('darkModeToggle');
             const darkModeIcon = document.getElementById('darkModeIcon');
             const appBody = document.getElementById('appBody');
-            const isAuthenticated = {{'true' if current_user.is_authenticated else 'false' }
-        };
-        const isDarkMode = {{'true' if current_user.dark_mode else 'false' }};
+            const isAuthenticated = {% if current_user.is_authenticated %}true{% else %}false{% endif %};
+            const isDarkMode = {% if current_user.dark_mode %}true{% else %}false{% endif %};
 
         // Initialize dark mode on load
         function initDarkMode() {
@@ -195,9 +194,8 @@
                     darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
                 }
 
-                if (isAuthenticated) {
-                    current_user.dark_mode = isDarkNow
-                } else {
+                // TODO: Save dark mode preference to database for authenticated users
+                if (!isAuthenticated) {
                     localStorage.setItem('darkMode', isDarkNow.toString());
                 }
             });
@@ -220,7 +218,7 @@
         popoverTriggerList.map(function (popoverTriggerEl) {
             return new bootstrap.Popover(popoverTriggerEl);
         });
-        });
+    });
 
         // Navbar shadow on scroll
         window.addEventListener('scroll', function () {

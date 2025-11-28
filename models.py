@@ -30,12 +30,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # TODO: Implement dark mode saving and retrieving
-    # def set_dark_mode(self, value):
-    #     """Set dark mode preference and save directly to database"""
-    #     self.dark_mode = value
-    #     db.session.commit()
-
     def review_count(self):
         return self.reviews.count()
 
@@ -139,7 +133,6 @@ class Restaurant(db.Model):
     is_small_business = db.Column(db.Boolean, default=False)
     is_approved = db.Column(db.Boolean, default=True, index=True)
     is_promoted = db.Column(db.Boolean, default=False, index=True)
-    dark_mode = db.Column(db.Boolean, default=False)
     food_categories = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)
 

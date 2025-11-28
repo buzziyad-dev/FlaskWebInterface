@@ -204,10 +204,12 @@ def restaurant_detail(id):
         key=lambda r:
         (not (r.author and r.author.is_admin), -r.created_at.timestamp()))
     photo_form = PhotoUploadForm()
+    comment_form = ReviewCommentForm()
     return render_template('restaurant_detail.html',
                            restaurant=restaurant,
                            reviews=reviews,
-                           photo_form=photo_form)
+                           photo_form=photo_form,
+                           comment_form=comment_form)
 
 
 @app.route('/restaurant/<int:id>/upload-photo', methods=['POST'])

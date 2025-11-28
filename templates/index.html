@@ -311,10 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <h2 class="fw-bold mb-3 animate-slide-up">🚀 Join Our Community</h2>
         <p class="fs-5 mb-4 animate-slide-up">Support local restaurants and discover amazing food</p>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('add_restaurant') }}" class="btn btn-light btn-lg me-2 animate-slide-up">Add Restaurant</a>
+        <a href="{{ url_for('add_restaurant') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">Add Restaurant</a>
         <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">Browse</a>
         {% else %}
-        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2 animate-slide-up">Sign Up</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">Sign Up</a>
         <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">Browse</a>
         {% endif %}
     </div>

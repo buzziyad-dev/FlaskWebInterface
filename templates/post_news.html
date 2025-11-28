@@ -193,28 +193,22 @@ body.dark-mode .quill-editor-dark .ql-container {
 .quill-editor-dark .ql-editor h3 {
     margin-bottom: 0.5rem;
 }
+
+/* Hide default Quill toolbar - we use custom toolbar */
+.ql-toolbar {
+    display: none !important;
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Quill editor with all formatting options
+    // Disable auto-generated toolbar since we're using custom toolbar
     const quill = new Quill('#editor', {
-        theme: 'snow',
+        theme: 'bubble',
         placeholder: 'Write your news content here... (minimum 20 characters)',
         modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'header': [1, 2, 3, 4, false] }],
-                [{ 'size': ['small', '', 'large', 'huge'] }],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-                [{ 'indent': '-1'}, { 'indent': '+1' }],
-                [{ 'align': ['', 'center', 'right', 'justify'] }],
-                [{ 'color': [] }, { 'background': [] }],
-                ['link', 'image'],
-                ['undo', 'redo'],
-                ['clean']
-            ]
+            toolbar: false
         }
     });
 

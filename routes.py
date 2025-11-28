@@ -780,9 +780,24 @@ def edit_restaurant(id):
         restaurant.description = request.form.get(
             'description',
             restaurant.description).strip()[:1000] or restaurant.description
+        restaurant.address = request.form.get(
+            'address', restaurant.address).strip()[:300] or restaurant.address
+        restaurant.phone = request.form.get(
+            'phone', restaurant.phone).strip()[:50] or restaurant.phone
         restaurant.working_hours = request.form.get(
             'working_hours',
             restaurant.working_hours).strip()[:500] or restaurant.working_hours
+        
+        # Handle location coordinates
+        try:
+            lat = request.form.get('location_latitude', '').strip()
+            lon = request.form.get('location_longitude', '').strip()
+            if lat and lon:
+                restaurant.location_latitude = float(lat)
+                restaurant.location_longitude = float(lon)
+        except (ValueError, TypeError):
+            pass
+        
         if 'restaurant_image' in request.files:
             file = request.files['restaurant_image']
             if file and file.filename:
@@ -817,6 +832,8 @@ def edit_restaurant(id):
         restaurant.price_range = price_range
         restaurant.is_small_business = request.form.get(
             'is_small_business') == 'on'
+        restaurant.is_approved = request.form.get('is_approved') == 'on'
+        restaurant.is_promoted = request.form.get('is_promoted') == 'on'
         food_categories_input = request.form.get('food_categories', '').strip()
         restaurant.food_categories = [
             tag.strip() for tag in food_categories_input.split(',')

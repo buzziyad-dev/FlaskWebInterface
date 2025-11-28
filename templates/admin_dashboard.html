@@ -223,6 +223,24 @@
                             </div>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="form-control" id="editRestaurantAddress" name="address" placeholder="e.g., King Fahd Road, Jeddah">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="editRestaurantPhone" name="phone" placeholder="e.g., +966 12 123 4567">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Latitude</label>
+                                <input type="number" step="0.000001" class="form-control" id="editLocationLatitude" name="location_latitude" placeholder="e.g., 21.5433">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Longitude</label>
+                                <input type="number" step="0.000001" class="form-control" id="editLocationLongitude" name="location_longitude" placeholder="e.g., 39.1728">
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Food Categories (comma-separated)</label>
                             <textarea class="form-control" id="editFoodCategories" name="food_categories" placeholder="e.g., Appetizers, Main Courses, Desserts" rows="3"></textarea>
                         </div>
@@ -234,10 +252,26 @@
                         <div class="mb-3">
                             <div id="editImagePreview"></div>
                         </div>
-                        <div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editSmallBiz" name="is_small_business">
-                                <label class="form-check-label">Small Business</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="editSmallBiz" name="is_small_business">
+                                    <label class="form-check-label">Small Business</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="editApproved" name="is_approved">
+                                    <label class="form-check-label">Approved</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="editPromoted" name="is_promoted">
+                                    <label class="form-check-label">Featured/Promoted</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -504,17 +538,29 @@ function attachEventListeners() {
             if (form) form.action = `{{ url_for('edit_restaurant', id=0) }}`.replace('/0', `/${id}`);
             const name = document.getElementById('editRestaurantName');
             const desc = document.getElementById('editRestaurantDescription');
+            const address = document.getElementById('editRestaurantAddress');
+            const phone = document.getElementById('editRestaurantPhone');
             const hours = document.getElementById('editRestaurantHours');
             const price = document.getElementById('editRestaurantPrice');
             const cuisineSelect = document.getElementById('editRestaurantCuisine');
             const smallBiz = document.getElementById('editSmallBiz');
+            const approved = document.getElementById('editApproved');
+            const promoted = document.getElementById('editPromoted');
             const categories = document.getElementById('editFoodCategories');
             const preview = document.getElementById('editImagePreview');
+            const latField = document.getElementById('editLocationLatitude');
+            const lonField = document.getElementById('editLocationLongitude');
             if (name) name.value = rest.name || '';
             if (desc) desc.value = rest.description || '';
+            if (address) address.value = rest.address || '';
+            if (phone) phone.value = rest.phone || '';
             if (hours) hours.value = rest.working_hours || '';
             if (price) price.value = rest.price_range || 1;
             if (smallBiz) smallBiz.checked = !!rest.is_small_business;
+            if (approved) approved.checked = !!rest.is_approved;
+            if (promoted) promoted.checked = !!rest.is_promoted;
+            if (latField) latField.value = rest.location_latitude || '';
+            if (lonField) lonField.value = rest.location_longitude || '';
             if (categories) categories.value = (rest.food_categories || []).join(', ');
             if (preview) {
                 preview.innerHTML = rest.image_url ? `<img src="${rest.image_url}" style="max-width:200px; max-height:150px; border-radius:4px;">` : '<p class="text-muted small">No image</p>';

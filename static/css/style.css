@@ -1610,8 +1610,3 @@ body.dark-mode .navbar.scrolled {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-body.dark-mode .hero-section {
-    background: linear-gradient(135deg, #2a2d5c, #3d3e6b, #4a3a6b) !important;
-    background-size: 100% 100% !important;
-    animation: none !important;
-}

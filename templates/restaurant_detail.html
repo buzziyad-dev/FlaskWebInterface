@@ -6,7 +6,7 @@
 
 <!-- Hero Image -->
 <div class="restaurant-hero" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200' }}'); height: 400px; background-size: cover; background-position: center; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4);"></div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none;"></div>
     <div class="container h-100 d-flex align-items-end animate-slide-up" style="position: relative; z-index: 2; padding-bottom: 2rem;">
         <h1 class="display-4 fw-bold text-white">{{ restaurant.name }}</h1>
     </div>

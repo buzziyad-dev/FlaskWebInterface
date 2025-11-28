@@ -134,7 +134,7 @@
             const darkModeIcon = document.getElementById('darkModeIcon');
             const appBody = document.getElementById('appBody');
             const isAuthenticated = {% if current_user.is_authenticated %}true{% else %}false{% endif %};
-            const isDarkMode = {% if current_user.dark_mode %}true{% else %}false{% endif %};
+        const isDarkMode = {% if current_user.dark_mode %}true{% else %} false{% endif %};
 
         // Initialize dark mode on load
         function initDarkMode() {
@@ -194,8 +194,9 @@
                     darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
                 }
 
-                // TODO: Save dark mode preference to database for authenticated users
-                if (!isAuthenticated) {
+                if (isAuthenticated) {
+                    current_user.dark_mode = isDarkNow
+                } else {
                     localStorage.setItem('darkMode', isDarkNow.toString());
                 }
             });

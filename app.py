@@ -35,6 +35,15 @@ def b64encode_filter(data):
         return base64.b64encode(data).decode('utf-8')
     return ''
 
+@app.after_request
+def add_cache_control(response):
+    if response.content_type and 'text/css' in response.content_type:
+        response.cache_control.no_cache = True
+        response.cache_control.no_store = True
+        response.cache_control.must_revalidate = True
+        response.headers['Pragma'] = 'no-cache'
+    return response
+
 with app.app_context():
     import models
     import routes

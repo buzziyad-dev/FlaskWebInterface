@@ -104,6 +104,7 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
+
 @app.route("/save_dark_mode", methods=["POST"])
 @login_required
 def save_dark_mode():
@@ -113,6 +114,7 @@ def save_dark_mode():
     current_user.dark_mode = dark_mode_value
     db.session.commit()
     return jsonify({"status": "success", "dark_mode": dark_mode_value})
+
 
 @app.route('/restaurants')
 def restaurants():
@@ -900,8 +902,6 @@ def add_cuisine():
     else:
         flash('Please enter a cuisine name.', 'danger')
     return redirect(url_for('admin_dashboard', tab='cuisines'))
-
-
 
 
 @app.route('/admin/delete-cuisine/<int:id>', methods=['POST'])

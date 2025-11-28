@@ -14,6 +14,9 @@
 </head>
 
 <body id="appBody">
+    <form id="darkModeForm" action="/save_dark_mode" method="POST" style="display:none;">
+        <input type="hidden" name="darkMode" id="darkModeInput">
+    </form>
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="text-center text-white">
@@ -195,7 +198,18 @@
                 }
 
                 if (isAuthenticated) {
-                    
+                    const form = document.getElementById("darkModeForm");
+                    const hiddenInput = document.getElementById("darkModeInput");
+
+                    hiddenInput.value = isDarkNow;
+
+                    // Submit form *without* reloading page
+                    fetch(form.action, {
+                        method: "POST",
+                        body: new FormData(form)
+                    })
+                        .then(response => response.json())
+                        .catch(err => console.error("Save error:", err));
                 } else {
                     localStorage.setItem('darkMode', isDarkNow.toString());
                 }

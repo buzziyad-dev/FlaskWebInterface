@@ -199,7 +199,7 @@ body.dark-mode .quill-editor-dark .ql-container {
 }
 
 /* Hide the form content field - data is synced via Quill */
-#contentInput {
+#content {
     display: none !important;
 }
 </style>
@@ -207,7 +207,7 @@ body.dark-mode .quill-editor-dark .ql-container {
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editor with all formatting options
+    // Initialize Quill editor
     const quill = new Quill('#editor', {
         theme: 'snow',
         placeholder: 'Write your news content here...',
@@ -221,142 +221,197 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Hide the default toolbar and use custom one
-    const defaultToolbar = document.querySelector('.ql-toolbar');
-    if (defaultToolbar) {
-        defaultToolbar.style.display = 'none';
-    }
-
-    // Wire up custom toolbar buttons to Quill formatting
-    const buttons = document.querySelectorAll('#editor-toolbar .quill-btn');
-    buttons.forEach((btn, index) => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const title = btn.getAttribute('title');
-            
-            if (title.includes('Bold')) quill.format('bold', true);
-            else if (title.includes('Italic')) quill.format('italic', true);
-            else if (title.includes('Underline')) quill.format('underline', true);
-            else if (title.includes('Strikethrough')) quill.format('strike', true);
-            else if (title.includes('Subscript')) quill.format('script', 'sub');
-            else if (title.includes('Superscript')) quill.format('script', 'super');
-            else if (title.includes('Unordered')) quill.format('list', 'bullet');
-            else if (title.includes('Ordered')) quill.format('list', 'ordered');
-            else if (title.includes('Checklist')) quill.format('list', 'check');
-            else if (title.includes('Quote')) quill.format('blockquote', true);
-            else if (title.includes('Code Block')) quill.format('code-block', true);
-            else if (title.includes('Insert Link')) {
-                const url = prompt('Enter URL:');
-                if (url) quill.format('link', url);
-            }
-            else if (title.includes('Insert Image')) {
-                const url = prompt('Enter image URL:');
-                if (url) quill.insertEmbed(quill.getLength() - 1, 'image', url);
-            }
-            else if (title.includes('Increase Indent')) quill.format('indent', '+1');
-            else if (title.includes('Decrease Indent')) quill.format('indent', '-1');
-            else if (title.includes('Horizontal')) quill.insertEmbed(quill.getLength() - 1, 'divider');
-            else if (title.includes('Undo')) quill.history.undo();
-            else if (title.includes('Redo')) quill.history.redo();
-            else if (title.includes('Clear')) quill.removeFormat(0, quill.getLength());
-            
-            quill.focus();
-        });
+    // Wire up bold button
+    document.querySelector('.quill-btn[title="Bold"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('bold', !quill.getFormat().bold);
+        quill.focus();
     });
 
-    // Wire up color pickers
-    const colorPicker = document.querySelector('.quill-color');
-    const bgPicker = document.querySelector('.quill-bg');
-    
-    if (colorPicker) {
-        colorPicker.addEventListener('change', function() {
-            quill.format('color', this.value);
-            quill.focus();
-        });
-    }
-    if (bgPicker) {
-        bgPicker.addEventListener('change', function() {
-            quill.format('background', this.value);
-            quill.focus();
-        });
-    }
+    // Wire up italic button
+    document.querySelector('.quill-btn[title="Italic"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('italic', !quill.getFormat().italic);
+        quill.focus();
+    });
 
-    // Wire up selects
-    const headerSelect = document.querySelector('.quill-header');
-    const sizeSelect = document.querySelector('.quill-size');
-    const alignSelect = document.querySelector('.quill-align');
+    // Wire up underline button
+    document.querySelector('.quill-btn[title="Underline"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('underline', !quill.getFormat().underline);
+        quill.focus();
+    });
 
-    if (headerSelect) {
-        headerSelect.addEventListener('change', function() {
-            const value = this.value ? parseInt(this.value) : false;
-            quill.format('header', value);
+    // Wire up strikethrough button
+    document.querySelector('.quill-btn[title="Strikethrough"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('strike', !quill.getFormat().strike);
+        quill.focus();
+    });
+
+    // Wire up subscript button
+    document.querySelector('.quill-btn[title="Subscript"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('script', quill.getFormat().script ? false : 'sub');
+        quill.focus();
+    });
+
+    // Wire up superscript button
+    document.querySelector('.quill-btn[title="Superscript"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('script', quill.getFormat().script ? false : 'super');
+        quill.focus();
+    });
+
+    // Wire up color picker
+    document.querySelector('.quill-color')?.addEventListener('change', function() {
+        quill.format('color', this.value);
+        quill.focus();
+    });
+
+    // Wire up background picker
+    document.querySelector('.quill-bg')?.addEventListener('change', function() {
+        quill.format('background', this.value);
+        quill.focus();
+    });
+
+    // Wire up header select
+    document.querySelector('.quill-header')?.addEventListener('change', function() {
+        quill.format('header', this.value ? parseInt(this.value) : false);
+        quill.focus();
+    });
+
+    // Wire up size select
+    document.querySelector('.quill-size')?.addEventListener('change', function() {
+        quill.format('size', this.value || false);
+        quill.focus();
+    });
+
+    // Wire up unordered list button
+    document.querySelector('.quill-btn[title="Unordered List"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('list', quill.getFormat().list === 'bullet' ? false : 'bullet');
+        quill.focus();
+    });
+
+    // Wire up ordered list button
+    document.querySelector('.quill-btn[title="Ordered List"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('list', quill.getFormat().list === 'ordered' ? false : 'ordered');
+        quill.focus();
+    });
+
+    // Wire up checklist button
+    document.querySelector('.quill-btn[title="Checklist"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('list', quill.getFormat().list === 'check' ? false : 'check');
+        quill.focus();
+    });
+
+    // Wire up alignment
+    document.querySelector('.quill-align')?.addEventListener('change', function() {
+        quill.format('align', this.value || false);
+        quill.focus();
+    });
+
+    // Wire up quote button
+    document.querySelector('.quill-btn[title="Quote"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('blockquote', !quill.getFormat().blockquote);
+        quill.focus();
+    });
+
+    // Wire up code block button
+    document.querySelector('.quill-btn[title="Code Block"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('code-block', !quill.getFormat()['code-block']);
+        quill.focus();
+    });
+
+    // Wire up link button
+    document.querySelector('.quill-btn[title="Insert Link"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = prompt('Enter URL:');
+        if (url) {
+            quill.format('link', url);
             quill.focus();
-        });
-    }
-    if (sizeSelect) {
-        sizeSelect.addEventListener('change', function() {
-            const value = this.value || false;
-            quill.format('size', value);
+        }
+    });
+
+    // Wire up image button
+    document.querySelector('.quill-btn[title="Insert Image"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = prompt('Enter image URL:');
+        if (url) {
+            quill.insertEmbed(quill.getLength() - 1, 'image', url);
             quill.focus();
-        });
-    }
-    if (alignSelect) {
-        alignSelect.addEventListener('change', function() {
-            const value = this.value || false;
-            quill.format('align', value);
-            quill.focus();
-        });
-    }
+        }
+    });
+
+    // Wire up indent button
+    document.querySelector('.quill-btn[title="Increase Indent"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('indent', '+1');
+        quill.focus();
+    });
+
+    // Wire up outdent button
+    document.querySelector('.quill-btn[title="Decrease Indent"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.format('indent', '-1');
+        quill.focus();
+    });
+
+    // Wire up HR button
+    document.querySelector('.quill-btn[title="Horizontal Rule"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.insertEmbed(quill.getLength() - 1, 'divider', true);
+        quill.focus();
+    });
+
+    // Wire up undo button
+    document.querySelector('.quill-btn[title="Undo"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.history.undo();
+        quill.focus();
+    });
+
+    // Wire up redo button
+    document.querySelector('.quill-btn[title="Redo"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.history.redo();
+        quill.focus();
+    });
+
+    // Wire up clear formatting button
+    document.querySelector('.quill-btn[title="Clear Formatting"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        quill.removeFormat(0, quill.getLength());
+        quill.focus();
+    });
 
     // Sync Quill content with hidden input on form submit
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        const contentInput = document.getElementById('content');
-        if (contentInput) {
-            const content = quill.root.innerHTML;
-            contentInput.value = content;
-            console.log('Content synced:', content.substring(0, 100));
+    document.querySelector('form')?.addEventListener('submit', function(e) {
+        const contentField = document.getElementById('content');
+        if (contentField) {
+            contentField.value = quill.root.innerHTML;
         }
     });
 
     // Load existing content if available
-    const contentInput = document.getElementById('content');
-    if (contentInput && contentInput.value) {
-        quill.root.innerHTML = contentInput.value;
+    const contentField = document.getElementById('content');
+    if (contentField?.value) {
+        quill.root.innerHTML = contentField.value;
     }
 
-    // Apply dark mode styles on load if needed
-    const isDarkMode = document.getElementById('appBody').classList.contains('dark-mode');
-    if (isDarkMode) {
-        applyDarkModeToQuill();
-    }
-
-    // Listen for dark mode changes
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', function() {
-            setTimeout(() => {
-                const isNowDark = document.getElementById('appBody').classList.contains('dark-mode');
-                if (isNowDark) {
-                    applyDarkModeToQuill();
-                } else {
-                    removeDarkModeFromQuill();
-                }
-            }, 100);
-        });
-    }
-
+    // Dark mode support
     function applyDarkModeToQuill() {
         const toolbar = document.getElementById('editor-toolbar');
         const editor = document.getElementById('editor');
         if (toolbar) toolbar.style.background = '#2a2a2a';
-        if (editor) {
-            editor.style.background = '#1e1e1e';
-            const editorContent = editor.querySelector('.ql-editor');
-            if (editorContent) {
-                editorContent.style.background = '#1e1e1e';
-                editorContent.style.color = '#e0e0e0';
-            }
+        if (editor?.querySelector('.ql-editor')) {
+            editor.querySelector('.ql-editor').style.background = '#1e1e1e';
+            editor.querySelector('.ql-editor').style.color = '#e0e0e0';
         }
     }
 
@@ -364,15 +419,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const toolbar = document.getElementById('editor-toolbar');
         const editor = document.getElementById('editor');
         if (toolbar) toolbar.style.background = '#f8f9fa';
-        if (editor) {
-            editor.style.background = 'white';
-            const editorContent = editor.querySelector('.ql-editor');
-            if (editorContent) {
-                editorContent.style.background = 'white';
-                editorContent.style.color = '#000';
-            }
+        if (editor?.querySelector('.ql-editor')) {
+            editor.querySelector('.ql-editor').style.background = 'white';
+            editor.querySelector('.ql-editor').style.color = '#000';
         }
     }
+
+    if (document.getElementById('appBody')?.classList.contains('dark-mode')) {
+        applyDarkModeToQuill();
+    }
+
+    document.getElementById('darkModeToggle')?.addEventListener('click', function() {
+        setTimeout(() => {
+            if (document.getElementById('appBody')?.classList.contains('dark-mode')) {
+                applyDarkModeToQuill();
+            } else {
+                removeDarkModeFromQuill();
+            }
+        }, 100);
+    });
 });
 </script>
 {% endblock %}

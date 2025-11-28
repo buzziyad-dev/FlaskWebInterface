@@ -76,3 +76,17 @@ class ProfileEditForm(FlaskForm):
 
 class ReviewCommentForm(FlaskForm):
     content = TextAreaField('Add a Comment', validators=[DataRequired(), Length(min=2, max=500)])
+
+class AdminChangePasswordForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('new_password')])
+
+class AdminChangeUsernameForm(FlaskForm):
+    current_username = StringField('Current Username', validators=[DataRequired()])
+    new_username = StringField('New Username', validators=[DataRequired(), Length(min=3, max=64)])
+    
+    def validate_new_username(self, new_username):
+        user = User.query.filter_by(username=new_username.data).first()
+        if user is not None:
+            raise ValidationError('Username already exists.')

@@ -631,6 +631,57 @@ body.dark-mode a:hover {
 </div>
 {% endset %}
 
+{% set settings_tab_html %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0 fw-bold">⚙️ Admin Settings</h4>
+    </div>
+    <div class="card-body px-4 py-4">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Change User Password</h6>
+                <form method="POST" action="{{ url_for('admin_change_password') }}">
+                    {{ csrf_token() }}
+                    <div class="mb-2">
+                        <label class="form-label small">Username</label>
+                        <input type="text" name="username" class="form-control form-control-sm" placeholder="Enter username" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">New Password</label>
+                        <input type="password" name="new_password" class="form-control form-control-sm" placeholder="Min 8 characters" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Confirm Password</label>
+                        <input type="password" name="confirm_password" class="form-control form-control-sm" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Password</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Change Username</h6>
+                <form method="POST" action="{{ url_for('admin_change_username') }}">
+                    {{ csrf_token() }}
+                    <div class="mb-2">
+                        <label class="form-label small">Current Username</label>
+                        <input type="text" name="current_username" class="form-control form-control-sm" placeholder="Enter current username" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">New Username</label>
+                        <input type="text" name="new_username" class="form-control form-control-sm" placeholder="New username (3-64 chars)" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Username</button>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <h6 class="fw-bold mb-3">Feature Toggles</h6>
+        <div class="row" id="featureToggles">
+            <p class="text-muted small">Loading toggles...</p>
+        </div>
+    </div>
+</div>
+{% endset %}
+
 <script>
 /* Admin dashboard client logic — robust renderer + event wiring
    - Fetches admin data from /admin/api/data

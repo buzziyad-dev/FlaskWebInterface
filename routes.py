@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle, ReviewComment
-from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm, ReviewCommentForm
+from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm, ReviewCommentForm, AdminChangePasswordForm, AdminChangeUsernameForm
 import base64
 
 
@@ -1049,6 +1049,42 @@ def post_news():
         flash('News posted successfully!', 'success')
         return redirect(url_for('news'))
     return render_template('post_news.html', form=form)
+
+
+@app.route('/admin/change-password', methods=['POST'])
+@login_required
+def admin_change_password():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='settings'))
+    form = AdminChangePasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if not user:
+            flash('User not found.', 'danger')
+        else:
+            user.set_password(form.new_password.data)
+            db.session.commit()
+            flash(f'Password for {user.username} changed successfully!', 'success')
+    return redirect(url_for('admin_dashboard', tab='settings'))
+
+
+@app.route('/admin/change-username', methods=['POST'])
+@login_required
+def admin_change_username():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='settings'))
+    form = AdminChangeUsernameForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.current_username.data).first()
+        if not user:
+            flash('User not found.', 'danger')
+        else:
+            user.username = form.new_username.data
+            db.session.commit()
+            flash(f'Username changed to {form.new_username.data} successfully!', 'success')
+    return redirect(url_for('admin_dashboard', tab='settings'))
 
 
 @app.route('/admin/toggle-feature/<feature_name>', methods=['POST'])

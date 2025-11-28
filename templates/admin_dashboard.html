@@ -1,6 +1,148 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+/* Dark mode styles for admin dashboard */
+body.dark-mode .bg-primary {
+    background-color: #1a3a52 !important;
+}
+
+body.dark-mode .modal-content {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .modal-header {
+    background-color: #3a3a3a !important;
+    border-bottom-color: #555 !important;
+}
+
+body.dark-mode .modal-body,
+body.dark-mode .modal-footer {
+    border-color: #555 !important;
+}
+
+body.dark-mode .modal-body {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+    border-color: #6c63ff !important;
+    box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25) !important;
+}
+
+body.dark-mode .table {
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .table thead {
+    border-bottom-color: #555 !important;
+}
+
+body.dark-mode .table tbody tr {
+    border-bottom-color: #555 !important;
+}
+
+body.dark-mode .table tbody tr:hover {
+    background-color: #3a3a3a !important;
+}
+
+body.dark-mode .card {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .card-header {
+    background-color: #3a3a3a !important;
+    border-bottom-color: #555 !important;
+}
+
+body.dark-mode .btn-outline-primary {
+    color: #6c63ff !important;
+    border-color: #6c63ff !important;
+}
+
+body.dark-mode .btn-outline-primary:hover {
+    background-color: #6c63ff !important;
+    border-color: #6c63ff !important;
+    color: white !important;
+}
+
+body.dark-mode .nav-tabs {
+    border-bottom-color: #555 !important;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+    color: #a0a0a0 !important;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #555 #555 #2a2a2a !important;
+}
+
+body.dark-mode .badge {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .alert {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .text-muted {
+    color: #a0a0a0 !important;
+}
+
+body.dark-mode .form-check-input {
+    background-color: #3a3a3a !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .form-check-input:checked {
+    background-color: #6c63ff !important;
+    border-color: #6c63ff !important;
+}
+
+body.dark-mode .form-switch .form-check-input:checked {
+    background-color: #6c63ff !important;
+}
+
+body.dark-mode .spinner-border {
+    color: #6c63ff !important;
+}
+
+body.dark-mode input[type="color"] {
+    background-color: #3a3a3a !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode textarea {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .container {
+    color: #e0e0e0 !important;
+}
+</style>
+
 <!-- CSRF Token for AJAX -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="bg-primary text-white py-4">

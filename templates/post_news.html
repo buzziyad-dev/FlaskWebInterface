@@ -315,12 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = quill.root.innerHTML;
         contentInput.value = content;
         
-        // Validate that content is not empty
-        if (!content || content === '<p><br></p>' || content.trim() === '') {
-            e.preventDefault();
-            alert('Please enter some content');
-            return false;
-        }
+        // Don't prevent submission - let Flask handle validation
     });
 
     // Load existing content if available

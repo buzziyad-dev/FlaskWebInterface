@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, SelectMultipleField, IntegerField, BooleanField, FileField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, SelectMultipleField, IntegerField, BooleanField, FileField, HiddenField, FloatField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, NumberRange
 from models import User
 
@@ -28,6 +28,9 @@ class ReviewForm(FlaskForm):
     title = StringField('Review Title', validators=[Length(max=100)])
     content = TextAreaField('Your Review', validators=[DataRequired(), Length(min=10, max=1000)])
     food_category = SelectField('What did you try?', choices=[], render_kw={'data-placeholder': 'Optional - select a food category...'})
+    location_name = StringField('Location', validators=[DataRequired(), Length(min=3, max=200)])
+    location_latitude = FloatField('Latitude', validators=[DataRequired()])
+    location_longitude = FloatField('Longitude', validators=[DataRequired()])
 
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])

@@ -32,33 +32,45 @@
 
                         <!-- Content Field with Rich Text Editor -->
                         <div class="mb-4">
-                            <label for="content" class="form-label fw-bold">News Content</label>
-                            <div id="editor-toolbar" class="mb-2" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
+                            <label for="content" class="form-label fw-bold">📝 News Content (Rich Editor)</label>
+                            <div id="editor-toolbar" class="mb-2 quill-toolbar-dark" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
                                 <!-- Text Formatting -->
-                                <button class="btn btn-sm btn-light" id="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
-                                <button class="btn btn-sm btn-light" id="italic" title="Italic (Ctrl+I)"><em>I</em></button>
-                                <button class="btn btn-sm btn-light" id="underline" title="Underline (Ctrl+U)"><u>U</u></button>
-                                <button class="btn btn-sm btn-light" id="strike" title="Strikethrough">S̶</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Bold (Ctrl+B)"><strong>B</strong></button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Italic (Ctrl+I)"><em>I</em></button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Underline (Ctrl+U)"><u>U</u></button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Strikethrough">S̶</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Subscript">X₂</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Superscript">X²</button>
                                 
                                 <div class="btn-group btn-group-sm ms-2" role="group">
-                                    <input type="color" id="color" class="form-control form-control-sm" style="width: 40px; height: 38px;" title="Text Color">
-                                    <input type="color" id="background" class="form-control form-control-sm" style="width: 40px; height: 38px;" title="Background Color">
+                                    <input type="color" class="form-control form-control-sm quill-color" style="width: 40px; height: 38px;" title="Text Color">
+                                    <input type="color" class="form-control form-control-sm quill-bg" style="width: 40px; height: 38px;" title="Background Color">
                                 </div>
                                 
                                 <!-- Headers -->
-                                <select class="form-select form-select-sm d-inline-block ms-2" id="header" style="width: 120px;" title="Heading">
+                                <select class="form-select form-select-sm d-inline-block ms-2 quill-header" style="width: 120px;" title="Heading">
                                     <option value="">Normal</option>
                                     <option value="1">Heading 1</option>
                                     <option value="2">Heading 2</option>
                                     <option value="3">Heading 3</option>
+                                    <option value="4">Heading 4</option>
+                                </select>
+                                
+                                <!-- Font Size -->
+                                <select class="form-select form-select-sm d-inline-block ms-2 quill-size" style="width: 100px;" title="Font Size">
+                                    <option value="">Default</option>
+                                    <option value="small">Small</option>
+                                    <option value="large">Large</option>
+                                    <option value="huge">Huge</option>
                                 </select>
                                 
                                 <!-- Lists -->
-                                <button class="btn btn-sm btn-light ms-2" id="list" title="Unordered List">• List</button>
-                                <button class="btn btn-sm btn-light" id="ordered" title="Ordered List">1. List</button>
+                                <button class="btn btn-sm btn-light quill-btn ms-2" title="Unordered List">• List</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Ordered List">1. List</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Checklist">✓ Check</button>
                                 
                                 <!-- Alignment -->
-                                <select class="form-select form-select-sm d-inline-block ms-2" id="align" style="width: 100px;" title="Alignment">
+                                <select class="form-select form-select-sm d-inline-block ms-2 quill-align" style="width: 100px;" title="Alignment">
                                     <option value="">Left</option>
                                     <option value="center">Center</option>
                                     <option value="right">Right</option>
@@ -66,18 +78,21 @@
                                 </select>
                                 
                                 <!-- Special Elements -->
-                                <button class="btn btn-sm btn-light ms-2" id="blockquote" title="Quote">" Quote</button>
-                                <button class="btn btn-sm btn-light" id="code-block" title="Code Block">{ } Code</button>
-                                <button class="btn btn-sm btn-light" id="link" title="Insert Link">🔗 Link</button>
+                                <button class="btn btn-sm btn-light quill-btn ms-2" title="Quote">" Quote</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Code Block">{ } Code</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Insert Link">🔗 Link</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Insert Image">🖼️ Image</button>
                                 
                                 <!-- Indentation & Others -->
-                                <button class="btn btn-sm btn-light ms-2" id="indent" title="Increase Indent">→ Indent</button>
-                                <button class="btn btn-sm btn-light" id="outdent" title="Decrease Indent">← Outdent</button>
-                                <button class="btn btn-sm btn-light" id="hr" title="Horizontal Rule">—— HR</button>
-                                <button class="btn btn-sm btn-light" id="clean" title="Clear Formatting">✕ Clear</button>
+                                <button class="btn btn-sm btn-light quill-btn ms-2" title="Increase Indent">→ Indent</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Decrease Indent">← Outdent</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Horizontal Rule">—— HR</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Undo">↶ Undo</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Redo">↷ Redo</button>
+                                <button class="btn btn-sm btn-light quill-btn" title="Clear Formatting">✕ Clear</button>
                             </div>
                             
-                            <div id="editor" style="height: 300px; background: white; border: 1px solid #dee2e6; border-radius: 4px;"></div>
+                            <div id="editor" class="quill-editor-dark" style="height: 350px; background: white; border: 1px solid #dee2e6; border-radius: 4px;"></div>
                             {{ form.content(id="contentInput", type="hidden") }}
                             <small class="text-muted d-block mt-2">Minimum 20 characters, maximum 5000 characters</small>
                             {% if form.content.errors %}
@@ -114,9 +129,75 @@
     </div>
 </div>
 
+<style>
+/* Dark Mode Styles for Quill Editor */
+body.dark-mode #editor-toolbar {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode #editor-toolbar .quill-btn,
+body.dark-mode #editor-toolbar .form-select,
+body.dark-mode #editor-toolbar .form-control,
+body.dark-mode #editor-toolbar input[type="color"] {
+    background-color: #3a3a3a !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #editor-toolbar .quill-btn:hover,
+body.dark-mode #editor-toolbar .form-select:hover {
+    background-color: #4a4a4a !important;
+}
+
+body.dark-mode .quill-editor-dark {
+    background: #1e1e1e !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .quill-editor-dark .ql-editor {
+    background: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .quill-editor-dark .ql-editor.ql-blank::before {
+    color: #888 !important;
+}
+
+body.dark-mode .quill-editor-dark .ql-toolbar {
+    background: transparent !important;
+    border: none !important;
+}
+
+body.dark-mode .quill-editor-dark .ql-container {
+    border: none !important;
+}
+
+/* Light mode defaults */
+#editor-toolbar {
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#editor-toolbar .quill-btn,
+#editor-toolbar .form-select {
+    transition: background-color 0.2s;
+}
+
+.quill-editor-dark .ql-editor {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.quill-editor-dark .ql-editor h1, 
+.quill-editor-dark .ql-editor h2, 
+.quill-editor-dark .ql-editor h3 {
+    margin-bottom: 0.5rem;
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editor
+    // Initialize Quill editor with all formatting options
     const quill = new Quill('#editor', {
         theme: 'snow',
         placeholder: 'Write your news content here... (minimum 20 characters)',
@@ -124,12 +205,14 @@ document.addEventListener('DOMContentLoaded', function() {
             toolbar: [
                 ['bold', 'italic', 'underline', 'strike'],
                 ['blockquote', 'code-block'],
-                [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, 4, false] }],
+                [{ 'size': ['small', '', 'large', 'huge'] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
                 [{ 'indent': '-1'}, { 'indent': '+1' }],
-                [{ 'align': [] }],
+                [{ 'align': ['', 'center', 'right', 'justify'] }],
                 [{ 'color': [] }, { 'background': [] }],
-                ['link'],
+                ['link', 'image'],
+                ['undo', 'redo'],
                 ['clean']
             ]
         }
@@ -146,6 +229,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentInput = document.getElementById('contentInput');
     if (contentInput.value) {
         quill.root.innerHTML = contentInput.value;
+    }
+
+    // Apply dark mode styles on load if needed
+    const isDarkMode = document.getElementById('appBody').classList.contains('dark-mode');
+    if (isDarkMode) {
+        applyDarkModeToQuill();
+    }
+
+    // Listen for dark mode changes
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            setTimeout(() => {
+                const isNowDark = document.getElementById('appBody').classList.contains('dark-mode');
+                if (isNowDark) {
+                    applyDarkModeToQuill();
+                } else {
+                    removeDarkModeFromQuill();
+                }
+            }, 100);
+        });
+    }
+
+    function applyDarkModeToQuill() {
+        const toolbar = document.getElementById('editor-toolbar');
+        const editor = document.getElementById('editor');
+        if (toolbar) toolbar.style.background = '#2a2a2a';
+        if (editor) {
+            editor.style.background = '#1e1e1e';
+            const editorContent = editor.querySelector('.ql-editor');
+            if (editorContent) {
+                editorContent.style.background = '#1e1e1e';
+                editorContent.style.color = '#e0e0e0';
+            }
+        }
+    }
+
+    function removeDarkModeFromQuill() {
+        const toolbar = document.getElementById('editor-toolbar');
+        const editor = document.getElementById('editor');
+        if (toolbar) toolbar.style.background = '#f8f9fa';
+        if (editor) {
+            editor.style.background = 'white';
+            const editorContent = editor.querySelector('.ql-editor');
+            if (editorContent) {
+                editorContent.style.background = 'white';
+                editorContent.style.color = '#000';
+            }
+        }
     }
 });
 </script>

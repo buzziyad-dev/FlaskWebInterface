@@ -30,19 +30,62 @@
                             {% endif %}
                         </div>
 
-                        <!-- Content Field -->
+                        <!-- Content Field with Rich Text Editor -->
                         <div class="mb-4">
                             <label for="content" class="form-label fw-bold">News Content</label>
-                            {% if form.content.errors %}
-                                {{ form.content(class="form-control is-invalid", rows="8", placeholder="Write your news content here...") }}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.content.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
+                            <div id="editor-toolbar" class="mb-2" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
+                                <!-- Text Formatting -->
+                                <button class="btn btn-sm btn-light" id="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
+                                <button class="btn btn-sm btn-light" id="italic" title="Italic (Ctrl+I)"><em>I</em></button>
+                                <button class="btn btn-sm btn-light" id="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+                                <button class="btn btn-sm btn-light" id="strike" title="Strikethrough">S̶</button>
+                                
+                                <div class="btn-group btn-group-sm ms-2" role="group">
+                                    <input type="color" id="color" class="form-control form-control-sm" style="width: 40px; height: 38px;" title="Text Color">
+                                    <input type="color" id="background" class="form-control form-control-sm" style="width: 40px; height: 38px;" title="Background Color">
                                 </div>
-                            {% else %}
-                                {{ form.content(class="form-control", rows="8", placeholder="Write your news content here... (minimum 20 characters)") }}
-                                <small class="text-muted">Minimum 20 characters, maximum 5000 characters</small>
+                                
+                                <!-- Headers -->
+                                <select class="form-select form-select-sm d-inline-block ms-2" id="header" style="width: 120px;" title="Heading">
+                                    <option value="">Normal</option>
+                                    <option value="1">Heading 1</option>
+                                    <option value="2">Heading 2</option>
+                                    <option value="3">Heading 3</option>
+                                </select>
+                                
+                                <!-- Lists -->
+                                <button class="btn btn-sm btn-light ms-2" id="list" title="Unordered List">• List</button>
+                                <button class="btn btn-sm btn-light" id="ordered" title="Ordered List">1. List</button>
+                                
+                                <!-- Alignment -->
+                                <select class="form-select form-select-sm d-inline-block ms-2" id="align" style="width: 100px;" title="Alignment">
+                                    <option value="">Left</option>
+                                    <option value="center">Center</option>
+                                    <option value="right">Right</option>
+                                    <option value="justify">Justify</option>
+                                </select>
+                                
+                                <!-- Special Elements -->
+                                <button class="btn btn-sm btn-light ms-2" id="blockquote" title="Quote">" Quote</button>
+                                <button class="btn btn-sm btn-light" id="code-block" title="Code Block">{ } Code</button>
+                                <button class="btn btn-sm btn-light" id="link" title="Insert Link">🔗 Link</button>
+                                
+                                <!-- Indentation & Others -->
+                                <button class="btn btn-sm btn-light ms-2" id="indent" title="Increase Indent">→ Indent</button>
+                                <button class="btn btn-sm btn-light" id="outdent" title="Decrease Indent">← Outdent</button>
+                                <button class="btn btn-sm btn-light" id="hr" title="Horizontal Rule">—— HR</button>
+                                <button class="btn btn-sm btn-light" id="clean" title="Clear Formatting">✕ Clear</button>
+                            </div>
+                            
+                            <div id="editor" style="height: 300px; background: white; border: 1px solid #dee2e6; border-radius: 4px;"></div>
+                            {{ form.content(id="contentInput", type="hidden") }}
+                            <small class="text-muted d-block mt-2">Minimum 20 characters, maximum 5000 characters</small>
+                            {% if form.content.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.content.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
 
@@ -70,4 +113,40 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill editor
+    const quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Write your news content here... (minimum 20 characters)',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Sync Quill content with hidden input on form submit
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        const contentInput = document.getElementById('contentInput');
+        contentInput.value = quill.root.innerHTML;
+    });
+
+    // Load existing content if available
+    const contentInput = document.getElementById('contentInput');
+    if (contentInput.value) {
+        quill.root.innerHTML = contentInput.value;
+    }
+});
+</script>
 {% endblock %}

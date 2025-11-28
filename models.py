@@ -204,6 +204,24 @@ class News(db.Model):
                         index=True)
 
     author = db.relationship('User', backref='news_posts')
+    
+    def get_plain_text(self):
+        """Extract plain text from HTML content (for previews)"""
+        from html.parser import HTMLParser
+        class MLStripper(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.reset()
+                self.strict = False
+                self.convert_charrefs = True
+                self.text = []
+            def handle_data(self, d):
+                self.text.append(d)
+            def get_data(self):
+                return ''.join(self.text)
+        s = MLStripper()
+        s.feed(self.content)
+        return s.get_data()[:150] + '...'
 
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')

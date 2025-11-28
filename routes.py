@@ -106,14 +106,14 @@ def logout():
 
 
 @app.route("/save_dark_mode", methods=["POST"])
-@login_required
 def save_dark_mode():
-    data = request.get_json()
-    dark_mode_value = data.get("darkMode")
+    if not current_user.is_authenticated:
+        return {"status": "unauthenticated"}, 401
 
+    dark_mode_value = request.form.get("darkMode") == "true"
     current_user.dark_mode = dark_mode_value
     db.session.commit()
-    return jsonify({"status": "success", "dark_mode": dark_mode_value})
+    return {"status": "ok", "dark_mode": dark_mode_value}, 200
 
 
 @app.route('/restaurants')

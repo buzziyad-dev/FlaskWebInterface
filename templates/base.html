@@ -208,7 +208,19 @@
                         method: "POST",
                         body: new FormData(form)
                     })
-                        .then(response => response.json())
+                        .then(async response => {
+                            const text = await response.text();
+
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error("Server did NOT return JSON:", text);
+                                throw new Error("Invalid JSON from server");
+                            }
+                        })
+                        .then(data => {
+                            console.log("Dark mode saved:", data);
+                        })
                         .catch(err => console.error("Save error:", err));
                 } else {
                     localStorage.setItem('darkMode', isDarkNow.toString());

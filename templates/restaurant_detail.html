@@ -164,7 +164,7 @@
                     </div>
 
                     {% if restaurant.food_categories %}
-                    <div>
+                    <div class="mb-3">
                         <h6 class="fw-bold text-muted small mb-1">FOOD CATEGORIES</h6>
                         <div class="d-flex flex-wrap gap-1">
                             {% for tag in restaurant.food_categories %}
@@ -173,8 +173,30 @@
                         </div>
                     </div>
                     {% endif %}
+
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-muted small mb-1">ADDRESS</h6>
+                        <p class="mb-0" style="font-size: 0.95rem;">📍 {{ restaurant.address }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-muted small mb-1">PHONE</h6>
+                        <p class="mb-0" style="font-size: 0.95rem;">📞 {{ restaurant.phone }}</p>
+                    </div>
                 </div>
             </div>
+
+            <!-- Location Map Card -->
+            {% if restaurant.location_latitude and restaurant.location_longitude %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📍 Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="restaurant-map" style="height: 300px; border-radius: 0 0 4px 4px;"></div>
+                </div>
+            </div>
+            {% endif %}
 
             {% if current_user.is_authenticated %}
             <div class="card shadow-sm">
@@ -188,5 +210,72 @@
         </div>
     </div>
 </div>
+
+{% if restaurant.location_latitude and restaurant.location_longitude %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = L.map('restaurant-map').setView([{{ restaurant.location_latitude }}, {{ restaurant.location_longitude }}], 15);
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Add marker for restaurant location
+    L.marker([{{ restaurant.location_latitude }}, {{ restaurant.location_longitude }}]).addTo(map)
+        .bindPopup('<strong>{{ restaurant.name }}</strong><br>{{ restaurant.address }}')
+        .openPopup();
+    
+    // Apply dark mode styles if needed
+    if (document.getElementById('appBody').classList.contains('dark-mode')) {
+        applyDarkModeToMap();
+    }
+    
+    // Listen for dark mode changes
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            setTimeout(() => {
+                if (document.getElementById('appBody').classList.contains('dark-mode')) {
+                    applyDarkModeToMap();
+                } else {
+                    removeDarkModeFromMap();
+                }
+            }, 100);
+        });
+    }
+    
+    function applyDarkModeToMap() {
+        const mapContainer = document.getElementById('restaurant-map');
+        if (mapContainer) {
+            mapContainer.style.filter = 'invert(1) hue-rotate(180deg)';
+        }
+    }
+    
+    function removeDarkModeFromMap() {
+        const mapContainer = document.getElementById('restaurant-map');
+        if (mapContainer) {
+            mapContainer.style.filter = 'none';
+        }
+    }
+});
+</script>
+
+<style>
+body.dark-mode #restaurant-map {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+.leaflet-popup-content {
+    font-size: 14px !important;
+}
+
+body.dark-mode .leaflet-popup-content {
+    color: #1e1e1e;
+}
+</style>
+{% endif %}
 
 {% endblock %}

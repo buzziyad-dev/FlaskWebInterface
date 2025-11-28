@@ -217,10 +217,12 @@
         onItemAdd: function(value) {
             const existingOption = Array.from(document.getElementById('foodCategories').options).find(opt => opt.value === value);
             if (!existingOption) {
+                const csrfToken = document.querySelector('[name=csrf_token]').value;
                 fetch('/create-food-category', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
                     },
                     body: JSON.stringify({ name: value })
                 })
@@ -231,9 +233,14 @@
                         tomSelect.removeOption(value);
                         tomSelect.addOption({value: String(data.id), text: data.name});
                         tomSelect.addItem(String(data.id), true);
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to create category'));
                     }
                 })
-                .catch(err => console.error('Error creating category:', err));
+                .catch(err => {
+                    console.error('Error creating category:', err);
+                    alert('Error creating category. Please try again.');
+                });
             }
         }
     });

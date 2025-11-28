@@ -304,12 +304,17 @@ def add_restaurant():
                                 food_categories=selected_categories,
                                 location_latitude=form.location_latitude.data,
                                 location_longitude=form.location_longitude.data,
-                                is_approved=False)
+                                is_approved=current_user.is_admin)
         db.session.add(restaurant)
         db.session.commit()
-        flash(
-            'Restaurant submitted for review! An admin will approve it shortly.',
-            'success')
+        if current_user.is_admin:
+            flash(
+                "The restaurant submission is awaiting approval, but you're too special for approval.",
+                'success')
+        else:
+            flash(
+                'Restaurant submitted for review! An admin will approve it shortly.',
+                'success')
         return redirect(url_for('restaurants'))
     return render_template('add_restaurant.html', form=form)
 

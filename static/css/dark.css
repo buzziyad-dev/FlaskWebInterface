@@ -1,28 +1,23 @@
-/* ===== DARK MODE - COMPREHENSIVE STYLES ===== */
+/* ===== DARK MODE - COMPREHENSIVE STYLES WITH SINGLE SOLID BACKGROUND ===== */
 
-/* Root & Base */
+/* Root & Base - Single Solid Color */
 body.dark-mode {
     background: #0f172a !important;
     color: #e2e8f0;
 }
 
-body.dark-mode * {
-    background-color: inherit;
-}
-
 body.dark-mode html {
-    background: #0f172a;
+    background: #0f172a !important;
 }
 
 /* Hero Section */
 body.dark-mode .hero-section {
-    background: linear-gradient(135deg, #2a2d5c 0%, #3d3e6b 50%, #4a3a6b 100%) !important;
-    background-size: 100% 100% !important;
-    animation: none !important;
+    background: #0f172a !important;
+    color: white;
 }
 
 body.dark-mode .hero-overlay {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .hero-content {
@@ -52,7 +47,7 @@ body.dark-mode .hero-search .form-control::placeholder {
 
 /* Navbar */
 body.dark-mode .navbar {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: #0f172a;
     border-bottom: 1px solid #334155;
 }
 
@@ -478,7 +473,7 @@ body.dark-mode .profile-content {
 
 /* Leaderboard */
 body.dark-mode .leaderboard-hero {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: #0f172a;
     color: white;
 }
 

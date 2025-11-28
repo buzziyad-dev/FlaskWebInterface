@@ -1609,3 +1609,9 @@ body.dark-mode .loading-screen {
 body.dark-mode .navbar.scrolled {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+body.dark-mode .hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}

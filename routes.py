@@ -976,7 +976,8 @@ def news_detail(news_id):
         flash('News is temporarily disabled.', 'warning')
         return redirect(url_for('index'))
     news_post = News.query.get_or_404(news_id)
-    return render_template('news_detail.html', post=news_post)
+    related_posts = News.query.filter(News.user_id == news_post.user_id, News.id != news_post.id).order_by(News.created_at.desc()).limit(3).all()
+    return render_template('news_detail.html', post=news_post, related_posts=related_posts)
 
 
 @app.route('/post_news', methods=['GET', 'POST'])

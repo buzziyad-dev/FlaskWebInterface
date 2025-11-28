@@ -105,6 +105,26 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/follow/<int:user_id>', methods=['POST'])
+@login_required
+def follow_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return jsonify({'error': 'You cannot follow yourself'}), 400
+    current_user.follow(user)
+    return jsonify({'status': 'following', 'follower_count': user.follower_count()}), 200
+
+
+@app.route('/unfollow/<int:user_id>', methods=['POST'])
+@login_required
+def unfollow_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return jsonify({'error': 'You cannot unfollow yourself'}), 400
+    current_user.unfollow(user)
+    return jsonify({'status': 'unfollowed', 'follower_count': user.follower_count()}), 200
+
+
 @app.route("/save_dark_mode", methods=["POST"])
 def save_dark_mode():
     if not current_user.is_authenticated:
@@ -356,10 +376,12 @@ def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
+    is_following = current_user.is_authenticated and current_user.is_following(user) if not is_own_profile else False
     return render_template('profile.html',
                            user=user,
                            reviews=reviews,
-                           is_own_profile=is_own_profile)
+                           is_own_profile=is_own_profile,
+                           is_following=is_following)
 
 
 @app.route('/profile/<username>/edit', methods=['GET', 'POST'])

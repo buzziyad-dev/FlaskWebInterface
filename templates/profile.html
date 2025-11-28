@@ -38,10 +38,18 @@
                 <div class="h3 fw-bold mb-1">{{ user.reputation_score or user.calculate_reputation() }}</div>
                 <div class="text-white-50">Reputation</div>
             </div>
+            <div class="stat-card animate-slide-up">
+                <div class="h3 fw-bold mb-1">{{ user.follower_count() }}</div>
+                <div class="text-white-50">Followers</div>
+            </div>
         </div>
 
         {% if is_own_profile %}
         <a href="{{ url_for('edit_profile', username=user.username) }}" class="btn btn-light mt-3 animate-slide-up">Edit Profile</a>
+        {% elif current_user.is_authenticated %}
+        <button id="followBtn" class="btn btn-light mt-3 animate-slide-up" onclick="toggleFollow({{ user.id }}, {{ 'true' if is_following else 'false' | lower }})">
+            {% if is_following %}Unfollow{% else %}Follow{% endif %}
+        </button>
         {% endif %}
     </div>
 </div>
@@ -86,5 +94,24 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function toggleFollow(userId, isFollowing) {
+    const url = isFollowing ? `/unfollow/${userId}` : `/follow/${userId}`;
+    const btn = document.getElementById('followBtn');
+    
+    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'following') {
+                btn.textContent = 'Unfollow';
+                btn.onclick = () => toggleFollow(userId, true);
+            } else if (data.status === 'unfollowed') {
+                btn.textContent = 'Follow';
+                btn.onclick = () => toggleFollow(userId, false);
+            }
+        });
+}
+</script>
 
 {% endblock %}

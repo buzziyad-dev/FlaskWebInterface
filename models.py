@@ -231,6 +231,34 @@ class Review(db.Model):
         ksa_time = self.created_at.replace(
             tzinfo=timezone.utc).astimezone(ksa_tz)
         return f"{ksa_time.strftime('%B %d, %Y')} at {ksa_time.strftime('%I:%M %p')} (KSA)"
+    
+    comments = db.relationship('ReviewComment',
+                              backref='review',
+                              lazy='dynamic',
+                              cascade='all, delete-orphan')
+
+
+class ReviewComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('user.id'),
+                        nullable=True,
+                        index=True)
+    review_id = db.Column(db.Integer,
+                         db.ForeignKey('review.id'),
+                         nullable=False,
+                         index=True)
+    
+    author = db.relationship('User', backref='review_comments')
+    
+    def formatted_datetime_ksa(self):
+        ksa_tz = timezone(timedelta(hours=3))
+        ksa_time = self.created_at.replace(
+            tzinfo=timezone.utc).astimezone(ksa_tz)
+        return f"{ksa_time.strftime('%b %d, %Y')} at {ksa_time.strftime('%I:%M %p')}"
 
 
 class News(db.Model):

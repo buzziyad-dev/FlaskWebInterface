@@ -73,3 +73,6 @@ class ProfileEditForm(FlaskForm):
             filename = profile_picture.data.filename.lower()
             if not any(filename.endswith('.' + ext) for ext in allowed_extensions):
                 raise ValidationError('Only PNG and JPG files are allowed.')
+
+class ReviewCommentForm(FlaskForm):
+    content = TextAreaField('Add a Comment', validators=[DataRequired(), Length(min=2, max=500)])

@@ -131,6 +131,35 @@ Admins can temporarily disable the following features via the Settings tab in th
 
 ## Recent Changes (Latest Session)
 
+### User Profile & Social Features
+- **User Profiles**: Added comprehensive profile pages showing review history, badges, reputation
+- **Follow System**: Users can follow/unfollow other reviewers to build social connections
+  - Follower counts displayed on profiles
+  - Many-to-many relationship via `user_follow` association table
+  - `/follow/<user_id>` and `/unfollow/<user_id>` routes with AJAX support
+- **Methods added to User model**: `follow()`, `unfollow()`, `is_following()`, `follower_count()`, `following_count()`
+
+### Admin Dashboard Dark Mode
+- Added comprehensive dark mode styling for admin dashboard
+- All UI elements styled: modals, forms, tables, cards, buttons, badges, tabs
+- Proper contrast and visibility in dark mode
+- Covers all Bootstrap components and custom elements
+
+### Review Comments System
+- **ReviewComment Model**: New model linking comments to reviews and users
+  - Supports nested discussions on individual reviews
+  - Cascade delete when reviews are removed
+  - Stores user_id, review_id, content, created_at
+- **Comment Routes**: 
+  - `/review/<review_id>/comment` (POST) - Add comment to review
+  - `/comment/<comment_id>` (DELETE) - Remove comment (auth required)
+- **Comment Display**:
+  - Comments show under each review with author, timestamp (KSA time), content
+  - Comment count displayed next to each review
+  - Authenticated users can add inline comments via simple form
+- **Comment Form**: `ReviewCommentForm` with validation (2-500 chars)
+- **UI**: Comments appear in left-indented section below review content
+
 ### Photo Upload System
 - Fixed SQLAlchemy JSON mutation tracking using `flag_modified()` for multiple photo uploads
 - Users can now upload multiple photos per restaurant

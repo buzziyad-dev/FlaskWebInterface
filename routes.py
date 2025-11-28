@@ -1,8 +1,8 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, login_manager
-from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle
-from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm
+from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle, ReviewComment
+from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm, ReviewCommentForm
 import base64
 
 
@@ -123,6 +123,34 @@ def unfollow_user(user_id):
         return jsonify({'error': 'You cannot unfollow yourself'}), 400
     current_user.unfollow(user)
     return jsonify({'status': 'unfollowed', 'follower_count': user.follower_count()}), 200
+
+
+@app.route('/review/<int:review_id>/comment', methods=['POST'])
+@login_required
+def add_comment(review_id):
+    review = Review.query.get_or_404(review_id)
+    form = ReviewCommentForm()
+    if form.validate_on_submit():
+        comment = ReviewComment(content=form.content.data, user_id=current_user.id, review_id=review.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment added successfully!', 'success')
+    return redirect(url_for('restaurant_detail', id=review.restaurant_id) + f'#review-{review.id}')
+
+
+@app.route('/comment/<int:comment_id>', methods=['DELETE'])
+@login_required
+def delete_comment(comment_id):
+    comment = ReviewComment.query.get_or_404(comment_id)
+    review_id = comment.review_id
+    restaurant_id = comment.review.restaurant_id
+    
+    if comment.user_id != current_user.id and not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify({'status': 'deleted'}), 200
 
 
 @app.route("/save_dark_mode", methods=["POST"])

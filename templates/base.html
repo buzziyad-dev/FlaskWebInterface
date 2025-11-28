@@ -15,8 +15,10 @@
 
 <body id="appBody">
     <form id="darkModeForm" action="/save_dark_mode" method="POST" style="display:none;">
+        {{ csrf_token() }}
         <input type="hidden" name="darkMode" id="darkModeInput">
     </form>
+
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="text-center text-white">

@@ -215,8 +215,13 @@
         create: true,
         createOnBlur: true,
         onItemAdd: function(value) {
-            const existingOption = Array.from(document.getElementById('foodCategories').options).find(opt => opt.value === value);
-            if (!existingOption) {
+            const tomSelect = document.getElementById('foodCategories').tomselect;
+            const existingOption = Array.from(document.getElementById('foodCategories').options).find(opt => opt.value === value || opt.text === value);
+            
+            // Check if this is a new item (not in existing options)
+            const isNewItem = !existingOption && !tomSelect.options[value];
+            
+            if (isNewItem) {
                 const csrfToken = document.querySelector('[name=csrf_token]').value;
                 fetch('/create-food-category', {
                     method: 'POST',
@@ -229,16 +234,20 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const tomSelect = document.getElementById('foodCategories').tomselect;
-                        tomSelect.removeOption(value);
+                        // Remove the temporary text value
+                        tomSelect.removeItem(value);
+                        // Add the new option
                         tomSelect.addOption({value: String(data.id), text: data.name});
-                        tomSelect.addItem(String(data.id), true);
+                        // Select it
+                        tomSelect.addItem(String(data.id), false);
                     } else {
+                        tomSelect.removeItem(value);
                         alert('Error: ' + (data.error || 'Failed to create category'));
                     }
                 })
                 .catch(err => {
                     console.error('Error creating category:', err);
+                    tomSelect.removeItem(value);
                     alert('Error creating category. Please try again.');
                 });
             }

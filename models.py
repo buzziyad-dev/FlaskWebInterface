@@ -121,7 +121,7 @@ class Restaurant(db.Model):
     description = db.Column(db.Text)
     address = db.Column(db.String(200))
     phone = db.Column(db.String(20))
-    working_hours = db.Column(db.String(100))
+    working_hours = db.Column(db.String(500))
     price_range = db.Column(db.Integer, default=2, index=True)
     cuisine_id = db.Column(db.Integer,
                            db.ForeignKey('cuisine.id'),

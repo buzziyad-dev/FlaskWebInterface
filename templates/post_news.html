@@ -212,19 +212,12 @@ document.addEventListener('DOMContentLoaded', function() {
         theme: 'snow',
         placeholder: 'Write your news content here...',
         modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'header': [1, 2, 3, 4, false] }],
-                [{ 'size': ['small', '', 'large', 'huge'] }],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-                [{ 'indent': '-1'}, { 'indent': '+1' }],
-                [{ 'align': ['', 'center', 'right', 'justify'] }],
-                [{ 'color': [] }, { 'background': [] }],
-                ['link', 'image'],
-                ['undo', 'redo'],
-                ['clean']
-            ]
+            toolbar: false,
+            history: {
+                delay: 1000,
+                maxStack: 50,
+                userOnly: true
+            }
         }
     });
 

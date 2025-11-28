@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Yalla - Discover Jeddah's Best Restaurants{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body id="appBody">
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
@@ -33,7 +37,8 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('news') }}">News</a></li>
                     {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('add_restaurant') }}">+ Add</a></li>
-                    {% if current_user.is_admin %}<li class="nav-item"><a class="nav-link text-warning fw-bold" href="{{ url_for('admin_dashboard') }}">Admin</a></li>{% endif %}
+                    {% if current_user.is_admin %}<li class="nav-item"><a class="nav-link text-warning fw-bold"
+                            href="{{ url_for('admin_dashboard') }}">Admin</a></li>{% endif %}
                     {% endif %}
                 </ul>
                 <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET">
@@ -42,24 +47,30 @@
                 </form>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <button type="button" class="btn btn-link btn-dark-mode" id="darkModeToggle" title="Toggle dark mode" style="text-decoration: none; padding: 0.5rem 0.75rem;">
+                        <button type="button" class="btn btn-link btn-dark-mode" id="darkModeToggle"
+                            title="Toggle dark mode" style="text-decoration: none; padding: 0.5rem 0.75rem;">
                             <span id="darkModeIcon">🌙</span>
                         </button>
                     </li>
                     {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
                             👤 {{ current_user.username }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('profile', username=current_user.username) }}">Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('profile', username=current_user.username) }}">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
                         </ul>
                     </li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                    <li class="nav-item"><a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Sign Up</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Sign Up</a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -68,16 +79,16 @@
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="container mt-3">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show animate-slide-down" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            {% endfor %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show animate-slide-down" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <!-- Content -->
@@ -115,104 +126,104 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-    
+
     <script>
         // Dark Mode Management
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const darkModeToggle = document.getElementById('darkModeToggle');
             const darkModeIcon = document.getElementById('darkModeIcon');
             const appBody = document.getElementById('appBody');
-            const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
-            const isDarkMode = {{ 'true' if current_user.dark_mode else 'false' }};
+            const isAuthenticated = {{'true' if current_user.is_authenticated else 'false' }
+        };
+        const isDarkMode = {{'true' if current_user.dark_mode else 'false' }};
 
-            // Initialize dark mode on load
-            function initDarkMode() {
-                let shouldBeDark = false;
-                
-                if (isAuthenticated) {
-                    // Use database preference for authenticated users
-                    shouldBeDark = isDarkMode;
-                } else {
-                    // Use localStorage for non-authenticated users
-                    const saved = localStorage.getItem('darkMode');
-                    shouldBeDark = saved === 'true';
-                }
-                
-                if (shouldBeDark) {
-                    appBody.classList.add('dark-mode');
-                    if (darkModeIcon) darkModeIcon.textContent = '☀️';
-                }
+        // Initialize dark mode on load
+        function initDarkMode() {
+            let shouldBeDark = false;
+
+            if (isAuthenticated) {
+                // Use database preference for authenticated users
+                shouldBeDark = isDarkMode;
+            } else {
+                // Use localStorage for non-authenticated users
+                const saved = localStorage.getItem('darkMode');
+                shouldBeDark = saved === 'true';
             }
 
-            initDarkMode();
+            if (shouldBeDark) {
+                appBody.classList.add('dark-mode');
+                if (darkModeIcon) darkModeIcon.textContent = '☀️';
+            }
+        }
 
-            // Show notification function
-            function showNotification(message, type = 'info') {
-                const container = document.querySelector('.container');
-                if (!container) return;
-                
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-slide-down`;
-                alertDiv.setAttribute('role', 'alert');
-                alertDiv.innerHTML = `
+        initDarkMode();
+
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const container = document.querySelector('.container');
+            if (!container) return;
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-slide-down`;
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
-                
-                const firstContainer = document.querySelector('.container');
-                if (firstContainer && firstContainer.parentNode) {
-                    firstContainer.parentNode.insertBefore(alertDiv, firstContainer.nextSibling);
-                    setTimeout(() => {
-                        alertDiv.style.opacity = '0';
-                        setTimeout(() => alertDiv.remove(), 300);
-                    }, 4000);
+
+            const firstContainer = document.querySelector('.container');
+            if (firstContainer && firstContainer.parentNode) {
+                firstContainer.parentNode.insertBefore(alertDiv, firstContainer.nextSibling);
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 4000);
+            }
+        }
+
+        // Toggle dark mode button click handler
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Toggle UI immediately
+                appBody.classList.toggle('dark-mode');
+                const isDarkNow = appBody.classList.contains('dark-mode');
+
+                if (darkModeIcon) {
+                    darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
                 }
-            }
 
-            // Toggle dark mode button click handler
-            if (darkModeToggle) {
-                darkModeToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Toggle UI immediately
-                    appBody.classList.toggle('dark-mode');
-                    const isDarkNow = appBody.classList.contains('dark-mode');
-                    
-                    if (darkModeIcon) {
-                        darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
-                    }
-                    
-                    // TODO: Save dark mode preference
-                    // For authenticated users: save to database
-                    // For guests: save to localStorage
-                    if (!isAuthenticated) {
-                        localStorage.setItem('darkMode', isDarkNow.toString());
-                    }
-                });
-            }
-
-            // Hide loading screen on load
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.classList.add('hidden');
-            }
-
-            // Initialize all tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+                if (isAuthenticated) {
+                    current_user.dark_mode = isDarkNow
+                } else {
+                    localStorage.setItem('darkMode', isDarkNow.toString());
+                }
             });
+        }
 
-            // Initialize popovers
-            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            popoverTriggerList.map(function (popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
+        // Hide loading screen on load
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+        }
+
+        // Initialize all tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Initialize popovers
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
         });
 
         // Navbar shadow on scroll
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const navbar = document.getElementById('mainNav');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
@@ -223,4 +234,5 @@
     </script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

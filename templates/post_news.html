@@ -93,7 +93,7 @@
                             </div>
                             
                             <div id="editor" class="quill-editor-dark" style="height: 350px; background: white; border: 1px solid #dee2e6; border-radius: 4px;"></div>
-                            {{ form.content(id="contentInput", type="hidden") }}
+                            {{ form.content(id="content", type="hidden") }}
                             {% if form.content.errors %}
                             <div class="text-danger small mt-2">
                                 {% for error in form.content.errors %}
@@ -311,16 +311,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sync Quill content with hidden input on form submit
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
-        const contentInput = document.getElementById('contentInput');
-        const content = quill.root.innerHTML;
-        contentInput.value = content;
-        
-        // Don't prevent submission - let Flask handle validation
+        const contentInput = document.getElementById('content');
+        if (contentInput) {
+            const content = quill.root.innerHTML;
+            contentInput.value = content;
+            console.log('Content synced:', content.substring(0, 100));
+        }
     });
 
     // Load existing content if available
-    const contentInput = document.getElementById('contentInput');
-    if (contentInput.value) {
+    const contentInput = document.getElementById('content');
+    if (contentInput && contentInput.value) {
         quill.root.innerHTML = contentInput.value;
     }
 

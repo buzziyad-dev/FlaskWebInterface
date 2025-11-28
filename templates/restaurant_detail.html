@@ -5,9 +5,13 @@
 {% block content %}
 
 <!-- Hero Image -->
-<div class="restaurant-hero" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200' }}'); height: 400px; background-size: cover; background-position: center; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none;"></div>
-    <div class="container h-100 d-flex align-items-end animate-slide-up" style="position: relative; z-index: 2; padding-bottom: 2rem;">
+<div class="restaurant-hero"
+    style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200' }}'); height: 400px; background-size: cover; background-position: center; position: relative;">
+    <div
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none;">
+    </div>
+    <div class="container h-100 d-flex align-items-end animate-slide-up"
+        style="position: relative; z-index: 2; padding-bottom: 2rem;" ; display: none>
         <h1 class="display-4 fw-bold text-white">{{ restaurant.name }}</h1>
     </div>
 </div>
@@ -25,9 +29,10 @@
                             <div class="rating mb-2">
                                 {% set rating = restaurant.avg_rating() %}
                                 {% for i in range(5) %}
-                                    {% if i < rating %}<span class="star filled">★</span>{% else %}<span class="star">☆</span>{% endif %}
-                                {% endfor %}
-                                <span class="ms-2 fw-bold">{{ restaurant.avg_rating() }}</span>
+                                {% if i < rating %}<span class="star filled">★</span>{% else %}<span
+                                        class="star">☆</span>{% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 fw-bold">{{ restaurant.avg_rating() }}</span>
                             </div>
                             <p class="text-muted small">{{ restaurant.review_count() }} reviews</p>
                         </div>
@@ -47,7 +52,9 @@
                     {% set hours = restaurant.get_formatted_hours() %}
                     {% if hours %}
                     <div class="row">
-                        {% for day, time in [('Monday', hours.get('monday')), ('Tuesday', hours.get('tuesday')), ('Wednesday', hours.get('wednesday')), ('Thursday', hours.get('thursday')), ('Friday', hours.get('friday')), ('Saturday', hours.get('saturday')), ('Sunday', hours.get('sunday'))] %}
+                        {% for day, time in [('Monday', hours.get('monday')), ('Tuesday', hours.get('tuesday')),
+                        ('Wednesday', hours.get('wednesday')), ('Thursday', hours.get('thursday')), ('Friday',
+                        hours.get('friday')), ('Saturday', hours.get('saturday')), ('Sunday', hours.get('sunday'))] %}
                         <div class="col-md-6 mb-2">
                             <strong>{{ day }}:</strong> <span class="text-muted">{{ time or 'Closed' }}</span>
                         </div>
@@ -63,62 +70,66 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 fw-bold">Reviews</h4>
                         {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('add_review', id=restaurant.id) }}" class="btn btn-primary">Write a Review</a>
+                        <a href="{{ url_for('add_review', id=restaurant.id) }}" class="btn btn-primary">Write a
+                            Review</a>
                         {% endif %}
                     </div>
                 </div>
                 <div class="card-body">
                     {% if reviews %}
-                        {% for review in reviews %}
-                        <div class="review-item {% if not loop.last %}border-bottom pb-3 mb-3{% endif %}">
-                            <div class="d-flex align-items-start">
-                                <div class="reviewer-avatar-small me-3">{{ (review.author.username[0].upper() if review.author else 'D') }}</div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h6 class="fw-bold mb-0">
-                                                {% if review.author %}
-                                                    {{ review.author.username }}
-                                                    {% if review.author.is_admin %}
-                                                    <span class="badge bg-danger small ms-2 badge-with-tooltip admin-badge">
-                                                        Admin
-                                                        <span class="badge-tooltip">This user is an Admin</span>
-                                                    </span>
-                                                    {% else %}
-                                                    <span class="badge bg-light text-dark small ms-2 badge-with-tooltip user-badge">
-                                                        {{ review.author.get_badge() }}
-                                                        <span class="badge-tooltip">This user is a {{ review.author.get_badge() }}</span>
-                                                    </span>
-                                                    {% endif %}
+                    {% for review in reviews %}
+                    <div class="review-item {% if not loop.last %}border-bottom pb-3 mb-3{% endif %}">
+                        <div class="d-flex align-items-start">
+                            <div class="reviewer-avatar-small me-3">{{ (review.author.username[0].upper() if
+                                review.author else 'D') }}</div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">
+                                            {% if review.author %}
+                                            {{ review.author.username }}
+                                            {% if review.author.is_admin %}
+                                            <span class="badge bg-danger small ms-2 badge-with-tooltip admin-badge">
+                                                Admin
+                                                <span class="badge-tooltip">This user is an Admin</span>
+                                            </span>
+                                            {% else %}
+                                            <span
+                                                class="badge bg-light text-dark small ms-2 badge-with-tooltip user-badge">
+                                                {{ review.author.get_badge() }}
+                                                <span class="badge-tooltip">This user is a {{ review.author.get_badge()
+                                                    }}</span>
+                                            </span>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="text-muted">Deleted User</span>
+                                            {% endif %}
+                                        </h6>
+                                        <div class="rating-small">
+                                            {% for i in range(5) %}
+                                            {% if i < review.rating %} <span class="star filled">★</span>
                                                 {% else %}
-                                                    <span class="text-muted">Deleted User</span>
+                                                <span class="star">☆</span>
                                                 {% endif %}
-                                            </h6>
-                                            <div class="rating-small">
-                                                {% for i in range(5) %}
-                                                    {% if i < review.rating %}
-                                                    <span class="star filled">★</span>
-                                                    {% else %}
-                                                    <span class="star">☆</span>
-                                                    {% endif %}
                                                 {% endfor %}
-                                            </div>
                                         </div>
-                                        <small class="text-muted">{{ review.formatted_datetime_ksa() }}</small>
                                     </div>
-                                    {% if review.title %}
-                                    <h6 class="fw-bold">{{ review.title }}</h6>
-                                    {% endif %}
-                                    {% if review.food_category %}
-                                    <p class="mb-1"><small><span class="badge bg-info">{{ review.food_category }}</span></small></p>
-                                    {% endif %}
-                                    <p class="mb-0">{{ review.content }}</p>
+                                    <small class="text-muted">{{ review.formatted_datetime_ksa() }}</small>
                                 </div>
+                                {% if review.title %}
+                                <h6 class="fw-bold">{{ review.title }}</h6>
+                                {% endif %}
+                                {% if review.food_category %}
+                                <p class="mb-1"><small><span class="badge bg-info">{{ review.food_category
+                                            }}</span></small></p>
+                                {% endif %}
+                                <p class="mb-0">{{ review.content }}</p>
                             </div>
                         </div>
-                        {% endfor %}
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <p class="text-center text-muted py-4">No reviews yet. Be the first to review this restaurant!</p>
+                    <p class="text-center text-muted py-4">No reviews yet. Be the first to review this restaurant!</p>
                     {% endif %}
                 </div>
             </div>
@@ -146,12 +157,12 @@
                         </div>
                     </div>
                     {% endif %}
-                    
+
                     <div class="mb-3">
                         <h6 class="fw-bold text-muted small mb-1">PRICE RANGE</h6>
                         <p class="mb-0">{{ '$' * restaurant.price_range }}</p>
                     </div>
-                    
+
                     {% if restaurant.food_categories %}
                     <div>
                         <h6 class="fw-bold text-muted small mb-1">FOOD CATEGORIES</h6>
@@ -164,12 +175,13 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             {% if current_user.is_authenticated %}
             <div class="card shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="fw-bold mb-3">Share Your Experience</h6>
-                    <a href="{{ url_for('add_review', id=restaurant.id) }}" class="btn btn-primary w-100">Write a Review</a>
+                    <a href="{{ url_for('add_review', id=restaurant.id) }}" class="btn btn-primary w-100">Write a
+                        Review</a>
                 </div>
             </div>
             {% endif %}

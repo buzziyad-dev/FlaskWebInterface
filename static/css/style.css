@@ -207,9 +207,16 @@ html, body {
     border-radius: 50px;
     font-size: 1rem;
     background: rgba(255, 255, 255, 0.95);
+    background-blend-mode: multiply;
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), inset 0 0 30px rgba(102, 126, 234, 0.2);
     transition: all 0.3s ease;
+}
+
+body.dark-mode .hero-search .form-control {
+    background: rgba(30, 41, 59, 0.95);
+    background-blend-mode: screen;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), inset 0 0 30px rgba(102, 126, 234, 0.15);
 }
 
 .hero-search .form-control:focus {
@@ -1351,6 +1358,27 @@ body.dark-mode .btn-dark-mode {
 
 body.dark-mode .btn-dark-mode:hover {
     color: #f1f5f9 !important;
+}
+
+.navbar-toggler {
+    color: var(--text) !important;
+    border: 2px solid var(--text) !important;
+    padding: 0.6rem !important;
+    font-size: 1.3rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    border-color: var(--primary) !important;
+}
+
+body.dark-mode .navbar-toggler {
+    color: #cbd5e1 !important;
+    border-color: #cbd5e1 !important;
+}
+
+body.dark-mode .navbar-toggler:focus {
+    border-color: #667eea !important;
 }
 
 body.dark-mode .form-control,

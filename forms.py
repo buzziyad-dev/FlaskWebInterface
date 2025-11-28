@@ -61,7 +61,7 @@ class PhotoUploadForm(FlaskForm):
 
 class NewsForm(FlaskForm):
     title = StringField('News Title', validators=[DataRequired(), Length(min=5, max=200)])
-    content = TextAreaField('News Content', validators=[DataRequired()])
+    content = TextAreaField('News Content')
 
 class ProfileEditForm(FlaskForm):
     bio = TextAreaField('Bio', validators=[Length(max=500)])

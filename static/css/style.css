@@ -1611,7 +1611,7 @@ body.dark-mode .navbar.scrolled {
 }
 
 body.dark-mode .hero-section {
-    background: linear-gradient(135deg, #4c5ca8 0%, #3d3e6b 50%, #6b4591 100%) !important;
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+    background: linear-gradient(135deg, #2a2d5c, #3d3e6b, #4a3a6b) !important;
+    background-size: 100% 100% !important;
+    animation: none !important;
 }

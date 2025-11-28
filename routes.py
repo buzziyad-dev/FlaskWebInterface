@@ -18,6 +18,14 @@ def check_banned_user():
             flash('Your account has been banned.', 'danger')
             return redirect(url_for('banned', username=user.username))
 
+@app.before_request
+def refresh_user_dark_mode():
+    """Refresh user dark mode preference from database on each request"""
+    if current_user.is_authenticated:
+        user = User.query.get(current_user.id)
+        if user:
+            current_user.dark_mode = user.dark_mode
+
 @app.route('/')
 def index():
     from sqlalchemy import func

@@ -21,7 +21,7 @@
             {% if users|length >= 2 %}
             <div class="podium-position second-place animate-slide-up" style="animation-delay: 0.1s;">
                 <div class="podium-rank-label">2nd</div>
-                <div class="podium-card">
+                <div class="podium-card" ; display=none>
                     <div class="podium-avatar silver">{{ users[1].username[0].upper() }}</div>
                     <div class="podium-username">{{ users[1].username }}</div>
                     <div class="podium-score">{{ users[1].reputation_score }}</div>
@@ -66,19 +66,22 @@
         {% for user in users[:3] %}
         <div class="col-md-4 animate-slide-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
             <div class="top-reviewer-detail-card">
-                <div class="detail-card-header {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% else %}bronze{% endif %}">
+                <div
+                    class="detail-card-header {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% else %}bronze{% endif %}">
                     <div class="detail-rank-badge">#{{ loop.index }}</div>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-avatar">{{ user.username[0].upper() }}</div>
                     <h4 class="detail-username">{{ user.username }}</h4>
-                    
+
                     {% if user.is_admin %}
                     <span class="badge bg-danger mb-3">Admin</span>
                     {% else %}
-                    <span class="badge" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin-bottom: 1rem;">{{ user.get_badge() }}</span>
+                    <span class="badge"
+                        style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin-bottom: 1rem;">{{
+                        user.get_badge() }}</span>
                     {% endif %}
-                    
+
                     <div class="detail-stats">
                         <div class="detail-stat">
                             <div class="detail-stat-value">{{ user.reputation_score }}</div>
@@ -93,8 +96,9 @@
                             <div class="detail-stat-label">Avg Rating</div>
                         </div>
                     </div>
-                    
-                    <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-primary w-100 mt-3">View Profile</a>
+
+                    <a href="{{ url_for('profile', username=user.username) }}"
+                        class="btn btn-sm btn-primary w-100 mt-3">View Profile</a>
                 </div>
             </div>
         </div>
@@ -126,7 +130,8 @@
                     <tr class="leaderboard-row" style="animation-delay: {{ loop.index * 0.05 }}s;">
                         <td class="rank-cell">
                             <span class="rank-badge">
-                                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}#{{ loop.index }}{% endif %}
+                                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{%
+                                else %}#{{ loop.index }}{% endif %}
                             </span>
                         </td>
                         <td class="user-cell">
@@ -151,13 +156,14 @@
                         <td class="stat-cell">
                             <div class="rating-display">
                                 {% for i in range(5) %}
-                                    <span class="star-sm {% if i < user.avg_rating_given() %}filled{% endif %}">★</span>
+                                <span class="star-sm {% if i < user.avg_rating_given() %}filled{% endif %}">★</span>
                                 {% endfor %}
                                 <span class="rating-value">({{ '%.1f'|format(user.avg_rating_given()) }})</span>
                             </div>
                         </td>
                         <td class="action-cell">
-                            <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">Profile</a>
+                            <a href="{{ url_for('profile', username=user.username) }}"
+                                class="btn btn-sm btn-outline-primary">Profile</a>
                         </td>
                     </tr>
                     {% endfor %}

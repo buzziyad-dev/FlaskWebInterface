@@ -234,9 +234,6 @@ def add_review(id):
                         content=form.content.data,
                         food_category=form.food_category.data
                         if form.food_category.data else None,
-                        location_name=form.location_name.data,
-                        location_latitude=form.location_latitude.data,
-                        location_longitude=form.location_longitude.data,
                         user_id=current_user.id,
                         restaurant_id=id)
         db.session.add(review)
@@ -305,6 +302,8 @@ def add_restaurant():
                                 image_url=image_url,
                                 is_small_business=False,
                                 food_categories=selected_categories,
+                                location_latitude=form.location_latitude.data,
+                                location_longitude=form.location_longitude.data,
                                 is_approved=False)
         db.session.add(restaurant)
         db.session.commit()

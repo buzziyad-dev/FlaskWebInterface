@@ -135,6 +135,8 @@ class Restaurant(db.Model):
     is_promoted = db.Column(db.Boolean, default=False, index=True)
     food_categories = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)
+    location_latitude = db.Column(db.Float)
+    location_longitude = db.Column(db.Float)
 
     submitter = db.relationship('User',
                                 backref='submitted_restaurants',
@@ -171,9 +173,6 @@ class Review(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     food_category = db.Column(db.String(100))
-    location_name = db.Column(db.String(200))
-    location_latitude = db.Column(db.Float)
-    location_longitude = db.Column(db.Float)
 
     user_id = db.Column(db.Integer,
                         db.ForeignKey('user.id'),

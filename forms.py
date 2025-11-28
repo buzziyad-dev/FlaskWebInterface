@@ -28,9 +28,6 @@ class ReviewForm(FlaskForm):
     title = StringField('Review Title', validators=[Length(max=100)])
     content = TextAreaField('Your Review', validators=[DataRequired(), Length(min=10, max=1000)])
     food_category = SelectField('What did you try?', choices=[], render_kw={'data-placeholder': 'Optional - select a food category...'})
-    location_name = StringField('Location', validators=[DataRequired(), Length(min=3, max=200)])
-    location_latitude = FloatField('Latitude', validators=[DataRequired()])
-    location_longitude = FloatField('Longitude', validators=[DataRequired()])
 
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])
@@ -38,6 +35,8 @@ class RestaurantForm(FlaskForm):
     price_range = SelectField('Price Range', choices=[(1, '$ - Budget'), (2, '$$ - Moderate'), (3, '$$$ - Expensive'), (4, '$$$$ - Very Expensive')], coerce=int, validators=[DataRequired()])
     cuisine_id = SelectField('Cuisine Type', coerce=int, validators=[DataRequired()])
     restaurant_image = FileField('Restaurant Image')
+    location_latitude = FloatField('Latitude', validators=[DataRequired()])
+    location_longitude = FloatField('Longitude', validators=[DataRequired()])
     
     # Working hours for each day
     monday_hours = StringField('Monday', validators=[Length(max=50)])

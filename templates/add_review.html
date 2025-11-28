@@ -81,28 +81,6 @@
                         </div>
                         {% endif %}
 
-                        <!-- Location Selection -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">📍 Review Location (Required)</label>
-                            <p class="text-muted small mb-3">Click on the map to select the exact location where you had this dining experience</p>
-                            <div id="mapContainer" style="width: 100%; height: 400px; border: 2px solid var(--border); border-radius: 0.5rem; margin-bottom: 1rem; display: none;"></div>
-                            <div class="input-group input-group-lg mb-2">
-                                <input type="text" id="location_name" name="location_name" class="form-control" placeholder="e.g., Jeddah Downtown, Table 5" required>
-                            </div>
-                            {{ form.location_latitude(class="form-control", type="hidden") }}
-                            {{ form.location_longitude(class="form-control", type="hidden") }}
-                            <small class="text-muted d-block">
-                                Selected: <span id="selectedLocation">No location selected</span>
-                            </small>
-                            {% if form.location_name.errors %}
-                            <div class="text-danger small mt-2">
-                                {% for error in form.location_name.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-
                         <!-- Buttons -->
                         <div class="d-flex gap-3 mt-5">
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
@@ -176,43 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 star.style.textShadow = 'none';
             }
         });
-    }
-
-    // Map functionality
-    const mapContainer = document.getElementById('mapContainer');
-    const locationNameInput = document.getElementById('location_name');
-    const latitudeInput = document.getElementById('location_latitude');
-    const longitudeInput = document.getElementById('location_longitude');
-    const selectedLocationSpan = document.getElementById('selectedLocation');
-    let map, marker;
-
-    // Focus on map input to show map
-    locationNameInput.addEventListener('focus', function() {
-        mapContainer.style.display = 'block';
-        if (!map) initMap();
-    });
-
-    function initMap() {
-        map = L.map('mapContainer').setView([21.5433, 39.1728], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19
-        }).addTo(map);
-
-        map.on('click', function(e) {
-            const lat = e.latlng.lat;
-            const lng = e.latlng.lng;
-            placeMarker(lat, lng);
-        });
-    }
-
-    function placeMarker(lat, lng) {
-        if (marker) map.removeLayer(marker);
-        marker = L.marker([lat, lng]).addTo(map);
-        latitudeInput.value = lat.toFixed(6);
-        longitudeInput.value = lng.toFixed(6);
-        selectedLocationSpan.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        locationNameInput.focus();
     }
 });
 </script>

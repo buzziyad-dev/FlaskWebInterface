@@ -1361,10 +1361,19 @@ body.dark-mode .btn-dark-mode:hover {
 }
 
 .navbar-toggler {
-    color: var(--text) !important;
     border: 2px solid var(--text) !important;
-    padding: 0.6rem !important;
-    font-size: 1.3rem;
+    padding: 0.5rem 0.75rem !important;
+}
+
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    border-top: 3px solid currentColor;
+    border-bottom: 3px solid currentColor;
+    box-shadow: 0 6px 0 currentColor;
+    color: var(--text);
 }
 
 .navbar-toggler:focus {
@@ -1373,8 +1382,11 @@ body.dark-mode .btn-dark-mode:hover {
 }
 
 body.dark-mode .navbar-toggler {
-    color: #cbd5e1 !important;
     border-color: #cbd5e1 !important;
+}
+
+body.dark-mode .navbar-toggler-icon {
+    color: #cbd5e1;
 }
 
 body.dark-mode .navbar-toggler:focus {

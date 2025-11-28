@@ -127,10 +127,10 @@
                                 
                                 <!-- Comments Section -->
                                 <div class="comments-section ps-3 border-start mb-3">
-                                    {% set comments = review.comments.order_by(models.ReviewComment.created_at.desc()).all() if 'models' in dir() else review.comments.all() %}
-                                    {% if review.comments.all()|length > 0 %}
-                                    <h6 class="small fw-bold mb-2">💬 Comments ({{ review.comments.all()|length }})</h6>
-                                    {% for comment in review.comments.order_by(models.ReviewComment.created_at.desc()).all() if 'models' in dir() else review.comments.all() %}
+                                    {% set comment_list = review.comments.all() | list %}
+                                    {% if comment_list %}
+                                    <h6 class="small fw-bold mb-2">💬 Comments ({{ comment_list|length }})</h6>
+                                    {% for comment in comment_list | reverse %}
                                     <div class="comment-item mb-2 pb-2 border-bottom small">
                                         <div class="d-flex justify-content-between">
                                             <strong class="text-primary">{% if comment.author %}{{ comment.author.username }}{% else %}Deleted User{% endif %}</strong>

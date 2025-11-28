@@ -185,8 +185,8 @@
                     
                     // Save preference
                     if (isAuthenticated) {
-                        // Send to server for authenticated users
-                        fetch('/toggle-dark-mode', {
+                        // Save to database for authenticated users
+                        fetch(`/api/dark-mode/${isDarkNow}`, {
                             method: 'POST',
                             credentials: 'same-origin'
                         }).catch(err => console.error('Dark mode save error:', err));

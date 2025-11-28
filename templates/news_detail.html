@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Yalla News{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back Button -->
+            <a href="{{ url_for('news') }}" class="btn btn-outline-secondary mb-4">← Back to News</a>
+
+            <!-- News Article Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="mb-4">
+                        <h1 class="fw-bold mb-3">{{ post.title }}</h1>
+                        <div class="d-flex align-items-center text-muted small">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                {{ post.author.username[0].upper() }}
+                            </div>
+                            <div class="ms-3">
+                                <strong class="d-block">{{ post.author.username }}</strong>
+                                <small>{{ post.formatted_date() }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Rich Content -->
+                    <div class="news-content mt-4" style="line-height: 1.8; font-size: 1.05rem;">
+                        {{ post.content|safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related News Section -->
+            <div class="mt-5 pt-4 border-top">
+                <h5 class="fw-bold mb-4">More News</h5>
+                {% set related_posts = post.author.news_posts.filter(News.id != post.id).order_by(News.created_at.desc()).limit(3).all() %}
+                {% if related_posts %}
+                    {% for p in related_posts %}
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title fw-bold">
+                                <a href="{{ url_for('news_detail', news_id=p.id) }}" class="text-decoration-none">{{ p.title }}</a>
+                            </h6>
+                            <small class="text-muted d-block">{{ p.formatted_date() }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-4">No other news from this author</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Rich text content styling */
+    .news-content h1, .news-content h2, .news-content h3 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .news-content p {
+        margin-bottom: 1rem;
+    }
+
+    .news-content ul, .news-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .news-content blockquote {
+        border-left: 4px solid var(--primary);
+        padding-left: 1rem;
+        margin: 1rem 0;
+        opacity: 0.8;
+        font-style: italic;
+    }
+
+    .news-content code {
+        background: #f4f4f4;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+    }
+
+    .news-content pre {
+        background: #f4f4f4;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+
+    .news-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 1rem 0;
+    }
+
+    .news-content a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .news-content a:hover {
+        text-decoration: underline;
+    }
+
+    /* Dark mode */
+    body.dark-mode .news-content {
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .news-content code {
+        background: #333;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .news-content pre {
+        background: #333;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .news-content blockquote {
+        opacity: 1;
+        color: #b0b0b0;
+    }
+</style>
+{% endblock %}

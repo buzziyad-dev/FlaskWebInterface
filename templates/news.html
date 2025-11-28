@@ -30,7 +30,18 @@
                                 </small>
                             </div>
                         </div>
-                        <p class="card-text mt-3">{{ post.content }}</p>
+                        <div class="card-text mt-3">
+                            {% set plain_text = post.get_plain_text() %}
+                            {% if plain_text|length > 300 %}
+                                <div class="news-preview" style="max-height: 200px; overflow: hidden; position: relative;">
+                                    <div style="line-height: 1.6;">{{ post.content|safe }}</div>
+                                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, var(--bg-color)); pointer-events: none;"></div>
+                                </div>
+                                <a href="{{ url_for('news_detail', news_id=post.id) }}" class="btn btn-sm btn-outline-primary mt-3">More Details →</a>
+                            {% else %}
+                                <div style="line-height: 1.6;">{{ post.content|safe }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}

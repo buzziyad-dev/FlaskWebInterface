@@ -970,6 +970,15 @@ def news():
     return render_template('news.html', news_posts=news_posts)
 
 
+@app.route('/news/<int:news_id>')
+def news_detail(news_id):
+    if not FeatureToggle.get_feature_status('news_enabled'):
+        flash('News is temporarily disabled.', 'warning')
+        return redirect(url_for('index'))
+    news_post = News.query.get_or_404(news_id)
+    return render_template('news_detail.html', post=news_post)
+
+
 @app.route('/post_news', methods=['GET', 'POST'])
 @login_required
 def post_news():

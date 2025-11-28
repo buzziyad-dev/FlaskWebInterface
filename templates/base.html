@@ -15,7 +15,7 @@
 
 <body id="appBody">
     <form id="darkModeForm" action="/save_dark_mode" method="POST" style="display:none;">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="darkMode" id="darkModeInput">
     </form>
 

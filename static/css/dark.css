@@ -1,8 +1,28 @@
 /* Dark Mode - Hero Section */
 body.dark-mode .hero-section {
-    background: linear-gradient(135deg, #2a2d5c 0%, #3d3e6b 50%, #4a3a6b 100%);
-    background-size: 100% 100%;
-    animation: none;
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0011ff 0%, #6b3d3d 50%, #396a51 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 body.dark-mode .hero-overlay {
@@ -62,13 +82,15 @@ body.dark-mode .card:hover {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
-body.dark-mode .form-control, body.dark-mode .form-select {
+body.dark-mode .form-control,
+body.dark-mode .form-select {
     background: #0f172a;
     border-color: #334155;
     color: #e2e8f0;
 }
 
-body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
     background: #1e293b;
     border-color: #667eea;
 }

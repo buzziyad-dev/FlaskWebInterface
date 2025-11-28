@@ -2,8 +2,12 @@
 
 /* Root & Base */
 body.dark-mode {
-    background: #0f172a;
+    background: #0f172a !important;
     color: #e2e8f0;
+}
+
+body.dark-mode * {
+    background-color: inherit;
 }
 
 body.dark-mode html {
@@ -213,6 +217,21 @@ body.dark-mode textarea:focus {
 }
 
 /* Buttons */
+body.dark-mode .btn {
+    color: inherit;
+}
+
+body.dark-mode .btn-primary {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+body.dark-mode .btn-primary:hover {
+    background: #764ba2;
+    border-color: #764ba2;
+}
+
 body.dark-mode .btn-outline-primary {
     color: #667eea;
     border-color: #667eea;
@@ -236,10 +255,12 @@ body.dark-mode .btn-outline-light:hover {
 body.dark-mode .btn-secondary {
     background: #334155;
     border: 1px solid #475569;
+    color: #e2e8f0;
 }
 
 body.dark-mode .btn-secondary:hover {
     background: #475569;
+    color: #f1f5f9;
 }
 
 body.dark-mode .btn-light {
@@ -249,6 +270,7 @@ body.dark-mode .btn-light {
 
 body.dark-mode .btn-light:hover {
     background: #cbd5e1;
+    color: #0f172a;
 }
 
 /* Sections */
@@ -266,6 +288,26 @@ body.dark-mode section h3 {
 }
 
 /* Background Utilities */
+body.dark-mode .bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+}
+
+body.dark-mode .bg-primary.text-white {
+    color: white !important;
+}
+
+body.dark-mode .bg-primary h2,
+body.dark-mode .bg-primary h3,
+body.dark-mode .bg-primary h4,
+body.dark-mode .bg-primary h5,
+body.dark-mode .bg-primary h6,
+body.dark-mode .bg-primary p,
+body.dark-mode .bg-primary small,
+body.dark-mode .bg-primary label {
+    color: white !important;
+}
+
 body.dark-mode .bg-white {
     background: #1e293b !important;
     color: #e2e8f0;
@@ -278,6 +320,7 @@ body.dark-mode .bg-light {
 
 body.dark-mode .bg-secondary {
     background: #334155 !important;
+    color: #e2e8f0;
 }
 
 /* Badges */

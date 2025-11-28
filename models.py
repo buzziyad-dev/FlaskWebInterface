@@ -26,6 +26,11 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    def set_dark_mode(self, value):
+        """Set dark mode preference and save directly to database"""
+        self.dark_mode = value
+        db.session.commit()
+    
     def review_count(self):
         return self.reviews.count()
     

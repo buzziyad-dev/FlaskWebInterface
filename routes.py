@@ -92,15 +92,15 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
-@app.route('/api/dark-mode/<state>', methods=['POST'])
+@app.route('/save-dark-mode/<state>', methods=['POST'])
 @login_required
 def save_dark_mode(state):
-    """Save dark mode preference directly to database"""
-    if current_user.is_authenticated:
-        current_user.dark_mode = state.lower() == 'true'
-        db.session.commit()
-        return jsonify({'success': True, 'dark_mode': current_user.dark_mode})
-    return jsonify({'success': False})
+    """Save dark mode preference using User model method"""
+    try:
+        current_user.set_dark_mode(state.lower() == 'true')
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/restaurants')
 def restaurants():

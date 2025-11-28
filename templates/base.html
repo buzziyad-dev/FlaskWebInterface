@@ -183,15 +183,10 @@
                         darkModeIcon.textContent = isDarkNow ? '☀️' : '🌙';
                     }
                     
-                    // Save preference
-                    if (isAuthenticated) {
-                        // Save to database for authenticated users
-                        fetch(`/save-dark-mode/${isDarkNow}`, {
-                            method: 'POST',
-                            credentials: 'same-origin'
-                        }).catch(err => console.error('Dark mode save error:', err));
-                    } else {
-                        // Save to localStorage for non-authenticated users
+                    // TODO: Save dark mode preference
+                    // For authenticated users: save to database
+                    // For guests: save to localStorage
+                    if (!isAuthenticated) {
                         localStorage.setItem('darkMode', isDarkNow.toString());
                     }
                 });

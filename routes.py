@@ -4,6 +4,7 @@ from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle, ReviewComment
 from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm, ReviewCommentForm, AdminChangePasswordForm, AdminChangeUsernameForm
 import base64
+import os
 
 
 @login_manager.user_loader
@@ -21,6 +22,17 @@ def check_banned_user():
             return redirect(url_for('banned', username=user.username))
 
 
+def get_client_ip():
+    """Get the client's IP address, considering proxy headers"""
+    if request.headers.get('X-Forwarded-For'):
+        # X-Forwarded-For can contain multiple IPs, get the first one
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    elif request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    else:
+        return request.remote_addr
+
+
 @app.before_request
 def check_maintenance_mode():
     """Check if maintenance mode is enabled - redirect non-admins to maintenance page"""
@@ -29,8 +41,16 @@ def check_maintenance_mode():
         if current_user.is_authenticated and current_user.is_admin:
             return None
         
+        # Check if client IP is whitelisted
+        whitelisted_ips = os.environ.get('MAINTENANCE_WHITELIST_IPS', '')
+        if whitelisted_ips:
+            client_ip = get_client_ip()
+            ip_list = [ip.strip() for ip in whitelisted_ips.split(',')]
+            if client_ip in ip_list:
+                return None
+        
         # Routes that should be accessible during maintenance
-        allowed_routes = ['maintenance', 'login', 'logout', 'banned']
+        allowed_routes = ['maintenance', 'login', 'logout', 'banned', 'restaurant_detail', 'restaurants']
         if request.endpoint and request.endpoint in allowed_routes:
             return None
         

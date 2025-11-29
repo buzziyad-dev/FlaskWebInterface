@@ -99,7 +99,7 @@ msgstr "اكتشف الجواهر الطهوية المخفية في جدة وا
 #: templates/index.html:8
 #, fuzzy
 msgid "Explore authentic flavors and support local businesses"
-msgstr "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية."
+msgstr "استكشف الأطمة التراثية وادعم المحلات الصغيرة!"
 
 #: templates/index.html:11
 #, fuzzy

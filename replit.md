@@ -152,8 +152,9 @@ Admins can temporarily disable the following features via the Settings tab in th
 ## Recent Changes (Current Session)
 
 ### Complete Bilingual Translation System (Final)
-- **160+ translations added** - All templates now fully translated to Arabic & English
-- **Translation files**: `translations/en.json` (172 lines), `translations/ar.json` (172 lines)
+- **180+ translations added** - All 15 templates now fully translated to Arabic & English
+- **Translation files**: `translations/en.json` (187 lines), `translations/ar.json` (187 lines)
+- **Complete coverage**: Main page (index.html) + all secondary pages
 - **Translated pages**:
   - ✅ Authentication (login, register, banned)
   - ✅ Restaurants (add, browse, detail, search)
@@ -166,7 +167,17 @@ Admins can temporarily disable the following features via the Settings tab in th
 - **Key strings translated**: All UI labels, buttons, placeholders, messages, titles, table headers
 - **RTL support**: Automatic `dir="rtl"` for Arabic pages
 - **Zero compilation**: Edit JSON files directly, restart app to see changes
-- **171 template translation calls** - All hardcoded text now wrapped with `_()` function
+- **180+ template translation calls** - All hardcoded text now wrapped with `_()` function
+- **All 15 pages translated**:
+  - ✅ Home/Index (hero, promoted, recent, cuisines, top reviewers, CTA)
+  - ✅ Authentication (login, register, banned)
+  - ✅ Restaurants (add, browse, detail, search)
+  - ✅ Reviews & comments
+  - ✅ User profiles & editing
+  - ✅ Leaderboard & rankings
+  - ✅ News posts
+  - ✅ Admin dashboard
+  - ✅ Error pages & maintenance
 
 ## Previous Changes (Prior Session)
 

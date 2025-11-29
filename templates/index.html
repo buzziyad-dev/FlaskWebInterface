@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="text-muted small ms-2">({{ restaurant.review_count() }})</span>
                         </div>
                         <p class="card-text text-muted small">{{ restaurant.description[:80] }}...</p>
-                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm w-100">View Details</a>
+                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm w-100">{{ _('View Details') }}</a>
                     </div>
                 </div>
             </div>
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Recent Restaurants -->
 <section class="py-5">
     <div class="container">
-        <h2 class="animate-slide-up">🍽️ Recently Added</h2>
+        <h2 class="animate-slide-up">🍽️ {{ _('Recently Added') }}</h2>
         <div class="row g-4">
             {% for restaurant in restaurants[:6] %}
             <div class="col-lg-4 col-md-6 animate-slide-up">
@@ -246,14 +246,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 {% if i < rating %}<span class="star filled">★</span>{% else %}<span class="star">☆</span>{% endif %}
                             {% endfor %}
                         </div>
-                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+                        <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm w-100">{{ _('View Details') }}</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
         <div class="text-center mt-5">
-            <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg px-5">Browse All Restaurants</a>
+            <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg px-5">{{ _('Browse All Restaurants') }}</a>
         </div>
     </div>
 </section>
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Cuisines -->
 <section class="py-5 bg-white">
     <div class="container">
-        <h2 class="animate-slide-up">🌍 Explore by Cuisine</h2>
+        <h2 class="animate-slide-up">🌍 {{ _('Explore by Cuisine') }}</h2>
         <div class="row g-3">
             {% for cuisine in cuisines[:6] %}
             <div class="col-lg-2 col-md-4 col-6 animate-slide-up">
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if top_reviewers %}
 <section class="py-5">
     <div class="container">
-        <h2 class="animate-slide-up">👑 Top Community Reviewers</h2>
+        <h2 class="animate-slide-up">👑 {{ _('Top Community Reviewers') }}</h2>
         <div class="row g-4">
             {% for user in top_reviewers %}
             <div class="col-lg-3 col-md-6 animate-slide-up">
@@ -293,8 +293,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <h6 class="fw-bold">{{ user.username }}</h6>
                         <span class="badge bg-light text-dark small mb-2">{{ user.get_badge() }}</span>
-                        <p class="text-muted small mb-3">{{ user.review_count() }} reviews</p>
-                        <a href="{{ url_for('profile', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                        <p class="text-muted small mb-3">{{ user.review_count() }} {{ _('reviews') }}</p>
+                        <a href="{{ url_for('profile', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Profile') }}</a>
                     </div>
                 </div>
             </div>
@@ -307,14 +307,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- CTA Section -->
 <section class="py-5" style="background: linear-gradient(135deg, #5a5fa3 0%, #633d8b 100%);">
     <div class="container text-center text-white">
-        <h2 class="fw-bold mb-3 animate-slide-up">🚀 Join Our Community</h2>
-        <p class="fs-5 mb-4 animate-slide-up">Support local restaurants and discover amazing food</p>
+        <h2 class="fw-bold mb-3 animate-slide-up">🚀 {{ _('Join Our Community') }}</h2>
+        <p class="fs-5 mb-4 animate-slide-up">{{ _('Support local restaurants and discover amazing food') }}</p>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('add_restaurant') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">Add Restaurant</a>
-        <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">Browse</a>
+        <a href="{{ url_for('add_restaurant') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">{{ _('Add Restaurant') }}</a>
+        <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">{{ _('Browse') }}</a>
         {% else %}
-        <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">Sign Up</a>
-        <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">Browse</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg me-2 animate-slide-up">{{ _('Sign Up') }}</a>
+        <a href="{{ url_for('restaurants') }}" class="btn btn-outline-light btn-lg animate-slide-up">{{ _('Browse') }}</a>
         {% endif %}
     </div>
 </section>

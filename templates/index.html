@@ -19,7 +19,7 @@
 {% if promoted and promoted|length > 0 %}
 <section class="py-5 bg-white">
     <div class="container">
-        <h2 class="animate-slide-up mb-4">⭐ Promoted Restaurants</h2>
+        <h2 class="animate-slide-up mb-4">⭐ {{ _('Promoted Restaurants') }}</h2>
         
         <div class="carousel-container position-relative">
             <!-- Carousel Wrapper -->
@@ -43,7 +43,7 @@
                                     <span class="text-muted small ms-2">({{ restaurant.review_count() }})</span>
                                 </div>
                                 <p class="card-text text-muted small flex-grow-1">{{ restaurant.description[:100] }}...</p>
-                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm mt-auto">View Details</a>
+                                <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-primary btn-sm mt-auto">{{ _('View Details') }}</a>
                             </div>
                         </div>
                     </div>

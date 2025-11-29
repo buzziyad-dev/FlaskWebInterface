@@ -9,7 +9,7 @@
         <div class="col-lg-8 animate-slide-up">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white fw-bold py-4">
-                    <h4 class="mb-0">⭐ Write a Review for {{ restaurant.name }}</h4>
+                    <h4 class="mb-0">⭐ {{ _('Write a Review for') }} {{ restaurant.name }}</h4>
                 </div>
                 <div class="card-body p-5">
                     <form method="POST" class="needs-validation">
@@ -17,7 +17,7 @@
 
                         <!-- Rating Stars -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Your Rating</label>
+                            <label class="form-label fw-bold">{{ _('Your Rating') }}</label>
                             <div class="star-rating-interactive" id="starRating" data-rating="0">
                                 {% for i in range(1, 6) %}
                                 <span class="star-interactive" data-value="{{ i }}" style="cursor: pointer; font-size: 3rem; margin-right: 0.5rem; transition: all 0.2s ease;">
@@ -28,7 +28,7 @@
                             <!-- Hidden input to store selected rating -->
                             <input type="hidden" id="ratingInput" name="rating" value="0" required>
                             <small class="text-muted d-block mt-2">
-                                Selected: <span id="ratingText">0</span> stars
+                                {{ _('Selected:') }} <span id="ratingText">0</span> {{ _('stars') }}
                             </small>
                             {% if form.rating.errors %}
                             <div class="text-danger small mt-2">
@@ -41,8 +41,8 @@
 
                         <!-- Title -->
                         <div class="mb-4">
-                            <label for="title" class="form-label fw-bold">Review Title</label>
-                            {{ form.title(class="form-control form-control-lg", placeholder="e.g., Amazing food and great service!") }}
+                            <label for="title" class="form-label fw-bold">{{ _('Review Title') }}</label>
+                            {{ form.title(class="form-control form-control-lg", placeholder=_('e.g., Amazing food and great service!')) }}
                             {% if form.title.errors %}
                             <div class="text-danger small mt-2">
                                 {% for error in form.title.errors %}
@@ -54,9 +54,9 @@
 
                         <!-- Content -->
                         <div class="mb-4">
-                            <label for="content" class="form-label fw-bold">Your Review</label>
-                            {{ form.content(class="form-control form-control-lg", rows="6", placeholder="Share your dining experience...") }}
-                            <small class="text-muted">Minimum 10 characters</small>
+                            <label for="content" class="form-label fw-bold">{{ _('Your Review') }}</label>
+                            {{ form.content(class="form-control form-control-lg", rows="6", placeholder=_('Share your dining experience...')) }}
+                            <small class="text-muted">{{ _('Minimum 10 characters') }}</small>
                             {% if form.content.errors %}
                             <div class="text-danger small mt-2">
                                 {% for error in form.content.errors %}
@@ -69,7 +69,7 @@
                         <!-- Food Category -->
                         {% if form.food_category.choices %}
                         <div class="mb-4">
-                            <label for="food_category" class="form-label fw-bold">Food Category (Optional)</label>
+                            <label for="food_category" class="form-label fw-bold">{{ _('Food Category (Optional)') }}</label>
                             {{ form.food_category(class="form-select form-select-lg") }}
                             {% if form.food_category.errors %}
                             <div class="text-danger small mt-2">
@@ -84,10 +84,10 @@
                         <!-- Buttons -->
                         <div class="d-flex gap-3 mt-5">
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
-                                ✓ Submit Review
+                                ✓ {{ _('Submit') }}
                             </button>
                             <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-secondary btn-lg">
-                                Cancel
+                                {{ _('Cancel') }}
                             </a>
                         </div>
                     </form>
@@ -102,7 +102,7 @@
                         <img src="{{ restaurant.image_url }}" alt="{{ restaurant.name }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 0.5rem;">
                         {% else %}
                         <div style="width: 120px; height: 120px; background: #e9ecef; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #999;">
-                            No Image
+                            {{ _('No Image') }}
                         </div>
                         {% endif %}
                         <div>

@@ -8,8 +8,8 @@
         <div class="col-md-6 col-lg-5">
             <div class="card shadow">
                 <div class="card-body p-5">
-                    <h2 class="text-center fw-bold mb-4">Join Yalla</h2>
-                    <p class="text-center text-muted mb-4">Start discovering and reviewing restaurants in Jeddah</p>
+                    <h2 class="text-center fw-bold mb-4">{{ _('Join Yalla') }}</h2>
+                    <p class="text-center text-muted mb-4">{{ _('Start discovering and reviewing restaurants in Jeddah') }}</p>
                     
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
@@ -54,11 +54,11 @@
                             {% endif %}
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Create Account</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">{{ _('Create Account') }}</button>
                     </form>
                     
                     <div class="text-center mt-4">
-                        <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                        <p class="mb-0">{{ _('Already have an account?') }} <a href="{{ url_for('login') }}">{{ _('Login here') }}</a></p>
                     </div>
                 </div>
             </div>

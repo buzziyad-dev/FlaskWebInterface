@@ -8,15 +8,15 @@
         <div class="col-md-6 col-lg-5">
             <div class="card shadow">
                 <div class="card-body p-5">
-                    <h2 class="text-center fw-bold mb-4">Welcome Back</h2>
-                    <p class="text-center text-muted mb-4">Login to continue discovering restaurants</p>
+                    <h2 class="text-center fw-bold mb-4">{{ _('Welcome Back') }}</h2>
+                    <p class="text-center text-muted mb-4">{{ _('Login to continue discovering restaurants') }}</p>
                     
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-3">
                             {{ form.user_input.label(class="form-label") }}
-                            {{ form.user_input(class="form-control" + (" is-invalid" if form.user_input.errors else ""), placeholder="Enter your username or email") }}
+                            {{ form.user_input(class="form-control" + (" is-invalid" if form.user_input.errors else ""), placeholder=_('Enter your username or email')) }}
                             {% if form.user_input.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.user_input.errors %}{{ error }}{% endfor %}
@@ -34,11 +34,11 @@
                             {% endif %}
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Login</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">{{ _('Login') }}</button>
                     </form>
                     
                     <div class="text-center mt-4">
-                        <p class="mb-0">Don't have an account? <a href="{{ url_for('register') }}">Sign up here</a></p>
+                        <p class="mb-0">{{ _('Don\'t have an account?') }} <a href="{{ url_for('register') }}">{{ _('Sign up here') }}</a></p>
                     </div>
                 </div>
             </div>

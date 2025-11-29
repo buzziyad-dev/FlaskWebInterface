@@ -5,8 +5,8 @@
 {% block content %}
 <div class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-2">Add a New Restaurant</h1>
-        <p class="lead">Help grow our community by adding a restaurant in Jeddah</p>
+        <h1 class="display-4 fw-bold mb-2">{{ _('Add a New Restaurant') }}</h1>
+        <p class="lead">{{ _('Help grow our community by adding a restaurant in Jeddah') }}</p>
     </div>
 </div>
 
@@ -22,7 +22,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 {{ form.name.label(class="form-label fw-bold") }}
-                                {{ form.name(class="form-control", placeholder="Restaurant name") }}
+                                {{ form.name(class="form-control", placeholder=_('Restaurant name')) }}
                                 {% if form.name.errors %}
                                     <div class="text-danger small mt-1">
                                         {% for error in form.name.errors %}{{ error }}{% endfor %}
@@ -44,7 +44,7 @@
                         <!-- Description -->
                         <div class="mb-4">
                             {{ form.description.label(class="form-label fw-bold") }}
-                            {{ form.description(class="form-control", rows="4", placeholder="Tell us about this restaurant...") }}
+                            {{ form.description(class="form-control", rows="4", placeholder=_('Tell us about this restaurant...')) }}
                             {% if form.description.errors %}
                                 <div class="text-danger small mt-1">
                                     {% for error in form.description.errors %}{{ error }}{% endfor %}
@@ -67,7 +67,7 @@
                             <div class="col-md-6 mb-4">
                                 {{ form.restaurant_image.label(class="form-label fw-bold") }}
                                 {{ form.restaurant_image(class="form-control", accept=".png,.jpg,.jpeg") }}
-                                <small class="text-muted d-block mt-2">PNG or JPG (max 2MB)</small>
+                                <small class="text-muted d-block mt-2">{{ _('PNG or JPG (max 2MB)') }}</small>
                                 {% if form.restaurant_image.errors %}
                                     <div class="text-danger small mt-1">
                                         {% for error in form.restaurant_image.errors %}{{ error }}{% endfor %}
@@ -78,7 +78,7 @@
                         
                         <!-- Working Hours Section -->
                         <div class="mb-4">
-                            <h5 class="fw-bold mb-3">🕐 Working Hours</h5>
+                            <h5 class="fw-bold mb-3">🕐 {{ _('Working Hours') }}</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     {{ form.monday_hours.label("Monday", class="form-label") }}
@@ -113,13 +113,13 @@
                         
                         <!-- Location Selection -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">📍 Restaurant Location (Required)</label>
-                            <p class="text-muted small mb-3">Click on the map to pin the exact location of this restaurant in Jeddah</p>
+                            <label class="form-label fw-bold">📍 {{ _('Restaurant Location (Required)') }}</label>
+                            <p class="text-muted small mb-3">{{ _('Click on the map to pin the exact location of this restaurant in Jeddah') }}</p>
                             <div id="mapContainer" style="width: 100%; height: 400px; border: 2px solid var(--border); border-radius: 0.5rem; margin-bottom: 1rem; display: none;"></div>
                             {{ form.location_latitude(class="form-control", type="hidden") }}
                             {{ form.location_longitude(class="form-control", type="hidden") }}
                             <small class="text-muted d-block">
-                                Selected: <span id="selectedLocation">No location selected</span>
+                                {{ _('Selected:') }} <span id="selectedLocation">{{ _('No location selected') }}</span>
                             </small>
                             {% if form.location_latitude.errors %}
                             <div class="text-danger small mt-2">
@@ -144,8 +144,8 @@
                         
                         <!-- Buttons -->
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold">🍽️ Submit Restaurant</button>
-                            <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary btn-lg fw-bold">Cancel</a>
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">🍽️ {{ _('Submit') }}</button>
+                            <a href="{{ url_for('restaurants') }}" class="btn btn-outline-secondary btn-lg fw-bold">{{ _('Cancel') }}</a>
                         </div>
                     </form>
                 </div>
@@ -153,12 +153,12 @@
             
             <!-- Info Box -->
             <div class="alert alert-info mt-4">
-                <h6 class="fw-bold mb-2">📋 Before You Submit</h6>
+                <h6 class="fw-bold mb-2">📋 {{ _('Before You Submit') }}</h6>
                 <ul class="mb-0 small">
-                    <li>Make sure the restaurant is located in Jeddah</li>
-                    <li>Upload a clear photo of the restaurant</li>
-                    <li>Enter accurate working hours for each day</li>
-                    <li>An admin will review and approve your submission</li>
+                    <li>{{ _('Make sure the restaurant is located in Jeddah') }}</li>
+                    <li>{{ _('Upload a clear photo of the restaurant') }}</li>
+                    <li>{{ _('Enter accurate working hours for each day') }}</li>
+                    <li>{{ _('An admin will review and approve your submission') }}</li>
                 </ul>
             </div>
         </div>

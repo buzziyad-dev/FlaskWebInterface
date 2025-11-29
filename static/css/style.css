@@ -276,7 +276,7 @@ body {
 .hero-search .form-control {
     padding: 1rem 1.5rem;
     border: none;
-    border-radius: 50px;
+    border-radius: 50px 0 0 50px;
     font-size: 1rem;
     background: rgba(255, 255, 255, 0.95);
     background-blend-mode: multiply;
@@ -299,7 +299,7 @@ body.dark-mode .hero-search .form-control {
 
 .hero-search .btn {
     padding: 1rem 2.5rem;
-    border-radius: 50px;
+    border-radius: 0 50px 50px 0;
     font-weight: 700;
 }
 
@@ -2651,4 +2651,9 @@ html[dir="rtl"] .input-group {
 
 html[dir="rtl"] .input-group .form-control {
     text-align: right;
+    border-radius: 0 50px 50px 0 !important;
+}
+
+html[dir="rtl"] .input-group .btn {
+    border-radius: 50px 0 0 50px !important;
 }

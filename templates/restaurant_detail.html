@@ -270,9 +270,10 @@
         const map = L.map('restaurant-map').setView([{{restaurant.location_latitude}}, {{restaurant.location_longitude}}], 15);
 
     // Add tile layer with labels
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap, © CartoDB',
-        maxZoom: 19
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}.png', {
+        attribution: '© CartoDB contributors, © OpenStreetMap contributors',
+        maxZoom: 19,
+        subdomains: 'abcd'
     }).addTo(map);
 
     // Add marker for restaurant location

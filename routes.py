@@ -658,6 +658,7 @@ def admin_api_data():
             'name': b.name,
             'color': b.color,
             'description': b.description,
+            'hierarchy': b.hierarchy,
             'created_at': b.created_at.strftime('%b %d, %Y')
         }
 
@@ -704,6 +705,21 @@ def reject_restaurant(id):
     db.session.commit()
     flash(f'{restaurant.name} has been rejected and removed.', 'warning')
     return redirect(url_for('admin_dashboard', tab='overview'))
+
+
+@app.route('/admin/badge/<int:badge_id>/hierarchy', methods=['POST'])
+@login_required
+def update_badge_hierarchy(badge_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    badge = Badge.query.get_or_404(badge_id)
+    hierarchy = request.form.get('hierarchy', '').strip()
+    try:
+        badge.hierarchy = int(hierarchy)
+        db.session.commit()
+        return jsonify({'success': True, 'hierarchy': badge.hierarchy})
+    except ValueError:
+        return jsonify({'error': 'Invalid hierarchy value'}), 400
 
 
 @app.route('/leaderboard')

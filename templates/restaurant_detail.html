@@ -93,9 +93,16 @@
                                                 Admin
                                             </span>
                                             {% else %}
+                                            {% set highest_badge = review.author.get_highest_hierarchy_badge() %}
+                                            {% if highest_badge %}
+                                            <span class="badge small ms-2" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="This user is a {{ highest_badge.name }}">
+                                                {{ highest_badge.name }}
+                                            </span>
+                                            {% else %}
                                             <span class="badge bg-light text-dark small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is a {{ review.author.get_badge() }}">
                                                 {{ review.author.get_badge() }}
                                             </span>
+                                            {% endif %}
                                             {% endif %}
                                             {% else %}
                                             <span class="text-muted">Deleted User</span>

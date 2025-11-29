@@ -99,6 +99,13 @@ class User(UserMixin, db.Model):
                                                badge_id=badge.id)
                         db.session.add(user_badge)
                 break
+    
+    def get_highest_hierarchy_badge(self):
+        """Get the badge with highest hierarchy for this user"""
+        user_badges = self.custom_badges.all()
+        if not user_badges:
+            return None
+        return max(user_badges, key=lambda ub: ub.badge.hierarchy).badge
 
 
 class Cuisine(db.Model):
@@ -261,6 +268,7 @@ class Badge(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False, index=True)
     color = db.Column(db.String(7), default='#007bff')
     description = db.Column(db.String(255), default='')
+    hierarchy = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_badges = db.relationship('UserBadge',

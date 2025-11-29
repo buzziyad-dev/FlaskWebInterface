@@ -800,6 +800,9 @@ def manage_user(id):
     elif action == 'edit':
         new_username = request.form.get('username', '').strip()
         new_email = request.form.get('email', '').strip()
+        change_to_username = request.form.get('change_to_username', '').strip()
+        new_password = request.form.get('new_password', '').strip()
+        
         if new_username and new_username != user.username:
             existing = User.query.filter_by(username=new_username).first()
             if existing:
@@ -810,10 +813,26 @@ def manage_user(id):
             if existing:
                 flash('Email already registered.', 'danger')
                 return redirect(url_for('admin_dashboard', tab='users'))
+        
         if new_username:
             user.username = new_username
         if new_email:
             user.email = new_email
+        if change_to_username:
+            if len(change_to_username) < 3 or len(change_to_username) > 64:
+                flash('Username must be between 3-64 characters.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='users'))
+            existing = User.query.filter_by(username=change_to_username).first()
+            if existing:
+                flash('New username already taken.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='users'))
+            user.username = change_to_username
+        if new_password:
+            if len(new_password) < 8:
+                flash('Password must be at least 8 characters.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='users'))
+            user.set_password(new_password)
+        
         try:
             user.reputation_score = int(
                 request.form.get('reputation_score', user.reputation_score))

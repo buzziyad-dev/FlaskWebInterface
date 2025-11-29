@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ get_locale() }}" {% if get_locale() == 'ar' %}dir="rtl"{% endif %}>
 
 <head>
     <meta charset="UTF-8">
@@ -68,6 +68,16 @@
                     <button class="btn btn-primary ms-2" type="submit">Go</button>
                 </form>
                 <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <button type="button" class="btn btn-link" id="languageDropdown" data-bs-toggle="dropdown" 
+                            title="Select language" style="text-decoration: none; padding: 0.5rem 0.75rem;">
+                            <span id="languageIcon">🌍</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item {% if get_locale() == 'en' %}active{% endif %}" href="{{ url_for('set_language', language='en') }}">English</a></li>
+                            <li><a class="dropdown-item {% if get_locale() == 'ar' %}active{% endif %}" href="{{ url_for('set_language', language='ar') }}">العربية</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <button type="button" class="btn btn-link btn-dark-mode" id="darkModeToggle"
                             title="Toggle dark mode" style="text-decoration: none; padding: 0.5rem 0.75rem;">

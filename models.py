@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.Text, default='')
     profile_picture = db.Column(db.LargeBinary)
     dark_mode = db.Column(db.Boolean, default=False)
+    language = db.Column(db.String(10), default='en')
 
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
 

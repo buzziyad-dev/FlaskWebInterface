@@ -158,6 +158,28 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/set_language/<language>')
+def set_language(language):
+    """Set the user's language preference"""
+    from flask import g
+    if language not in ['en', 'ar']:
+        language = 'en'
+    
+    # Set cookie for non-authenticated users
+    response = redirect(request.referrer or url_for('index'))
+    response.set_cookie('language', language, max_age=60*60*24*365)  # 1 year
+    
+    # Save to database if authenticated
+    if current_user.is_authenticated:
+        current_user.language = language
+        db.session.commit()
+    
+    # Set locale for this request
+    g.locale = language
+    
+    return response
+
+
 @app.route('/review/<int:review_id>/comment', methods=['POST'])
 @login_required
 def add_comment(review_id):

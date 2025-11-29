@@ -1,0 +1,222 @@
+# Arabic translations for Yalla
+# Copyright (C) 2024 Yalla
+# This file is distributed under the same license as the Yalla package.
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%10>=3 && n%10<=10 ? 3 : n%10>=11 ? 4 : 5);\n"
+
+msgid "Home"
+msgstr "الرئيسية"
+
+msgid "Restaurants"
+msgstr "المطاعم"
+
+msgid "Leaderboard"
+msgstr "لوحة المتصدرين"
+
+msgid "News"
+msgstr "الأخبار"
+
+msgid "+ Add"
+msgstr "+ إضافة"
+
+msgid "Admin"
+msgstr "إدارة"
+
+msgid "Search..."
+msgstr "البحث..."
+
+msgid "Go"
+msgstr "ابحث"
+
+msgid "Toggle dark mode"
+msgstr "تبديل الوضع الليلي"
+
+msgid "Select language"
+msgstr "اختر اللغة"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Sign Up"
+msgstr "إنشاء حساب"
+
+msgid "Add a New Restaurant"
+msgstr "إضافة مطعم جديد"
+
+msgid "Help grow our community by adding a restaurant in Jeddah"
+msgstr "ساعد في نمو مجتمعنا بإضافة مطعم في جدة"
+
+msgid "Restaurant name"
+msgstr "اسم المطعم"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Tell us about this restaurant..."
+msgstr "أخبرنا عن هذا المطعم..."
+
+msgid "Price Range"
+msgstr "نطاق السعر"
+
+msgid "Upload Image"
+msgstr "تحميل صورة"
+
+msgid "PNG or JPG (max 2MB)"
+msgstr "PNG أو JPG (بحد أقصى 2MB)"
+
+msgid "Location"
+msgstr "الموقع"
+
+msgid "Click on the map to pin the exact location of this restaurant in Jeddah"
+msgstr "انقر على الخريطة لتحديد الموقع الدقيق لهذا المطعم في جدة"
+
+msgid "Selected: No location selected"
+msgstr "المختار: لم يتم تحديد موقع"
+
+msgid "Add Restaurant"
+msgstr "إضافة مطعم"
+
+msgid "Submit"
+msgstr "إرسال"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Welcome to Yalla"
+msgstr "أهلا بك في يلا"
+
+msgid "Discover Jeddah's hidden culinary gems and support local businesses."
+msgstr "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية."
+
+msgid "Quick Links"
+msgstr "روابط سريعة"
+
+msgid "Community"
+msgstr "المجتمع"
+
+msgid "Join our growing community of food lovers in Jeddah!"
+msgstr "انضم إلى مجتمعنا المتنامي من محبي الطعام في جدة!"
+
+msgid "All rights reserved"
+msgstr "جميع الحقوق محفوظة"
+
+msgid "Discover Jeddah's Best Restaurants"
+msgstr "اكتشف أفضل مطاعم جدة"
+
+msgid "Reviews"
+msgstr "التقييمات"
+
+msgid "Rating"
+msgstr "التقييم"
+
+msgid "No reviews yet"
+msgstr "لا توجد تقييمات حتى الآن"
+
+msgid "Write a Review"
+msgstr "كتابة تقييم"
+
+msgid "Your Review"
+msgstr "تقييمك"
+
+msgid "Cuisine"
+msgstr "المطبخ"
+
+msgid "Add your review..."
+msgstr "أضف تقييمك..."
+
+msgid "Price"
+msgstr "السعر"
+
+msgid "Budget-friendly"
+msgstr "ميسور الأسعار"
+
+msgid "Moderate"
+msgstr "متوسط"
+
+msgid "Premium"
+msgstr "فاخر"
+
+msgid "Elite"
+msgstr "نخبوي"
+
+msgid "User Profile"
+msgstr "ملف المستخدم"
+
+msgid "Reputation"
+msgstr "السمعة"
+
+msgid "Badge"
+msgstr "الشارة"
+
+msgid "Joined"
+msgstr "انضم في"
+
+msgid "No restaurants yet"
+msgstr "لا توجد مطاعم حتى الآن"
+
+msgid "Registration successful! Welcome to Yalla!"
+msgstr "تم التسجيل بنجاح! أهلا بك في يلا!"
+
+msgid "Login failed. Please check your username/email and password."
+msgstr "فشل تسجيل الدخول. يرجى التحقق من اسم المستخدم أو البريد الإلكتروني وكلمة المرور."
+
+msgid "Welcome back"
+msgstr "أهلا بعودتك"
+
+msgid "You have been logged out."
+msgstr "تم تسجيل خروجك."
+
+msgid "Registration"
+msgstr "التسجيل"
+
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Confirm Password"
+msgstr "تأكيد كلمة المرور"
+
+msgid "Already have an account?"
+msgstr "هل لديك حساب بالفعل؟"
+
+msgid "Comment added successfully!"
+msgstr "تم إضافة التعليق بنجاح!"
+
+msgid "Restaurant added successfully!"
+msgstr "تم إضافة المطعم بنجاح!"
+
+msgid "Elite Foodie"
+msgstr "عاشق طعام نخبوي"
+
+msgid "Expert Reviewer"
+msgstr "مراجع خبير"
+
+msgid "Experienced Diner"
+msgstr "آكل ذو خبرة"
+
+msgid "Rising Critic"
+msgstr "ناقد صاعد"
+
+msgid "Food Explorer"
+msgstr "مستكشف الطعام"
+
+msgid "Newcomer"
+msgstr "وافد جديد"
+
+msgid "Dark Mode"
+msgstr "الوضع الليلي"

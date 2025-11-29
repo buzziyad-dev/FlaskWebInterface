@@ -88,11 +88,6 @@
                                         <h6 class="fw-bold mb-0">
                                             {% if review.author %}
                                             <a href="{{ url_for('profile', user_id=review.author.id) }}" class="text-decoration-none" style="color: inherit;">{{ review.author.username }}</a>
-                                            {% if review.author.is_admin %}
-                                            <span class="badge bg-danger small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is an Admin">
-                                                Admin
-                                            </span>
-                                            {% else %}
                                             {% set highest_badge = review.author.get_highest_hierarchy_badge() %}
                                             {% if highest_badge %}
                                             <span class="badge small ms-2" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="This user is a {{ highest_badge.name }}">
@@ -102,7 +97,6 @@
                                             <span class="badge bg-light text-dark small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is a {{ review.author.get_badge() }}">
                                                 {{ review.author.get_badge() }}
                                             </span>
-                                            {% endif %}
                                             {% endif %}
                                             {% else %}
                                             <span class="text-muted">Deleted User</span>
@@ -139,13 +133,9 @@
                                             <strong class="text-primary">
                                                 {% if comment.author %}
                                                 <a href="{{ url_for('profile', user_id=comment.author.id) }}" class="text-decoration-none text-primary">{{ comment.author.username }}</a>
-                                                {% if comment.author.is_admin %}
-                                                <span class="badge bg-danger badge-sm" data-bs-toggle="tooltip" data-bs-title="This user is an Admin">Admin</span>
-                                                {% else %}
                                                 {% set highest_badge = comment.author.get_highest_hierarchy_badge() %}
                                                 {% if highest_badge %}
                                                 <span class="badge badge-sm" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="This user is a {{ highest_badge.name }}">{{ highest_badge.name }}</span>
-                                                {% endif %}
                                                 {% endif %}
                                                 {% else %}
                                                 Deleted User

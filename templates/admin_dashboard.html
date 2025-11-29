@@ -748,9 +748,8 @@ function attachEventListeners() {
     document.querySelectorAll('a[data-restaurant-id]').forEach(a => {
         a.href = `/restaurant/${a.dataset.restaurantId}`;
     });
-    document.querySelectorAll('a[data-username]').forEach(a => {
-        const base = `{{ url_for('profile', username='') }}`;
-        a.href = base + a.dataset.username;
+    document.querySelectorAll('a[data-user-id]').forEach(a => {
+        a.href = `/profile/${a.dataset.userId}`;
     });
 
     // Edit user modal wiring
@@ -1120,7 +1119,7 @@ function renderUsersTab() {
             ${adminData.all_users.map(u=>`
                 <tr>
                     <td><input class="form-check-input user-checkbox" value="${u.id}" type="checkbox"></td>
-                    <td><a href="#" data-username="${u.username}" class="user-link">${u.username}</a></td>
+                    <td><a href="#" data-user-id="${u.id}" class="user-link">${u.username}</a></td>
                     <td>${u.email}</td>
                     <td>${u.is_admin?'<span class="badge bg-danger">Admin</span>':'<span class="badge bg-secondary">User</span>'}</td>
                     <td>${u.is_banned?'<span class="badge bg-danger">🚫 Banned</span>':'<span class="badge bg-success">✓ Active</span>'}</td>
@@ -1128,15 +1127,15 @@ function renderUsersTab() {
                     <td>${u.review_count}</td>
                     <td><small>${u.created_at}</small></td>
                     <td>
-                        <button class="btn btn-sm btn-info edit-user-btn" data-id="${u.id}" data-username="${u.username}" data-email="${u.email}" data-reputation="${u.reputation_score}" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
+                        <button class="btn btn-sm btn-info edit-user-btn" data-id="${u.id}" data-user-id="${u.id}" data-email="${u.email}" data-reputation="${u.reputation_score}" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
                         <form method="POST" action="{{ url_for('manage_user', id=0) }}" data-id="${u.id}" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="action" value="toggle_admin">
                             <button class="btn btn-sm btn-outline-primary" type="submit">${u.is_admin?'Demote':'Promote'}</button>
                         </form>
-                        ${u.is_banned?`<form method="POST" action="{{ url_for('manage_user', id=0) }}" data-id="${u.id}" style="display:inline;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="unban"><button class="btn btn-sm btn-outline-success" type="submit">Unban</button></form>`:`<button class="btn btn-sm btn-outline-danger ban-user-btn" data-id="${u.id}" data-username="${u.username}" data-bs-toggle="modal" data-bs-target="#banUserModal">Ban</button>`}
+                        ${u.is_banned?`<form method="POST" action="{{ url_for('manage_user', id=0) }}" data-id="${u.id}" style="display:inline;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="unban"><button class="btn btn-sm btn-outline-success" type="submit">Unban</button></form>`:`<button class="btn btn-sm btn-outline-danger ban-user-btn" data-id="${u.id}" data-user-id="${u.id}" data-bs-toggle="modal" data-bs-target="#banUserModal">Ban</button>`}
                         <form method="POST" action="{{ url_for('manage_user', id=0) }}" data-id="${u.id}" style="display:inline;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>
-                        <button class="btn btn-sm btn-warning assign-badges-btn" data-id="${u.id}" data-username="${u.username}" data-bs-toggle="modal" data-bs-target="#assignBadgesModal">Badges</button>
+                        <button class="btn btn-sm btn-warning assign-badges-btn" data-id="${u.id}" data-user-id="${u.id}" data-bs-toggle="modal" data-bs-target="#assignBadgesModal">Badges</button>
                     </td>
                 </tr>`).join('')}
             </tbody></table></div>

@@ -398,12 +398,12 @@ def create_food_category():
     })
 
 
-@app.route('/profile/<username>')
-def profile(username):
+@app.route('/profile/<int:user_id>')
+def profile(user_id):
     if not FeatureToggle.get_feature_status('profiles_enabled'):
         flash('User profiles are temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    user = User.query.filter_by(username=username).first_or_404()
+    user = User.query.get_or_404(user_id)
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
     is_following = current_user.is_authenticated and current_user.is_following(user) if not is_own_profile else False
@@ -414,13 +414,13 @@ def profile(username):
                            is_following=is_following)
 
 
-@app.route('/profile/<username>/edit', methods=['GET', 'POST'])
+@app.route('/profile/<int:user_id>/edit', methods=['GET', 'POST'])
 @login_required
-def edit_profile(username):
-    user = User.query.filter_by(username=username).first_or_404()
+def edit_profile(user_id):
+    user = User.query.get_or_404(user_id)
     if user.id != current_user.id and not current_user.is_admin:
         flash('You can only edit your own profile.', 'danger')
-        return redirect(url_for('profile', username=username))
+        return redirect(url_for('profile', user_id=user_id))
     form = ProfileEditForm()
     if form.validate_on_submit():
         user.bio = form.bio.data
@@ -441,10 +441,10 @@ def edit_profile(username):
                         'Invalid image file. Please upload a valid PNG or JPG.',
                         'danger')
                     return redirect(
-                        url_for('edit_profile', username=user.username))
+                        url_for('edit_profile', user_id=user.id))
         db.session.commit()
         flash('Profile updated successfully!', 'success')
-        return redirect(url_for('profile', username=user.username))
+        return redirect(url_for('profile', user_id=user.id))
     if request.method == 'GET':
         form.bio.data = user.bio
     return render_template('edit_profile.html', user=user, form=form)

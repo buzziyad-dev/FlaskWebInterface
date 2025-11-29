@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h6 class="fw-bold">{{ user.username }}</h6>
                         <span class="badge bg-light text-dark small mb-2">{{ user.get_badge() }}</span>
                         <p class="text-muted small mb-3">{{ user.review_count() }} reviews</p>
-                        <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                        <a href="{{ url_for('profile', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">View Profile</a>
                     </div>
                 </div>
             </div>

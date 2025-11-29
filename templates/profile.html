@@ -45,7 +45,7 @@
         </div>
 
         {% if is_own_profile %}
-        <a href="{{ url_for('edit_profile', username=user.username) }}" class="btn btn-light mt-3 animate-slide-up">Edit Profile</a>
+        <a href="{{ url_for('edit_profile', user_id=user.id) }}" class="btn btn-light mt-3 animate-slide-up">Edit Profile</a>
         {% elif current_user.is_authenticated %}
         <button id="followBtn" class="btn btn-light mt-3 animate-slide-up" onclick="toggleFollow({{ user.id }}, {{ 'true' if is_following else 'false' | lower }})">
             {% if is_following %}Unfollow{% else %}Follow{% endif %}

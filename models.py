@@ -133,11 +133,11 @@ class User(UserMixin, db.Model):
     
     def follower_count(self):
         """Get count of followers"""
-        return len(self.followers)
+        return self.followers.count()
     
     def following_count(self):
         """Get count of users this user is following"""
-        return len(self.following)
+        return self.following.count()
 
 
 class Cuisine(db.Model):

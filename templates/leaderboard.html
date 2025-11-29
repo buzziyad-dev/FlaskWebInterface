@@ -97,7 +97,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ url_for('profile', username=user.username) }}"
+                    <a href="{{ url_for('profile', user_id=user.id) }}"
                         class="btn btn-sm btn-primary w-100 mt-3">View Profile</a>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                             </div>
                         </td>
                         <td class="action-cell">
-                            <a href="{{ url_for('profile', username=user.username) }}"
+                            <a href="{{ url_for('profile', user_id=user.id) }}"
                                 class="btn btn-sm btn-outline-primary">Profile</a>
                         </td>
                     </tr>

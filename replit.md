@@ -35,16 +35,18 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - **Design Rationale**: Session-based authentication chosen over JWT for simpler implementation and better fit for server-rendered templates. Login required decorator protects sensitive routes.
 
 ### Frontend Architecture
-- **Template Engine**: Jinja2 (Flask default)
+- **Template Engine**: Jinja2 (Flask default) with Flask-Babel for i18n
 - **CSS Framework**: Bootstrap 5
 - **Custom Styling**: Additional CSS for brand-specific design
 - **Typography**: Inter and Cairo fonts for bilingual support (Arabic/English)
 - **Responsive Design**: Mobile-first approach using Bootstrap grid system
+- **Localization**: Flask-Babel for Arabic/English translation with RTL support
 - **Key Components**:
   - Base template with navigation and authentication state
   - Card-based layouts for restaurant listings
   - Form components with WTForms validation
   - Hero sections with overlay effects for visual impact
+  - Language switcher (🌍) in navbar with dropdown menu
 
 ### Form Handling & Validation
 - **Library**: Flask-WTF with WTForms
@@ -64,7 +66,7 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 
 ### Database Schema Design
 **Core Entities**:
-- **User**: Authentication and profile data, tracks review authorship
+- **User**: Authentication and profile data, tracks review authorship, includes `language` field (en/ar)
 - **Restaurant**: Business information (name, address, hours, price range, cuisine type)
 - **Review**: User-generated content linking users to restaurants with ratings
 - **Cuisine**: Category taxonomy for restaurant classification
@@ -73,6 +75,19 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 **Key Relationships**:
 - User has many Reviews (one-to-many)
 - Restaurant has many Reviews (one-to-many)
+
+### Internationalization (i18n) & Localization (l10n)
+- **Framework**: Flask-Babel with Babel package
+- **Supported Languages**: English (en), Arabic (ar)
+- **Translation Files**: 
+  - `translations/ar/LC_MESSAGES/messages.po` - Arabic translations
+  - `translations/ar/LC_MESSAGES/messages.mo` - Compiled translations
+- **Language Persistence**:
+  - Authenticated users: Stored in database (User.language field)
+  - Guests: Persisted via cookie (1-year expiration)
+  - Current page requests: Via g.locale variable
+- **RTL Support**: CSS automatically applies `dir="rtl"` for Arabic with proper layout adjustments
+- **UI**: Language switcher (🌍) in navbar with English/العربية options
 - Cuisine has many Restaurants (one-to-many)
 - Review belongs to User and Restaurant (many-to-one for both)
 
@@ -130,6 +145,28 @@ Admins can temporarily disable the following features via the Settings tab in th
 - **SESSION_SECRET**: Secret key for session encryption and security
 
 ## Recent Changes (Latest Session)
+
+### Arabic Language Support Implementation
+- **Added Flask-Babel**: Professional i18n framework for multilingual support
+  - Installed: `Flask-Babel==4.0.0`, `babel==2.17.0`
+  - Configured in app.py with locale selector function
+- **Language Switcher**: Added to navbar as 🌍 dropdown
+  - English/العربية options visible to all users
+  - Route: `/set_language/<language>` handles language switching
+- **Persistence Strategy**:
+  - Authenticated users: Language preference saved to `User.language` database field
+  - Non-authenticated users: Language preference saved to `language` cookie
+  - Automatic detection via `get_locale()` function with priority: g.locale → User.language → cookie → default (en)
+- **Arabic Translations**: Complete `.po` translation file with 80+ translated UI strings
+  - Compiled to `.mo` file for production use
+  - Covers: navigation, forms, buttons, messages, placeholders
+- **RTL Support**: Comprehensive CSS changes for Arabic
+  - HTML automatically sets `dir="rtl"` when Arabic is selected
+  - Bootstrap components adapted for RTL layout
+  - Text alignment, margins, floats properly flipped for Arabic
+- **Database Migration**: Added `language` VARCHAR(10) column to `user` table with 'en' default
+
+### Recent Changes (Previous Session)
 
 ### User Profile & Social Features
 - **User Profiles**: Added comprehensive profile pages showing review history, badges, reputation

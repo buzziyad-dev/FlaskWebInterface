@@ -28,13 +28,6 @@ app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB max file size
 app.config["BABEL_DEFAULT_LOCALE"] = "en"
 app.config["BABEL_DEFAULT_TIMEZONE"] = "UTC"
 
-db.init_app(app)
-login_manager.init_app(app)
-csrf.init_app(app)
-babel.init_app(app)
-login_manager.login_view = 'login'
-
-@babel.localeselector
 def get_locale():
     from flask import request, g
     from flask_login import current_user
@@ -47,6 +40,14 @@ def get_locale():
     # Check cookie
     locale = request.cookies.get('language', 'en')
     return locale if locale in ['en', 'ar'] else 'en'
+
+db.init_app(app)
+login_manager.init_app(app)
+csrf.init_app(app)
+babel.init_app(app, locale_selector=get_locale)
+login_manager.login_view = 'login'
+
+app.jinja_env.globals.update(get_locale=get_locale)
 
 @app.template_filter('b64encode')
 def b64encode_filter(data):

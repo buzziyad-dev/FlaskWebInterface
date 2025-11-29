@@ -712,6 +712,7 @@ def reject_restaurant(id):
 def update_badge_hierarchy(badge_id):
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
+    from models import Badge
     badge = Badge.query.get_or_404(badge_id)
     hierarchy = request.form.get('hierarchy', '').strip()
     try:

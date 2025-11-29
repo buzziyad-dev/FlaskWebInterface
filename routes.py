@@ -485,7 +485,15 @@ def get_admin_data():
         'news_enabled': 'Allow news posts and viewing',
         'profiles_enabled': 'Allow user profile viewing',
         'photo_uploads_enabled': 'Allow photo uploads for restaurants',
-        'restaurant_filtering_enabled': 'Enable cuisine and price filtering'
+        'restaurant_filtering_enabled': 'Enable cuisine and price filtering',
+        'user_registration_enabled': 'Allow new users to sign up',
+        'review_comments_enabled': 'Allow users to comment on reviews',
+        'review_images_enabled': 'Allow image uploads in review posts',
+        'badges_display_enabled': 'Display user badges on reviews and profiles',
+        'dark_mode_enabled': 'Allow users to toggle dark mode',
+        'review_approval_enabled': 'Require admin approval for reviews',
+        'content_reporting_enabled': 'Allow users to report inappropriate content',
+        'maintenance_mode': 'Put website in maintenance mode (shows message to non-admins)'
     }
     for feature_name, description in default_toggles.items():
         if feature_name not in toggle_dict:

@@ -30,7 +30,7 @@ def check_maintenance_mode():
             return None
         
         # Routes that should be accessible during maintenance
-        allowed_routes = ['maintenance', 'login', 'logout', 'banned', 'restaurant_detail', 'restaurants']
+        allowed_routes = ['maintenance', 'login', 'logout', 'banned']
         if request.endpoint and request.endpoint in allowed_routes:
             return None
         

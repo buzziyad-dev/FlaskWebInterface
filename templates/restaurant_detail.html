@@ -243,9 +243,7 @@
                     <h5 class="mb-0">📍 Location</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div id="restaurant-map"
-                        style="height: 300px; border-radius: 0 0 4px 4px; color: initial !important;">
-                    </div>
+                    <iframe width="100%" height="300" style="border: none; border-radius: 0 0 4px 4px;" src="https://www.openstreetmap.org/export/embed.html?bbox={{ restaurant.location_longitude - 0.01 }},{{ restaurant.location_latitude - 0.01 }},{{ restaurant.location_longitude + 0.01 }},{{ restaurant.location_latitude + 0.01 }}&layer=mapnik&marker={{ restaurant.location_latitude }},{{ restaurant.location_longitude }}" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
             {% endif %}
@@ -263,28 +261,8 @@
     </div>
 </div>
 
-{% if restaurant.location_latitude and restaurant.location_longitude %}
+<!-- Initialize Bootstrap tooltips -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map
-        const map = L.map('restaurant-map').setView([{{restaurant.location_latitude}}, {{restaurant.location_longitude}}], 15);
-
-    // Add tile layer with labels
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}.png', {
-        attribution: '© CartoDB contributors, © OpenStreetMap contributors',
-        maxZoom: 19,
-        subdomains: 'abcd'
-    }).addTo(map);
-
-    // Add marker for restaurant location
-    L.marker([{{restaurant.location_latitude}}, {{restaurant.location_longitude}}]).addTo(map)
-        .bindPopup('<strong>{{ restaurant.name }}</strong><br>{{ restaurant.address }}')
-        .openPopup();
-    
-    
-});
-
-    // Initialize Bootstrap tooltips
     document.addEventListener('DOMContentLoaded', function () {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -292,7 +270,5 @@
         });
     });
 </script>
-
-{% endif %}
 
 {% endblock %}

@@ -90,7 +90,7 @@
                                             <a href="{{ url_for('profile', user_id=review.author.id) }}" class="text-decoration-none" style="color: inherit;">{{ review.author.username }}</a>
                                             {% set highest_badge = review.author.get_highest_hierarchy_badge() %}
                                             {% if highest_badge %}
-                                            <span class="badge small ms-2" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="This user is a {{ highest_badge.name }}">
+                                            <span class="badge small ms-2" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">
                                                 {{ highest_badge.name }}
                                             </span>
                                             {% else %}
@@ -135,7 +135,7 @@
                                                 <a href="{{ url_for('profile', user_id=comment.author.id) }}" class="text-decoration-none text-primary">{{ comment.author.username }}</a>
                                                 {% set highest_badge = comment.author.get_highest_hierarchy_badge() %}
                                                 {% if highest_badge %}
-                                                <span class="badge badge-sm" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="This user is a {{ highest_badge.name }}">{{ highest_badge.name }}</span>
+                                                <span class="badge badge-sm" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">{{ highest_badge.name }}</span>
                                                 {% endif %}
                                                 {% else %}
                                                 Deleted User

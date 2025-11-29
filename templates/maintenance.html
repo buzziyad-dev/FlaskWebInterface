@@ -246,5 +246,37 @@
             </p>
         </div>
     </div>
+
+    <script>
+        // Check if maintenance mode is still active every 3 seconds
+        let checkCount = 0;
+        const maintenanceCheck = setInterval(async function() {
+            try {
+                const response = await fetch('/', { 
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                // If we can access home page (status 200 and not maintenance page), maintenance ended
+                if (response.ok) {
+                    const html = await response.text();
+                    // Check if the response is not the maintenance page by looking for the title
+                    if (!html.includes('Under Maintenance')) {
+                        // Maintenance is over, redirect to home
+                        window.location.href = '/';
+                        clearInterval(maintenanceCheck);
+                    }
+                }
+            } catch (err) {
+                console.log('Checking maintenance status...');
+            }
+            
+            checkCount++;
+            // Stop checking after 2 hours (2400 checks at 3 second intervals)
+            if (checkCount > 2400) {
+                clearInterval(maintenanceCheck);
+            }
+        }, 3000);
+    </script>
 </body>
 </html>

@@ -1,12 +1,12 @@
 import os
 import base64
-from flask import Flask
+import json
+from flask import Flask, g, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
-from flask_babel import Babel
 
 class Base(DeclarativeBase):
     pass
@@ -14,7 +14,6 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 csrf = CSRFProtect()
-babel = Babel()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
@@ -25,12 +24,18 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
 }
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB max file size
-app.config["BABEL_DEFAULT_LOCALE"] = "en"
-app.config["BABEL_DEFAULT_TIMEZONE"] = "UTC"
+
+# Load translations
+TRANSLATIONS = {}
+for lang in ['en', 'ar']:
+    try:
+        with open(f'translations/{lang}.json', 'r', encoding='utf-8') as f:
+            TRANSLATIONS[lang] = json.load(f)
+    except:
+        TRANSLATIONS[lang] = {}
 
 def get_locale():
-    from flask import request, g
-    from flask_login import current_user
+    """Get current locale from g, user preference, cookie, or default"""
     # Check if locale is stored in g (set by set_language route)
     if hasattr(g, 'locale'):
         return g.locale
@@ -41,13 +46,20 @@ def get_locale():
     locale = request.cookies.get('language', 'en')
     return locale if locale in ['en', 'ar'] else 'en'
 
+def translate(text):
+    """Translate text to current locale"""
+    locale = get_locale()
+    if locale in TRANSLATIONS and text in TRANSLATIONS[locale]:
+        return TRANSLATIONS[locale][text]
+    return text
+
 db.init_app(app)
 login_manager.init_app(app)
 csrf.init_app(app)
-babel.init_app(app, locale_selector=get_locale)
 login_manager.login_view = 'login'
 
-app.jinja_env.globals.update(get_locale=get_locale)
+# Make helpers available to templates
+app.jinja_env.globals.update(get_locale=get_locale, _=translate)
 
 @app.template_filter('b64encode')
 def b64encode_filter(data):

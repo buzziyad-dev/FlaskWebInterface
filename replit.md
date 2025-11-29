@@ -77,15 +77,20 @@ Yalla is a restaurant discovery and review platform focused on Jeddah, Saudi Ara
 - Restaurant has many Reviews (one-to-many)
 
 ### Internationalization (i18n) & Localization (l10n)
-- **Framework**: Flask-Babel with Babel package
+- **Framework**: Custom JSON-based translation system (simple and lightweight)
 - **Supported Languages**: English (en), Arabic (ar)
 - **Translation Files**: 
-  - `translations/ar/LC_MESSAGES/messages.po` - Arabic translations
-  - `translations/ar/LC_MESSAGES/messages.mo` - Compiled translations
+  - `translations/en.json` - English translations
+  - `translations/ar.json` - Arabic translations
+  - Simple key-value JSON structure for easy editing
 - **Language Persistence**:
   - Authenticated users: Stored in database (User.language field)
   - Guests: Persisted via cookie (1-year expiration)
   - Current page requests: Via g.locale variable
+- **Translation Function**: Custom `translate()` function in app.py
+  - No compilation step needed
+  - Changes take effect immediately after restart
+  - Easy to edit directly in JSON files
 - **RTL Support**: CSS automatically applies `dir="rtl"` for Arabic with proper layout adjustments
 - **UI**: Language switcher (🌍) in navbar with English/العربية options
 - Cuisine has many Restaurants (one-to-many)
@@ -146,10 +151,12 @@ Admins can temporarily disable the following features via the Settings tab in th
 
 ## Recent Changes (Latest Session)
 
-### Arabic Language Support Implementation
-- **Added Flask-Babel**: Professional i18n framework for multilingual support
-  - Installed: `Flask-Babel==4.0.0`, `babel==2.17.0`
-  - Configured in app.py with locale selector function
+### Arabic Language Support Implementation (Revised)
+- **Translation System**: Replaced Flask-Babel with simple JSON-based system
+  - No compilation needed - edit `translations/en.json` and `translations/ar.json` directly
+  - Changes take effect immediately after app restart
+  - Much simpler than Babel's `.po` files
+  - Custom `translate()` function in app.py handles all translations
 - **Language Switcher**: Added to navbar as 🌍 dropdown
   - English/العربية options visible to all users
   - Route: `/set_language/<language>` handles language switching
@@ -157,13 +164,14 @@ Admins can temporarily disable the following features via the Settings tab in th
   - Authenticated users: Language preference saved to `User.language` database field
   - Non-authenticated users: Language preference saved to `language` cookie
   - Automatic detection via `get_locale()` function with priority: g.locale → User.language → cookie → default (en)
-- **Arabic Translations**: Complete `.po` translation file with 80+ translated UI strings
-  - Compiled to `.mo` file for production use
-  - Covers: navigation, forms, buttons, messages, placeholders
+- **Arabic Translations**: 22+ key UI strings translated in JSON files
+  - Covers: navigation, hero section, forms, buttons, messages, placeholders
+  - Easy to add new translations - just add key-value pairs to JSON
 - **RTL Support**: Comprehensive CSS changes for Arabic
   - HTML automatically sets `dir="rtl"` when Arabic is selected
   - Bootstrap components adapted for RTL layout
   - Text alignment, margins, floats properly flipped for Arabic
+  - Search bar maintains LTR structure for proper UX
 - **Database Migration**: Added `language` VARCHAR(10) column to `user` table with 'en' default
 
 ### Recent Changes (Previous Session)

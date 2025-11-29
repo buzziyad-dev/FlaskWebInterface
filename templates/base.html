@@ -29,6 +29,21 @@
         </div>
     </div>
 
+    <!-- Maintenance Notification for Whitelisted IPs -->
+    {% if g.is_whitelisted %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; min-width: 300px;">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: #fff3cd; border: 1px solid #ffc107; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px;">
+            <div class="toast-header" style="background-color: #ffc107; border-bottom: 1px solid #ffb300;">
+                <span style="color: #000; font-weight: 600;">⚠️ Maintenance Mode Active</span>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" style="color: #333;">
+                🔧 Website is under maintenance. You can access it because your IP is whitelisted.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
         <div class="container">

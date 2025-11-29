@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify
+from flask import render_template, redirect, url_for, flash, request, jsonify, g
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle, ReviewComment
@@ -36,20 +36,24 @@ def get_client_ip():
 @app.before_request
 def check_maintenance_mode():
     """Check if maintenance mode is enabled - redirect non-admins to maintenance page"""
+    # Initialize whitelisted flag
+    g.is_whitelisted = False
+    
     if FeatureToggle.get_feature_status('maintenance_mode'):
-        # Allow admins and certain routes to bypass maintenance mode
+        # Allow admins - they bypass all maintenance checks
         if current_user.is_authenticated and current_user.is_admin:
             return None
         
-        # Check if client IP is whitelisted
+        # Check if client IP is whitelisted - whitelisted IPs can access everything
         whitelisted_ips = os.environ.get('MAINTENANCE_WHITELIST_IPS', '')
         if whitelisted_ips:
             client_ip = get_client_ip()
             ip_list = [ip.strip() for ip in whitelisted_ips.split(',')]
             if client_ip in ip_list:
-                return None
+                g.is_whitelisted = True
+                return None  # Allow whitelisted IPs to access all pages
         
-        # Routes that should be accessible during maintenance
+        # Routes that should be accessible during maintenance (for non-whitelisted users)
         allowed_routes = ['maintenance', 'login', 'logout', 'banned', 'restaurant_detail', 'restaurants']
         if request.endpoint and request.endpoint in allowed_routes:
             return None

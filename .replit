@@ -34,6 +34,10 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 34359
+externalPort = 6000
+
+[[ports]]
 localPort = 35475
 externalPort = 3003
 
@@ -63,3 +67,8 @@ externalPort = 5000
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+MAINTENANCE_WHITELIST_IPS = "10.17.160.130"

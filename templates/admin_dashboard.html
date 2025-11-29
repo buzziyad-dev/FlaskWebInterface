@@ -1256,7 +1256,7 @@ function renderNewsTab() {
 }
 
 function renderBadgesTab() {
-    const badges = adminData.all_badges || [];
+    const badges = (adminData.all_badges || []).sort((a, b) => (b.hierarchy || 0) - (a.hierarchy || 0));
     if (!badges.length) return '<p class="text-center text-muted py-4">No badges yet.</p>';
     return `
     <div class="card shadow-sm">

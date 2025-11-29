@@ -105,26 +105,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/follow/<int:user_id>', methods=['POST'])
-@login_required
-def follow_user(user_id):
-    user = User.query.get_or_404(user_id)
-    if user.id == current_user.id:
-        return jsonify({'error': 'You cannot follow yourself'}), 400
-    current_user.follow(user)
-    return jsonify({'status': 'following', 'follower_count': user.follower_count()}), 200
-
-
-@app.route('/unfollow/<int:user_id>', methods=['POST'])
-@login_required
-def unfollow_user(user_id):
-    user = User.query.get_or_404(user_id)
-    if user.id == current_user.id:
-        return jsonify({'error': 'You cannot unfollow yourself'}), 400
-    current_user.unfollow(user)
-    return jsonify({'status': 'unfollowed', 'follower_count': user.follower_count()}), 200
-
-
 @app.route('/review/<int:review_id>/comment', methods=['POST'])
 @login_required
 def add_comment(review_id):
@@ -406,12 +386,10 @@ def profile(user_id):
     user = User.query.get_or_404(user_id)
     reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
-    is_following = current_user.is_authenticated and current_user.is_following(user) if not is_own_profile else False
     return render_template('profile.html',
                            user=user,
                            reviews=reviews,
-                           is_own_profile=is_own_profile,
-                           is_following=is_following)
+                           is_own_profile=is_own_profile)
 
 
 @app.route('/profile/<int:user_id>/edit', methods=['GET', 'POST'])
@@ -828,8 +806,8 @@ def manage_user(id):
                 return redirect(url_for('admin_dashboard', tab='users'))
             user.username = change_to_username
         if new_password:
-            if len(new_password) < 8:
-                flash('Password must be at least 8 characters.', 'danger')
+            if len(new_password) < 6:
+                flash('Password must be at least 6 characters.', 'danger')
                 return redirect(url_for('admin_dashboard', tab='users'))
             user.set_password(new_password)
         

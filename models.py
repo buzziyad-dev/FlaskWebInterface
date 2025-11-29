@@ -3,11 +3,6 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timezone, timedelta
 
-# Association table for followers
-user_follow = db.Table('user_follow',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('following_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-)
 
 
 class User(UserMixin, db.Model):
@@ -29,16 +24,6 @@ class User(UserMixin, db.Model):
     dark_mode = db.Column(db.Boolean, default=False)
 
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
-    
-    # Follower/Following relationship
-    followers = db.relationship(
-        'User',
-        secondary='user_follow',
-        primaryjoin='User.id==user_follow.c.following_id',
-        secondaryjoin='User.id==user_follow.c.follower_id',
-        backref='following',
-        lazy='dynamic'
-    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -114,30 +99,6 @@ class User(UserMixin, db.Model):
                                                badge_id=badge.id)
                         db.session.add(user_badge)
                 break
-    
-    def follow(self, user):
-        """Follow another user"""
-        if not self.is_following(user):
-            self.following.append(user)
-            db.session.commit()
-    
-    def unfollow(self, user):
-        """Unfollow another user"""
-        if self.is_following(user):
-            self.following.remove(user)
-            db.session.commit()
-    
-    def is_following(self, user):
-        """Check if following another user"""
-        return user in self.following
-    
-    def follower_count(self):
-        """Get count of followers"""
-        return self.followers.count()
-    
-    def following_count(self):
-        """Get count of users this user is following"""
-        return self.following.count()
 
 
 class Cuisine(db.Model):

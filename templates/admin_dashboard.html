@@ -316,10 +316,6 @@ body.dark-mode a:hover {
                     <input type="hidden" name="action" value="edit">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-control" id="editUsername" name="username" required>
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" id="editEmail" name="email" required>
                         </div>
@@ -766,7 +762,6 @@ function attachEventListeners() {
     document.querySelectorAll('.edit-user-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = this.dataset.id;
-            const username = this.dataset.username;
             const email = this.dataset.email;
             const reputation = this.dataset.reputation;
             const form = document.getElementById('editUserForm');
@@ -774,7 +769,6 @@ function attachEventListeners() {
             const uName = document.getElementById('editUsername');
             const uEmail = document.getElementById('editEmail');
             const uRep = document.getElementById('editReputation');
-            if (uName) uName.value = username || '';
             if (uEmail) uEmail.value = email || '';
             if (uRep) uRep.value = reputation || 0;
         });
@@ -784,7 +778,6 @@ function attachEventListeners() {
     document.querySelectorAll('.ban-user-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = this.dataset.id;
-            const username = this.dataset.username;
             const banForm = document.getElementById('banUserForm');
             const banUsername = document.getElementById('banUsername');
             const banReason = document.getElementById('banReason');

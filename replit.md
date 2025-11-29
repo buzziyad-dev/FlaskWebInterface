@@ -149,7 +149,26 @@ Admins can temporarily disable the following features via the Settings tab in th
 - **DATABASE_URL**: Database connection string (SQL database)
 - **SESSION_SECRET**: Secret key for session encryption and security
 
-## Recent Changes (Latest Session)
+## Recent Changes (Current Session)
+
+### Complete Bilingual Translation System (Final)
+- **160+ translations added** - All templates now fully translated to Arabic & English
+- **Translation files**: `translations/en.json` (172 lines), `translations/ar.json` (172 lines)
+- **Translated pages**:
+  - ✅ Authentication (login, register, banned)
+  - ✅ Restaurants (add, browse, detail, search)
+  - ✅ Reviews & comments
+  - ✅ User profiles & editing
+  - ✅ Leaderboard & rankings
+  - ✅ News posts & detail pages
+  - ✅ Admin dashboard
+  - ✅ Error pages & maintenance
+- **Key strings translated**: All UI labels, buttons, placeholders, messages, titles, table headers
+- **RTL support**: Automatic `dir="rtl"` for Arabic pages
+- **Zero compilation**: Edit JSON files directly, restart app to see changes
+- **171 template translation calls** - All hardcoded text now wrapped with `_()` function
+
+## Previous Changes (Prior Session)
 
 ### Arabic Language Support Implementation (Revised)
 - **Translation System**: Replaced Flask-Babel with simple JSON-based system

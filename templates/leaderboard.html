@@ -109,20 +109,20 @@
     {% if users|length > 3 %}
     <div class="leaderboard-section animate-slide-up">
         <div class="section-header">
-            <h3 class="section-title">📊 All Reviewers</h3>
-            <p class="section-subtitle">Complete rankings of community members</p>
+            <h3 class="section-title">{{ _('📊 All Reviewers') }}</h3>
+            <p class="section-subtitle">{{ _('Complete rankings of community members') }}</p>
         </div>
 
         <div class="leaderboard-table-wrapper">
             <table class="leaderboard-table">
                 <thead>
                     <tr>
-                        <th class="rank-col">Rank</th>
-                        <th class="user-col">User</th>
-                        <th class="stat-col">Reputation</th>
-                        <th class="stat-col">Reviews</th>
-                        <th class="stat-col">Avg Rating</th>
-                        <th class="action-col">Action</th>
+                        <th class="rank-col">{{ _('Rank') }}</th>
+                        <th class="user-col">{{ _('User') }}</th>
+                        <th class="stat-col">{{ _('Reputation') }}</th>
+                        <th class="stat-col">{{ _('Reviews') }}</th>
+                        <th class="stat-col">{{ _('Avg Rating') }}</th>
+                        <th class="action-col">{{ _('Action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,7 +140,7 @@
                                 <div>
                                     <div class="user-name">{{ user.username }}</div>
                                     {% if user.is_admin %}
-                                    <span class="badge bg-danger badge-sm">Admin</span>
+                                    <span class="badge bg-danger badge-sm">{{ _('Admin') }}</span>
                                     {% else %}
                                     <span class="badge bg-light text-dark badge-sm">{{ user.get_badge() }}</span>
                                     {% endif %}
@@ -163,7 +163,7 @@
                         </td>
                         <td class="action-cell">
                             <a href="{{ url_for('profile', user_id=user.id) }}"
-                                class="btn btn-sm btn-outline-primary">Profile</a>
+                                class="btn btn-sm btn-outline-primary">{{ _('Profile') }}</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -177,7 +177,7 @@
     <!-- Empty State -->
     <div class="leaderboard-empty animate-slide-up">
         <div class="empty-icon">🌟</div>
-        <h2 class="empty-title">No Reviewers Yet</h2>
+        <h2 class="empty-title">{{ _('No Reviewers Yet') }}</h2>
         <p class="empty-description">Be the first to write reviews and earn your spot on the leaderboard!</p>
         <a href="{{ url_for('restaurants') }}" class="btn btn-primary btn-lg mt-4">Start Reviewing Restaurants</a>
     </div>

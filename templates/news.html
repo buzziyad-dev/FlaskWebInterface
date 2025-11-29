@@ -8,12 +8,12 @@
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="fw-bold mb-2">📰 Yalla News</h1>
-                    <p class="text-muted">Stay updated with the latest from Yalla community</p>
+                    <h1 class="fw-bold mb-2">📰 {{ _('Yalla News') }}</h1>
+                    <p class="text-muted">{{ _('Stay updated with the latest from Yalla community') }}</p>
                 </div>
                 {% if current_user.is_authenticated and current_user.is_admin %}
                 <a href="{{ url_for('post_news') }}" class="btn btn-primary">
-                    <span class="me-2">+</span>Post News
+                    <span class="me-2">+</span>{{ _('Post News') }}
                 </a>
                 {% endif %}
             </div>
@@ -26,7 +26,7 @@
                         <div>
                             <h5 class="card-title fw-bold">{{ post.title }}</h5>
                             <small class="text-muted">
-                                Posted by <strong>{{ post.author.username }}</strong> on {{ post.formatted_date() }}
+                                {{ _('Posted by') }} <strong>{{ post.author.username }}</strong> {{ _('on') }} {{ post.formatted_date() }}
                             </small>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                             </div>
                         </div>
                         <a href="{{ url_for('news_detail', news_id=post.id) }}"
-                            class="btn btn-sm btn-outline-primary mt-3">More Details →</a>
+                            class="btn btn-sm btn-outline-primary mt-3">{{ _('More Details →') }}</a>
                         {% else %}
                         <div style="line-height: 1.6;">{{ post.content|safe }}</div>
                         {% endif %}
@@ -55,11 +55,11 @@
                 <ul class="pagination justify-content-center">
                     {% if news_posts.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('news', page=news_posts.prev_num) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('news', page=news_posts.prev_num) }}">{{ _('Previous') }}</a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
+                        <span class="page-link">{{ _('Previous') }}</span>
                     </li>
                     {% endif %}
 
@@ -83,11 +83,11 @@
 
                     {% if news_posts.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('news', page=news_posts.next_num) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('news', page=news_posts.next_num) }}">{{ _('Next') }}</a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link">Next</span>
+                        <span class="page-link">{{ _('Next') }}</span>
                     </li>
                     {% endif %}
                 </ul>
@@ -95,8 +95,8 @@
             {% endif %}
             {% else %}
             <div class="alert alert-info text-center py-5">
-                <h5>No news yet</h5>
-                <p class="text-muted mb-0">Check back soon for updates from the Yalla community!</p>
+                <h5>{{ _('No news yet') }}</h5>
+                <p class="text-muted mb-0">{{ _('Check back soon for updates from the Yalla community!') }}</p>
             </div>
             {% endif %}
         </div>
@@ -104,7 +104,7 @@
         <div class="col-lg-4">
             <div class="card shadow-sm sticky-top" style="top: 100px;">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">📢 About Yalla News</h6>
+                    <h6 class="mb-0">📢 {{ _('About Yalla News') }}</h6>
                 </div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">
@@ -112,7 +112,7 @@
                         from the Yalla team.
                     </p>
                     <hr>
-                    <h6 class="fw-bold">Latest Updates</h6>
+                    <h6 class="fw-bold">{{ _('Latest Updates') }}</h6>
                     <p class="text-muted small mb-0">
                         New features, partner announcements, and community highlights - all in one place.
                     </p>

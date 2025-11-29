@@ -105,5 +105,69 @@
   "Followers": "المتابعون",
   "Joined": "انضم",
   "Badges": "الشارات",
-  "Untitled Review": "تقييم بدون عنوان"
+  "Untitled Review": "تقييم بدون عنوان",
+  "Yalla News": "أخبار يلا",
+  "Stay updated with the latest from Yalla community": "ابقَ على اطلاع بأحدث الأخبار من مجتمع يلا",
+  "Post News": "نشر خبر",
+  "Posted by": "نُشر بواسطة",
+  "on": "في",
+  "More Details →": "المزيد من التفاصيل →",
+  "Previous": "السابق",
+  "Next": "التالي",
+  "No news yet": "لا توجد أخبار حتى الآن",
+  "Check back soon for updates from the Yalla community!": "تحقق قريبًا من أجل التحديثات من مجتمع يلا!",
+  "About Yalla News": "حول أخبار يلا",
+  "Latest Updates": "أحدث التحديثات",
+  "News Title": "عنوان الخبر",
+  "Enter news title (5-200 characters)": "أدخل عنوان الخبر (5-200 أحرف)",
+  "Minimum 5 characters, maximum 200 characters": "بحد أدنى 5 أحرف، بحد أقصى 200 حرف",
+  "News Content (Rich Editor)": "محتوى الخبر (محرر غني)",
+  "Search Results": "نتائج البحث",
+  "restaurants found": "مطاعم وجدت",
+  "No exact matches found": "لم يتم العثور على مطابقات دقيقة",
+  "Showing related restaurants and suggestions instead": "عرض المطاعم ذات الصلة والاقتراحات بدلاً من ذلك",
+  "Small Business": "مشروع صغير",
+  "reviews": "تقييمات",
+  "Try a different search term": "حاول مصطلح بحث مختلف",
+  "Browse All Restaurants": "تصفح جميع المطاعم",
+  "Edit Profile": "تحرير الملف الشخصي",
+  "Customize your Yalla profile": "خصص ملفك الشخصي في يلا",
+  "Profile Picture": "صورة الملف الشخصي",
+  "Recommended: Square image (PNG, JPG)": "موصى به: صورة مربعة (PNG, JPG)",
+  "Bio": "السيرة الذاتية",
+  "Tell other food lovers about yourself...": "أخبر محبي الطعام الآخرين عن نفسك...",
+  "Max 500 characters": "بحد أقصى 500 حرف",
+  "Save Changes": "حفظ التغييرات",
+  "Account Banned": "تم حظر الحساب",
+  "Your account has been banned from Yalla": "تم حظر حسابك من يلا",
+  "Ban Reason": "سبب الحظر",
+  "No reason provided": "لم يتم توفير سبب",
+  "If you believe this is a mistake, please contact our support team.": "إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بفريق الدعم لدينا.",
+  "Go Home": "العودة للرئيسية",
+  "Error Details:": "تفاصيل الخطأ:",
+  "Under Maintenance": "قيد الصيانة",
+  "We're making things better": "نحن نحسن الأمور",
+  "Yalla is undergoing scheduled maintenance to bring you new features and improvements. We appreciate your patience!": "يلا تخضع لصيانة مجدولة لإحضار ميزات وتحسينات جديدة. نقدر صبرك!",
+  "Expected to be back soon...": "من المتوقع أن نعود قريبًا...",
+  "No reviews yet. Be the first to review this restaurant!": "لا توجد تقييمات حتى الآن. كن أول من يقيّم هذا المطعم!",
+  "Information": "معلومات",
+  "HOURS": "الساعات",
+  "PRICE RANGE": "نطاق السعر",
+  "FOOD CATEGORIES": "فئات الطعام",
+  "ADDRESS": "العنوان",
+  "PHONE": "الهاتف",
+  "📍 Location": "📍 الموقع",
+  "Share Your Experience": "شارك تجربتك",
+  "📊 All Reviewers": "📊 جميع المراجعين",
+  "Complete rankings of community members": "تصنيفات كاملة لأعضاء المجتمع",
+  "Rank": "الترتيب",
+  "User": "المستخدم",
+  "Reputation": "السمعة",
+  "Reviews": "التقييمات",
+  "Avg Rating": "متوسط التقييم",
+  "Action": "الإجراء",
+  "Admin": "الإدارة",
+  "Profile": "الملف الشخصي",
+  "🌟": "🌟",
+  "No Reviewers Yet": "لا توجد مراجعات حتى الآن"
 }

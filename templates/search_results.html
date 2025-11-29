@@ -5,14 +5,14 @@
 {% block content %}
 <div class="container py-5">
     <div class="mb-4">
-        <h2 class="fw-bold mb-2">Search Results{% if query %} for "{{ query }}"{% endif %}</h2>
-        <p class="text-muted">{{ restaurants|length }} restaurants found</p>
+        <h2 class="fw-bold mb-2">{{ _('Search Results') }}{% if query %} for "{{ query }}"{% endif %}</h2>
+        <p class="text-muted">{{ restaurants|length }} {{ _('restaurants found') }}</p>
     </div>
     
     {% if restaurants %}
     {% if is_suggestion and query %}
     <div class="alert alert-info mb-4" role="alert">
-        <strong>No exact matches found.</strong> Showing related restaurants and suggestions instead.
+        <strong>{{ _('No exact matches found') }}.</strong> {{ _('Showing related restaurants and suggestions instead') }}.
     </div>
     {% endif %}
     <div class="row g-4">
@@ -21,7 +21,7 @@
             <div class="card restaurant-card h-100 shadow-sm">
                 <div class="restaurant-image" style="background-image: url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800' }}');">
                     {% if restaurant.is_small_business %}
-                    <span class="badge bg-success position-absolute top-0 start-0 m-3">Small Business</span>
+                    <span class="badge bg-success position-absolute top-0 start-0 m-3">{{ _('Small Business') }}</span>
                     {% endif %}
                 </div>
                 <div class="card-body">
@@ -39,10 +39,10 @@
                             <span class="star">☆</span>
                             {% endif %}
                         {% endfor %}
-                        <span class="text-muted small ms-2">({{ restaurant.review_count() }} reviews)</span>
+                        <span class="text-muted small ms-2">({{ restaurant.review_count() }} {{ _('reviews') }})</span>
                     </div>
                     <p class="card-text text-muted small">{{ restaurant.description[:100] }}...</p>
-                    <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    <a href="{{ url_for('restaurant_detail', id=restaurant.id) }}" class="btn btn-outline-primary btn-sm">{{ _('View Details') }}</a>
                 </div>
             </div>
         </div>
@@ -50,9 +50,9 @@
     </div>
     {% else %}
     <div class="text-center py-5">
-        <h4 class="text-muted">No restaurants found</h4>
-        <p class="text-muted">Try a different search term</p>
-        <a href="{{ url_for('restaurants') }}" class="btn btn-primary">Browse All Restaurants</a>
+        <h4 class="text-muted">{{ _('No restaurants found') }}</h4>
+        <p class="text-muted">{{ _('Try a different search term') }}</p>
+        <a href="{{ url_for('restaurants') }}" class="btn btn-primary">{{ _('Browse All Restaurants') }}</a>
     </div>
     {% endif %}
 </div>

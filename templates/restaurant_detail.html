@@ -178,7 +178,7 @@
                     </div>
                     {% endfor %}
                     {% else %}
-                    <p class="text-center text-muted py-4">No reviews yet. Be the first to review this restaurant!</p>
+                    <p class="text-center text-muted py-4">{{ _('No reviews yet. Be the first to review this restaurant!') }}</p>
                     {% endif %}
                 </div>
             </div>
@@ -188,13 +188,13 @@
         <div class="col-lg-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Information</h5>
+                    <h5 class="mb-0">{{ _('Information') }}</h5>
                 </div>
                 <div class="card-body">
                     {% set hours = restaurant.get_formatted_hours() %}
                     {% if hours %}
                     <div class="mb-3">
-                        <h6 class="fw-bold text-muted small mb-2">HOURS</h6>
+                        <h6 class="fw-bold text-muted small mb-2">{{ _('HOURS') }}</h6>
                         <div style="font-size: 0.95rem; line-height: 1.8;">
                             <p class="mb-1"><strong>Monday:</strong> {{ hours.get('monday', 'Closed') }}</p>
                             <p class="mb-1"><strong>Tuesday:</strong> {{ hours.get('tuesday', 'Closed') }}</p>
@@ -208,13 +208,13 @@
                     {% endif %}
 
                     <div class="mb-3">
-                        <h6 class="fw-bold text-muted small mb-1">PRICE RANGE</h6>
+                        <h6 class="fw-bold text-muted small mb-1">{{ _('PRICE RANGE') }}</h6>
                         <p class="mb-0">{{ '$' * restaurant.price_range }}</p>
                     </div>
 
                     {% if restaurant.food_categories %}
                     <div class="mb-3">
-                        <h6 class="fw-bold text-muted small mb-1">FOOD CATEGORIES</h6>
+                        <h6 class="fw-bold text-muted small mb-1">{{ _('FOOD CATEGORIES') }}</h6>
                         <div class="d-flex flex-wrap gap-1">
                             {% for tag in restaurant.food_categories %}
                             <span class="badge bg-info">{{ tag }}</span>
@@ -224,12 +224,12 @@
                     {% endif %}
 
                     <div class="mb-3">
-                        <h6 class="fw-bold text-muted small mb-1">ADDRESS</h6>
+                        <h6 class="fw-bold text-muted small mb-1">{{ _('ADDRESS') }}</h6>
                         <p class="mb-0" style="font-size: 0.95rem;">📍 {{ restaurant.address }}</p>
                     </div>
 
                     <div class="mb-3">
-                        <h6 class="fw-bold text-muted small mb-1">PHONE</h6>
+                        <h6 class="fw-bold text-muted small mb-1">{{ _('PHONE') }}</h6>
                         <p class="mb-0" style="font-size: 0.95rem;">📞 {{ restaurant.phone }}</p>
                     </div>
                 </div>
@@ -239,7 +239,7 @@
             {% if restaurant.location_latitude and restaurant.location_longitude %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">📍 Location</h5>
+                    <h5 class="mb-0">{{ _('📍 Location') }}</h5>
                 </div>
                 <div class="card-body p-0">
                     <iframe width="100%" height="300" style="border: none; border-radius: 0 0 4px 4px;" src="https://www.openstreetmap.org/export/embed.html?bbox={{ restaurant.location_longitude - 0.01 }},{{ restaurant.location_latitude - 0.01 }},{{ restaurant.location_longitude + 0.01 }},{{ restaurant.location_latitude + 0.01 }}&layer=mapnik&marker={{ restaurant.location_latitude }},{{ restaurant.location_longitude }}" allowfullscreen="" loading="lazy"></iframe>
@@ -250,7 +250,7 @@
             {% if current_user.is_authenticated %}
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h6 class="fw-bold mb-3">Share Your Experience</h6>
+                    <h6 class="fw-bold mb-3">{{ _('Share Your Experience') }}</h6>
                     <a href="{{ url_for('add_review', id=restaurant.id) }}" class="btn btn-primary w-100">Write a
                         Review</a>
                 </div>

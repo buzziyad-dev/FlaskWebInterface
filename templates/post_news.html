@@ -8,7 +8,7 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">📝 Post News</h5>
+                    <h5 class="mb-0">📝 {{ _('Post News') }}</h5>
                 </div>
                 <div class="card-body p-4">
                     <form method="POST" novalidate onsubmit="syncNewsContent()">
@@ -16,7 +16,7 @@
 
                         <!-- Title Field -->
                         <div class="mb-4">
-                            <label for="title" class="form-label fw-bold">News Title</label>
+                            <label for="title" class="form-label fw-bold">{{ _('News Title') }}</label>
                             {% if form.title.errors %}
                                 {{ form.title(class="form-control is-invalid") }}
                                 <div class="invalid-feedback d-block">
@@ -25,14 +25,14 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form.title(class="form-control", placeholder="Enter news title (5-200 characters)") }}
-                                <small class="text-muted">Minimum 5 characters, maximum 200 characters</small>
+                                {{ form.title(class="form-control", placeholder=_('Enter news title (5-200 characters)')) }}
+                                <small class="text-muted">{{ _('Minimum 5 characters, maximum 200 characters') }}</small>
                             {% endif %}
                         </div>
 
                         <!-- Content Field with Rich Text Editor -->
                         <div class="mb-4">
-                            <label for="content" class="form-label fw-bold">📝 News Content (Rich Editor)</label>
+                            <label for="content" class="form-label fw-bold">📝 {{ _('News Content (Rich Editor)') }}</label>
                             <div id="editor-toolbar" class="mb-2 quill-toolbar-dark" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
                                 <!-- Text Formatting -->
                                 <button type="button" class="btn btn-sm btn-light quill-btn" title="Bold"><strong>B</strong></button>

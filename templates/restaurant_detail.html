@@ -78,7 +78,8 @@
                 <div class="card-body">
                     {% if reviews %}
                     {% for review in reviews %}
-                    <div class="review-item {% if not loop.last %}border-bottom pb-3 mb-3{% endif %}" id="review-{{ review.id }}">
+                    <div class="review-item {% if not loop.last %}border-bottom pb-3 mb-3{% endif %}"
+                        id="review-{{ review.id }}">
                         <div class="d-flex align-items-start">
                             <div class="reviewer-avatar-small me-3">{{ (review.author.username[0].upper() if
                                 review.author else 'D') }}</div>
@@ -87,14 +88,20 @@
                                     <div>
                                         <h6 class="fw-bold mb-0">
                                             {% if review.author %}
-                                            <a href="{{ url_for('profile', user_id=review.author.id) }}" class="text-decoration-none" style="color: inherit;">{{ review.author.username }}</a>
+                                            <a href="{{ url_for('profile', user_id=review.author.id) }}"
+                                                class="text-decoration-none" style="color: inherit;">{{
+                                                review.author.username }}</a>
                                             {% set highest_badge = review.author.get_highest_hierarchy_badge() %}
                                             {% if highest_badge %}
-                                            <span class="badge small ms-2" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">
+                                            <span class="badge small ms-2"
+                                                style="background-color: {{ highest_badge.color }};"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">
                                                 {{ highest_badge.name }}
                                             </span>
                                             {% else %}
-                                            <span class="badge bg-light text-dark small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is a {{ review.author.get_badge() }}">
+                                            <span class="badge bg-light text-dark small ms-2" data-bs-toggle="tooltip"
+                                                data-bs-title="This user is a {{ review.author.get_badge() }}">
                                                 {{ review.author.get_badge() }}
                                             </span>
                                             {% endif %}
@@ -121,7 +128,7 @@
                                             }}</span></small></p>
                                 {% endif %}
                                 <p class="mb-3">{{ review.content }}</p>
-                                
+
                                 <!-- Comments Section -->
                                 <div class="comments-section ps-3 border-start mb-3">
                                     {% set comment_list = review.comments.all() | list %}
@@ -132,10 +139,16 @@
                                         <div class="d-flex justify-content-between">
                                             <strong class="text-primary">
                                                 {% if comment.author %}
-                                                <a href="{{ url_for('profile', user_id=comment.author.id) }}" class="text-decoration-none text-primary">{{ comment.author.username }}</a>
+                                                <a href="{{ url_for('profile', user_id=comment.author.id) }}"
+                                                    class="text-decoration-none text-primary">{{ comment.author.username
+                                                    }}</a>
                                                 {% set highest_badge = comment.author.get_highest_hierarchy_badge() %}
                                                 {% if highest_badge %}
-                                                <span class="badge badge-sm" style="background-color: {{ highest_badge.color }};" data-bs-toggle="tooltip" data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">{{ highest_badge.name }}</span>
+                                                <span class="badge badge-sm"
+                                                    style="background-color: {{ highest_badge.color }};"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-title="{{ highest_badge.name }} - {{ highest_badge.description or 'No description' }}">{{
+                                                    highest_badge.name }}</span>
                                                 {% endif %}
                                                 {% else %}
                                                 Deleted User
@@ -147,13 +160,15 @@
                                     </div>
                                     {% endfor %}
                                     {% endif %}
-                                    
+
                                     <!-- Add Comment Form -->
                                     {% if current_user.is_authenticated %}
-                                    <form method="POST" action="{{ url_for('add_comment', review_id=review.id) }}" class="mt-2">
+                                    <form method="POST" action="{{ url_for('add_comment', review_id=review.id) }}"
+                                        class="mt-2">
                                         {{ comment_form.hidden_tag() if comment_form else '' }}
                                         <div class="input-group input-group-sm">
-                                            <input type="text" name="content" class="form-control" placeholder="Add a comment..." maxlength="500" required>
+                                            <input type="text" name="content" class="form-control"
+                                                placeholder="Add a comment..." maxlength="500" required>
                                             <button class="btn btn-sm btn-primary" type="submit">Post</button>
                                         </div>
                                     </form>
@@ -228,7 +243,9 @@
                     <h5 class="mb-0">📍 Location</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div id="restaurant-map" style="height: 300px; border-radius: 0 0 4px 4px;"></div>
+                    <div id="restaurant-map"
+                        style="height: 300px; border-radius: 0 0 4px 4px; color: initial !important;">
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -248,31 +265,31 @@
 
 {% if restaurant.location_latitude and restaurant.location_longitude %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize map
-    const map = L.map('restaurant-map').setView([{{ restaurant.location_latitude }}, {{ restaurant.location_longitude }}], 15);
-    
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize map
+        const map = L.map('restaurant-map').setView([{{restaurant.location_latitude}}, {{restaurant.location_longitude}}], 15);
+
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
-    
+
     // Add marker for restaurant location
-    L.marker([{{ restaurant.location_latitude }}, {{ restaurant.location_longitude }}]).addTo(map)
+    L.marker([{{restaurant.location_latitude}}, {{restaurant.location_longitude}}]).addTo(map)
         .bindPopup('<strong>{{ restaurant.name }}</strong><br>{{ restaurant.address }}')
         .openPopup();
     
     
 });
 
-// Initialize Bootstrap tooltips
-document.addEventListener('DOMContentLoaded', function() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Initialize Bootstrap tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
-});
 </script>
 
 {% endif %}

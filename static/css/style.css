@@ -24,7 +24,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     min-height: 100vh;
     font-family: 'Inter', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -34,47 +35,109 @@ html, body {
 
 /* === ANIMATIONS === */
 @keyframes slideInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 @keyframes glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-    50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+    }
 }
 
 /* === UTILITIES === */
-.animate-fade-in { animation: fadeIn 0.6s ease-out; }
-.animate-slide-up { animation: slideInUp 0.6s ease-out; }
-.animate-slide-down { animation: slideInDown 0.6s ease-out; }
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-pulse { animation: pulse 2s ease-in-out infinite; }
-.animate-glow { animation: glow 2s ease-in-out infinite; }
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.animate-slide-down {
+    animation: slideInDown 0.6s ease-out;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite;
+}
 
 /* === NAVBAR === */
 .navbar {
@@ -157,9 +220,17 @@ html, body {
 }
 
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .hero-overlay {
@@ -386,7 +457,8 @@ body.dark-mode .hero-search .form-control {
 }
 
 /* === FORMS === */
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 0.75rem;
     border: 2px solid var(--border);
     padding: 0.75rem 1.25rem;
@@ -394,7 +466,8 @@ body.dark-mode .hero-search .form-control {
     transition: all 0.3s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     transform: translateY(-2px);
@@ -535,8 +608,13 @@ footer a:hover {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* === RESPONSIVE === */
@@ -1181,7 +1259,10 @@ footer a:hover {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .rank-col, .user-col, .stat-col, .action-col {
+    .rank-col,
+    .user-col,
+    .stat-col,
+    .action-col {
         width: auto;
     }
 
@@ -1863,7 +1944,12 @@ body.dark-mode .dropdown-divider {
 }
 
 /* Text Colors */
-body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
     color: #f1f5f9;
 }
 
@@ -2154,15 +2240,15 @@ body.dark-mode .table {
     border-color: #334155;
 }
 
-body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+body.dark-mode .table-striped>tbody>tr:nth-of-type(odd) {
     background: #1e293b;
 }
 
-body.dark-mode .table-striped > tbody > tr:nth-of-type(even) {
+body.dark-mode .table-striped>tbody>tr:nth-of-type(even) {
     background: #0f172a;
 }
 
-body.dark-mode .table-hover > tbody > tr:hover {
+body.dark-mode .table-hover>tbody>tr:hover {
     background: #334155;
 }
 
@@ -2441,4 +2527,26 @@ body.dark-mode pre {
 body.dark-mode blockquote {
     border-left: 4px solid #667eea;
     color: #cbd5e1;
+}
+
+/* Hide all Leaflet popups */
+.leaflet-popup,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip,
+.leaflet-popup-content {
+    display: none !important;
+}
+
+/* Keep markers as they are */
+.leaflet-marker-icon {
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    filter: none !important;
+    outline: none !important;
+}
+
+.leaflet-marker-shadow {
+    display: none !important;
+    /* keeps marker shadow hidden */
 }

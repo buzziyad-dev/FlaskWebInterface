@@ -87,7 +87,7 @@
                                     <div>
                                         <h6 class="fw-bold mb-0">
                                             {% if review.author %}
-                                            {{ review.author.username }}
+                                            <a href="{{ url_for('profile', user_id=review.author.id) }}" class="text-decoration-none" style="color: inherit;">{{ review.author.username }}</a>
                                             {% if review.author.is_admin %}
                                             <span class="badge bg-danger small ms-2 badge-with-tooltip admin-badge">
                                                 Admin
@@ -133,7 +133,7 @@
                                     {% for comment in comment_list | reverse %}
                                     <div class="comment-item mb-2 pb-2 border-bottom small">
                                         <div class="d-flex justify-content-between">
-                                            <strong class="text-primary">{% if comment.author %}{{ comment.author.username }}{% else %}Deleted User{% endif %}</strong>
+                                            <strong class="text-primary">{% if comment.author %}<a href="{{ url_for('profile', user_id=comment.author.id) }}" class="text-decoration-none text-primary">{{ comment.author.username }}</a>{% else %}Deleted User{% endif %}</strong>
                                             <small class="text-muted">{{ comment.formatted_datetime_ksa() }}</small>
                                         </div>
                                         <p class="mb-1 mt-1">{{ comment.content }}</p>

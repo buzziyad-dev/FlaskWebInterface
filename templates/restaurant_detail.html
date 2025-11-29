@@ -89,16 +89,12 @@
                                             {% if review.author %}
                                             <a href="{{ url_for('profile', user_id=review.author.id) }}" class="text-decoration-none" style="color: inherit;">{{ review.author.username }}</a>
                                             {% if review.author.is_admin %}
-                                            <span class="badge bg-danger small ms-2 badge-with-tooltip admin-badge">
+                                            <span class="badge bg-danger small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is an Admin">
                                                 Admin
-                                                <span class="badge-tooltip">This user is an Admin</span>
                                             </span>
                                             {% else %}
-                                            <span
-                                                class="badge bg-light text-dark small ms-2 badge-with-tooltip user-badge">
+                                            <span class="badge bg-light text-dark small ms-2" data-bs-toggle="tooltip" data-bs-title="This user is a {{ review.author.get_badge() }}">
                                                 {{ review.author.get_badge() }}
-                                                <span class="badge-tooltip">This user is a {{ review.author.get_badge()
-                                                    }}</span>
                                             </span>
                                             {% endif %}
                                             {% else %}
@@ -288,6 +284,14 @@ document.addEventListener('DOMContentLoaded', function() {
             mapContainer.style.filter = 'none';
         }
     }
+});
+
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 });
 </script>
 

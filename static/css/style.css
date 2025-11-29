@@ -2634,3 +2634,21 @@ html[dir="rtl"] [dir="ltr"] {
     direction: ltr;
     text-align: left;
 }
+
+html[dir="rtl"] .d-flex {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .d-flex.me-3 {
+    flex-direction: row;
+    direction: ltr;
+}
+
+html[dir="rtl"] .input-group {
+    direction: ltr;
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .input-group .form-control {
+    text-align: right;
+}

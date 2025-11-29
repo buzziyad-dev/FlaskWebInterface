@@ -4,12 +4,12 @@
 <div class="hero-section">
     <div class="hero-overlay"></div>
     <div class="hero-content container">
-        <h1 class="animate-slide-up">Discover Jeddah's Hidden Culinary Gems</h1>
-        <p class="animate-slide-up">Explore authentic flavors and support local businesses</p>
+        <h1 class="animate-slide-up">{{ _('Discover Jeddah\'s Hidden Culinary Gems') }}</h1>
+        <p class="animate-slide-up">{{ _('Explore authentic flavors and support local businesses') }}</p>
         <form action="{{ url_for('search') }}" method="GET" class="hero-search">
             <div class="input-group input-group-lg">
-                <input type="text" name="q" class="form-control" placeholder="Search for restaurants...">
-                <button class="btn btn-primary px-5" type="submit">🔍 Search</button>
+                <input type="text" name="q" class="form-control" placeholder="{{ _('Search for restaurants...') }}">
+                <button class="btn btn-primary px-5" type="submit">🔍 {{ _('Search') }}</button>
             </div>
         </form>
     </div>

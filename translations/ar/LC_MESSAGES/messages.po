@@ -4,219 +4,272 @@
 #
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=utf-8\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-11-29 17:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ar\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%10>=3 && n%10<=10 ? 3 : n%10>=11 ? 4 : 5);\n"
+"Language-Team: ar <LL@li.org>\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
+"n%10>=3 && n%10<=10 ? 3 : n%10>=11 ? 4 : 5);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: templates/base.html:56 templates/base.html:140
 msgid "Home"
 msgstr "الرئيسية"
 
+#: templates/base.html:57 templates/base.html:141
 msgid "Restaurants"
 msgstr "المطاعم"
 
+#: templates/base.html:58
 msgid "Leaderboard"
 msgstr "لوحة المتصدرين"
 
+#: templates/base.html:59
 msgid "News"
 msgstr "الأخبار"
 
-msgid "+ Add"
+#: templates/base.html:61
+#, fuzzy
+msgid "Add"
 msgstr "+ إضافة"
 
+#: templates/base.html:63
 msgid "Admin"
 msgstr "إدارة"
 
+#: templates/base.html:67
 msgid "Search..."
 msgstr "البحث..."
 
+#: templates/base.html:68
 msgid "Go"
 msgstr "ابحث"
 
-msgid "Toggle dark mode"
-msgstr "تبديل الوضع الليلي"
-
-msgid "Select language"
-msgstr "اختر اللغة"
-
+#: templates/base.html:95
 msgid "Profile"
 msgstr "الملف الشخصي"
 
+#: templates/base.html:99
 msgid "Logout"
 msgstr "تسجيل الخروج"
 
+#: templates/base.html:103
 msgid "Login"
 msgstr "تسجيل الدخول"
 
+#: templates/base.html:104
 msgid "Sign Up"
 msgstr "إنشاء حساب"
 
-msgid "Add a New Restaurant"
-msgstr "إضافة مطعم جديد"
-
-msgid "Help grow our community by adding a restaurant in Jeddah"
-msgstr "ساعد في نمو مجتمعنا بإضافة مطعم في جدة"
-
-msgid "Restaurant name"
-msgstr "اسم المطعم"
-
-msgid "Description"
-msgstr "الوصف"
-
-msgid "Tell us about this restaurant..."
-msgstr "أخبرنا عن هذا المطعم..."
-
-msgid "Price Range"
-msgstr "نطاق السعر"
-
-msgid "Upload Image"
-msgstr "تحميل صورة"
-
-msgid "PNG or JPG (max 2MB)"
-msgstr "PNG أو JPG (بحد أقصى 2MB)"
-
-msgid "Location"
-msgstr "الموقع"
-
-msgid "Click on the map to pin the exact location of this restaurant in Jeddah"
-msgstr "انقر على الخريطة لتحديد الموقع الدقيق لهذا المطعم في جدة"
-
-msgid "Selected: No location selected"
-msgstr "المختار: لم يتم تحديد موقع"
-
-msgid "Add Restaurant"
-msgstr "إضافة مطعم"
-
-msgid "Submit"
-msgstr "إرسال"
-
-msgid "Cancel"
-msgstr "إلغاء"
-
-msgid "Welcome to Yalla"
-msgstr "أهلا بك في يلا"
-
+#: templates/base.html:135
 msgid "Discover Jeddah's hidden culinary gems and support local businesses."
 msgstr "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية."
 
+#: templates/base.html:138
 msgid "Quick Links"
 msgstr "روابط سريعة"
 
+#: templates/base.html:142
+msgid "Add Restaurant"
+msgstr "إضافة مطعم"
+
+#: templates/base.html:146
 msgid "Community"
 msgstr "المجتمع"
 
+#: templates/base.html:147
 msgid "Join our growing community of food lovers in Jeddah!"
 msgstr "انضم إلى مجتمعنا المتنامي من محبي الطعام في جدة!"
 
+#: templates/base.html:152
 msgid "All rights reserved"
 msgstr "جميع الحقوق محفوظة"
 
-msgid "Discover Jeddah's Best Restaurants"
-msgstr "اكتشف أفضل مطاعم جدة"
+#: templates/index.html:7
+#, fuzzy
+msgid "Discover Jeddah's Hidden Culinary Gems"
+msgstr "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية."
 
-msgid "Reviews"
-msgstr "التقييمات"
+#: templates/index.html:8
+#, fuzzy
+msgid "Explore authentic flavors and support local businesses"
+msgstr "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية."
 
-msgid "Rating"
-msgstr "التقييم"
+#: templates/index.html:11
+#, fuzzy
+msgid "Search for restaurants..."
+msgstr "إضافة مطعم"
 
-msgid "No reviews yet"
-msgstr "لا توجد تقييمات حتى الآن"
+#: templates/index.html:12
+#, fuzzy
+msgid "Search"
+msgstr "البحث..."
 
-msgid "Write a Review"
-msgstr "كتابة تقييم"
+#~ msgid "Toggle dark mode"
+#~ msgstr "تبديل الوضع الليلي"
 
-msgid "Your Review"
-msgstr "تقييمك"
+#~ msgid "Select language"
+#~ msgstr "اختر اللغة"
 
-msgid "Cuisine"
-msgstr "المطبخ"
+#~ msgid "Add a New Restaurant"
+#~ msgstr "إضافة مطعم جديد"
 
-msgid "Add your review..."
-msgstr "أضف تقييمك..."
+#~ msgid "Help grow our community by adding a restaurant in Jeddah"
+#~ msgstr "ساعد في نمو مجتمعنا بإضافة مطعم في جدة"
 
-msgid "Price"
-msgstr "السعر"
+#~ msgid "Restaurant name"
+#~ msgstr "اسم المطعم"
 
-msgid "Budget-friendly"
-msgstr "ميسور الأسعار"
+#~ msgid "Description"
+#~ msgstr "الوصف"
 
-msgid "Moderate"
-msgstr "متوسط"
+#~ msgid "Tell us about this restaurant..."
+#~ msgstr "أخبرنا عن هذا المطعم..."
 
-msgid "Premium"
-msgstr "فاخر"
+#~ msgid "Price Range"
+#~ msgstr "نطاق السعر"
 
-msgid "Elite"
-msgstr "نخبوي"
+#~ msgid "Upload Image"
+#~ msgstr "تحميل صورة"
 
-msgid "User Profile"
-msgstr "ملف المستخدم"
+#~ msgid "PNG or JPG (max 2MB)"
+#~ msgstr "PNG أو JPG (بحد أقصى 2MB)"
 
-msgid "Reputation"
-msgstr "السمعة"
+#~ msgid "Location"
+#~ msgstr "الموقع"
 
-msgid "Badge"
-msgstr "الشارة"
+#~ msgid "Click on the map to pin the exact location of this restaurant in Jeddah"
+#~ msgstr "انقر على الخريطة لتحديد الموقع الدقيق لهذا المطعم في جدة"
 
-msgid "Joined"
-msgstr "انضم في"
+#~ msgid "Selected: No location selected"
+#~ msgstr "المختار: لم يتم تحديد موقع"
 
-msgid "No restaurants yet"
-msgstr "لا توجد مطاعم حتى الآن"
+#~ msgid "Submit"
+#~ msgstr "إرسال"
 
-msgid "Registration successful! Welcome to Yalla!"
-msgstr "تم التسجيل بنجاح! أهلا بك في يلا!"
+#~ msgid "Cancel"
+#~ msgstr "إلغاء"
 
-msgid "Login failed. Please check your username/email and password."
-msgstr "فشل تسجيل الدخول. يرجى التحقق من اسم المستخدم أو البريد الإلكتروني وكلمة المرور."
+#~ msgid "Welcome to Yalla"
+#~ msgstr "أهلا بك في يلا"
 
-msgid "Welcome back"
-msgstr "أهلا بعودتك"
+#~ msgid "Discover Jeddah's Best Restaurants"
+#~ msgstr "اكتشف أفضل مطاعم جدة"
 
-msgid "You have been logged out."
-msgstr "تم تسجيل خروجك."
+#~ msgid "Reviews"
+#~ msgstr "التقييمات"
 
-msgid "Registration"
-msgstr "التسجيل"
+#~ msgid "Rating"
+#~ msgstr "التقييم"
 
-msgid "Username"
-msgstr "اسم المستخدم"
+#~ msgid "No reviews yet"
+#~ msgstr "لا توجد تقييمات حتى الآن"
 
-msgid "Email"
-msgstr "البريد الإلكتروني"
+#~ msgid "Write a Review"
+#~ msgstr "كتابة تقييم"
 
-msgid "Password"
-msgstr "كلمة المرور"
+#~ msgid "Your Review"
+#~ msgstr "تقييمك"
 
-msgid "Confirm Password"
-msgstr "تأكيد كلمة المرور"
+#~ msgid "Cuisine"
+#~ msgstr "المطبخ"
 
-msgid "Already have an account?"
-msgstr "هل لديك حساب بالفعل؟"
+#~ msgid "Add your review..."
+#~ msgstr "أضف تقييمك..."
 
-msgid "Comment added successfully!"
-msgstr "تم إضافة التعليق بنجاح!"
+#~ msgid "Price"
+#~ msgstr "السعر"
 
-msgid "Restaurant added successfully!"
-msgstr "تم إضافة المطعم بنجاح!"
+#~ msgid "Budget-friendly"
+#~ msgstr "ميسور الأسعار"
 
-msgid "Elite Foodie"
-msgstr "عاشق طعام نخبوي"
+#~ msgid "Moderate"
+#~ msgstr "متوسط"
 
-msgid "Expert Reviewer"
-msgstr "مراجع خبير"
+#~ msgid "Premium"
+#~ msgstr "فاخر"
 
-msgid "Experienced Diner"
-msgstr "آكل ذو خبرة"
+#~ msgid "Elite"
+#~ msgstr "نخبوي"
 
-msgid "Rising Critic"
-msgstr "ناقد صاعد"
+#~ msgid "User Profile"
+#~ msgstr "ملف المستخدم"
 
-msgid "Food Explorer"
-msgstr "مستكشف الطعام"
+#~ msgid "Reputation"
+#~ msgstr "السمعة"
 
-msgid "Newcomer"
-msgstr "وافد جديد"
+#~ msgid "Badge"
+#~ msgstr "الشارة"
 
-msgid "Dark Mode"
-msgstr "الوضع الليلي"
+#~ msgid "Joined"
+#~ msgstr "انضم في"
+
+#~ msgid "No restaurants yet"
+#~ msgstr "لا توجد مطاعم حتى الآن"
+
+#~ msgid "Registration successful! Welcome to Yalla!"
+#~ msgstr "تم التسجيل بنجاح! أهلا بك في يلا!"
+
+#~ msgid "Login failed. Please check your username/email and password."
+#~ msgstr ""
+#~ "فشل تسجيل الدخول. يرجى التحقق من "
+#~ "اسم المستخدم أو البريد الإلكتروني وكلمة"
+#~ " المرور."
+
+#~ msgid "Welcome back"
+#~ msgstr "أهلا بعودتك"
+
+#~ msgid "You have been logged out."
+#~ msgstr "تم تسجيل خروجك."
+
+#~ msgid "Registration"
+#~ msgstr "التسجيل"
+
+#~ msgid "Username"
+#~ msgstr "اسم المستخدم"
+
+#~ msgid "Email"
+#~ msgstr "البريد الإلكتروني"
+
+#~ msgid "Password"
+#~ msgstr "كلمة المرور"
+
+#~ msgid "Confirm Password"
+#~ msgstr "تأكيد كلمة المرور"
+
+#~ msgid "Already have an account?"
+#~ msgstr "هل لديك حساب بالفعل؟"
+
+#~ msgid "Comment added successfully!"
+#~ msgstr "تم إضافة التعليق بنجاح!"
+
+#~ msgid "Restaurant added successfully!"
+#~ msgstr "تم إضافة المطعم بنجاح!"
+
+#~ msgid "Elite Foodie"
+#~ msgstr "عاشق طعام نخبوي"
+
+#~ msgid "Expert Reviewer"
+#~ msgstr "مراجع خبير"
+
+#~ msgid "Experienced Diner"
+#~ msgstr "آكل ذو خبرة"
+
+#~ msgid "Rising Critic"
+#~ msgstr "ناقد صاعد"
+
+#~ msgid "Food Explorer"
+#~ msgstr "مستكشف الطعام"
+
+#~ msgid "Newcomer"
+#~ msgstr "وافد جديد"
+
+#~ msgid "Dark Mode"
+#~ msgstr "الوضع الليلي"
+

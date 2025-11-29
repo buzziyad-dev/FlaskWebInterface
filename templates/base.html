@@ -53,19 +53,19 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('restaurants') }}">Restaurants</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('leaderboard') }}">Leaderboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('news') }}">News</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">{{ _('Home') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('restaurants') }}">{{ _('Restaurants') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('leaderboard') }}">{{ _('Leaderboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('news') }}">{{ _('News') }}</a></li>
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('add_restaurant') }}">+ Add</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('add_restaurant') }}">+ {{ _('Add') }}</a></li>
                     {% if current_user.is_admin %}<li class="nav-item"><a class="nav-link text-warning fw-bold"
-                            href="{{ url_for('admin_dashboard') }}">Admin</a></li>{% endif %}
+                            href="{{ url_for('admin_dashboard') }}">{{ _('Admin') }}</a></li>{% endif %}
                     {% endif %}
                 </ul>
                 <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET">
-                    <input class="form-control rounded-pill" type="search" name="q" placeholder="Search...">
-                    <button class="btn btn-primary ms-2" type="submit">Go</button>
+                    <input class="form-control rounded-pill" type="search" name="q" placeholder="{{ _('Search...') }}">
+                    <button class="btn btn-primary ms-2" type="submit">{{ _('Go') }}</button>
                 </form>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
@@ -92,16 +92,16 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item"
-                                    href="{{ url_for('profile', user_id=current_user.id) }}">Profile</a></li>
+                                    href="{{ url_for('profile', user_id=current_user.id) }}">{{ _('Profile') }}</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
                         </ul>
                     </li>
                     {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                    <li class="nav-item"><a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Sign Up</a>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">{{ _('Login') }}</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">{{ _('Sign Up') }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -132,24 +132,24 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5>🍽️ Yalla</h5>
-                    <p>Discover Jeddah's hidden culinary gems and support local businesses.</p>
+                    <p>{{ _('Discover Jeddah\'s hidden culinary gems and support local businesses.') }}</p>
                 </div>
                 <div class="col-md-4 mb-4">
-                    <h5>Quick Links</h5>
+                    <h5>{{ _('Quick Links') }}</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="{{ url_for('restaurants') }}">Restaurants</a></li>
-                        <li><a href="{{ url_for('add_restaurant') }}">Add Restaurant</a></li>
+                        <li><a href="{{ url_for('index') }}">{{ _('Home') }}</a></li>
+                        <li><a href="{{ url_for('restaurants') }}">{{ _('Restaurants') }}</a></li>
+                        <li><a href="{{ url_for('add_restaurant') }}">{{ _('Add Restaurant') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-4">
-                    <h5>Community</h5>
-                    <p>Join our growing community of food lovers in Jeddah!</p>
+                    <h5>{{ _('Community') }}</h5>
+                    <p>{{ _('Join our growing community of food lovers in Jeddah!') }}</p>
                 </div>
             </div>
             <hr class="border-secondary">
             <div class="text-center py-3">
-                <p class="mb-0">&copy; 2024 Yalla. All rights reserved. 🌟</p>
+                <p class="mb-0">&copy; 2024 Yalla. {{ _('All rights reserved') }}. 🌟</p>
             </div>
         </div>
     </footer>

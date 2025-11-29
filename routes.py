@@ -22,6 +22,29 @@ def check_banned_user():
 
 
 @app.before_request
+def check_maintenance_mode():
+    """Check if maintenance mode is enabled - redirect non-admins to maintenance page"""
+    if FeatureToggle.get_feature_status('maintenance_mode'):
+        # Allow admins and certain routes to bypass maintenance mode
+        if current_user.is_authenticated and current_user.is_admin:
+            return None
+        
+        # Routes that should be accessible during maintenance
+        allowed_routes = ['maintenance', 'login', 'logout', 'banned']
+        if request.endpoint and request.endpoint in allowed_routes:
+            return None
+        
+        # API routes for admins
+        if request.endpoint and request.endpoint.startswith('admin_'):
+            if not (current_user.is_authenticated and current_user.is_admin):
+                return redirect(url_for('maintenance'))
+            return None
+        
+        # Redirect to maintenance page for all other routes
+        return redirect(url_for('maintenance'))
+
+
+@app.before_request
 def refresh_user_dark_mode():
     """Refresh user dark mode preference from database on each request"""
     if current_user.is_authenticated:
@@ -95,6 +118,12 @@ def banned(username):
     if not user or not user.is_banned:
         return redirect(url_for('index'))
     return render_template('banned.html', user=user)
+
+
+@app.route('/maintenance')
+def maintenance():
+    """Maintenance mode page for non-admin users"""
+    return render_template('maintenance.html')
 
 
 @app.route('/logout')

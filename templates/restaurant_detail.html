@@ -263,38 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .bindPopup('<strong>{{ restaurant.name }}</strong><br>{{ restaurant.address }}')
         .openPopup();
     
-    // Apply dark mode styles if needed
-    if (document.getElementById('appBody').classList.contains('dark-mode')) {
-        applyDarkModeToMap();
-    }
     
-    // Listen for dark mode changes
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', function() {
-            setTimeout(() => {
-                if (document.getElementById('appBody').classList.contains('dark-mode')) {
-                    applyDarkModeToMap();
-                } else {
-                    removeDarkModeFromMap();
-                }
-            }, 100);
-        });
-    }
-    
-    function applyDarkModeToMap() {
-        const mapContainer = document.getElementById('restaurant-map');
-        if (mapContainer) {
-            mapContainer.style.filter = 'invert(1) hue-rotate(180deg)';
-        }
-    }
-    
-    function removeDarkModeFromMap() {
-        const mapContainer = document.getElementById('restaurant-map');
-        if (mapContainer) {
-            mapContainer.style.filter = 'none';
-        }
-    }
 });
 
 // Initialize Bootstrap tooltips
@@ -307,16 +276,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-body.dark-mode #restaurant-map {
-    filter: invert(1) hue-rotate(180deg);
-}
-
 .leaflet-popup-content {
     font-size: 14px !important;
-}
-
-body.dark-mode .leaflet-popup-content {
-    color: #1e1e1e;
 }
 </style>
 {% endif %}

@@ -1,8 +1,156 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <h1>{{ _('About Us') }}</h1>
-    <p class="text-muted">{{ _('Placeholder: About Us content will be added here.') }}</p>
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0;
+    }
+    
+    .about-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .about-hero p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    .about-section {
+        margin-bottom: 3rem;
+    }
+    
+    .about-section h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #667eea;
+        display: inline-block;
+    }
+    
+    .about-section p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: #555;
+        margin-bottom: 1rem;
+    }
+    
+    .about-section ul, .about-section ol {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+    }
+    
+    .about-section li {
+        margin-bottom: 0.5rem;
+        line-height: 1.8;
+        color: #555;
+    }
+    
+    .about-section strong {
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .about-content {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    body.dark-mode .about-section h2 {
+        color: #e0e0e0;
+    }
+    
+    body.dark-mode .about-section p,
+    body.dark-mode .about-section li {
+        color: #b0b0b0;
+    }
+    
+    body.dark-mode .about-section strong {
+        color: #e0e0e0;
+    }
+    
+    body.dark-mode .about-content {
+        background-color: #2a2a2a;
+    }
+</style>
+
+<div class="about-hero">
+    <div class="container">
+        <h1>{{ _('About Us') }}</h1>
+        <p>{{ _('Learn more about Yalla and our mission') }}</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Mission Section -->
+    <div class="about-section">
+        <h2>{{ _('Our Mission') }}</h2>
+        <div class="about-content">
+            <p>
+                {{ _('Placeholder: Add your mission statement here. Describe the core purpose and goals of Yalla.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Vision Section -->
+    <div class="about-section">
+        <h2>{{ _('Our Vision') }}</h2>
+        <div class="about-content">
+            <p>
+                {{ _('Placeholder: Add your vision statement here. Describe the future state and impact you aim to achieve.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Values Section -->
+    <div class="about-section">
+        <h2>{{ _('Our Values') }}</h2>
+        <div class="about-content">
+            <ul>
+                <li><strong>{{ _('Value 1') }}:</strong> {{ _('Placeholder: Add description') }}</li>
+                <li><strong>{{ _('Value 2') }}:</strong> {{ _('Placeholder: Add description') }}</li>
+                <li><strong>{{ _('Value 3') }}:</strong> {{ _('Placeholder: Add description') }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Story Section -->
+    <div class="about-section">
+        <h2>{{ _('Our Story') }}</h2>
+        <div class="about-content">
+            <p>
+                {{ _('Placeholder: Add your company story here. Explain how Yalla was founded and what inspired its creation.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="about-section">
+        <h2>{{ _('Our Team') }}</h2>
+        <div class="about-content">
+            <p>
+                {{ _('Placeholder: Add team information here. Describe the people behind Yalla.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="about-section">
+        <h2>{{ _('Get in Touch') }}</h2>
+        <div class="about-content">
+            <p>
+                {{ _('Placeholder: Add contact information and methods here.') }}
+            </p>
+        </div>
+    </div>
 </div>
 {% endblock %}

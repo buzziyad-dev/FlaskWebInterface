@@ -35,11 +35,8 @@
                 <div class="text-white-50">{{ _('Reviews') }}</div>
             </div>
             <div class="stat-card animate-slide-up">
-                <div class="h3 fw-bold mb-1">{{ user.reputation_score or user.calculate_reputation() }}</div>
-                <div class="text-white-50">{{ _('Reputation') }}</div>
-            </div>
-            <div class="stat-card animate-slide-up">
-                <div class="text-white-50">{{ _('Followers') }}</div>
+                <div class="h3 fw-bold mb-1">{{ '%.1f'|format(user.avg_rating_given()) }}/5</div>
+                <div class="text-white-50">{{ _('Avg Rating') }}</div>
             </div>
         </div>
 

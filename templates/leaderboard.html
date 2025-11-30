@@ -24,7 +24,7 @@
                 <div class="podium-card" ; display: none>
                     <div class="podium-avatar silver">{{ users[1].username[0].upper() }}</div>
                     <div class="podium-username">{{ users[1].username }}</div>
-                    <div class="podium-score">{{ users[1].reputation_score }}</div>
+                    <div class="podium-score">{{ users[1].review_count() }}</div>
                     <div class="podium-medal">🥈</div>
                 </div>
                 <div class="podium-bar" style="height: 140px;"></div>
@@ -38,7 +38,7 @@
                 <div class="podium-card">
                     <div class="podium-avatar gold">{{ users[0].username[0].upper() }}</div>
                     <div class="podium-username">{{ users[0].username }}</div>
-                    <div class="podium-score">{{ users[0].reputation_score }}</div>
+                    <div class="podium-score">{{ users[0].review_count() }}</div>
                     <div class="podium-medal">🥇</div>
                 </div>
                 <div class="podium-bar" style="height: 180px;"></div>
@@ -52,7 +52,7 @@
                 <div class="podium-card">
                     <div class="podium-avatar bronze">{{ users[2].username[0].upper() }}</div>
                     <div class="podium-username">{{ users[2].username }}</div>
-                    <div class="podium-score">{{ users[2].reputation_score }}</div>
+                    <div class="podium-score">{{ users[2].review_count() }}</div>
                     <div class="podium-medal">🥉</div>
                 </div>
                 <div class="podium-bar" style="height: 110px;"></div>
@@ -84,10 +84,6 @@
 
                     <div class="detail-stats">
                         <div class="detail-stat">
-                            <div class="detail-stat-value">{{ user.reputation_score }}</div>
-                            <div class="detail-stat-label">{{ _('Rep Score') }}</div>
-                        </div>
-                        <div class="detail-stat">
                             <div class="detail-stat-value">{{ user.review_count() }}</div>
                             <div class="detail-stat-label">{{ _('Reviews') }}</div>
                         </div>
@@ -97,8 +93,8 @@
                         </div>
                     </div>
 
-                    <a href="{{ url_for('profile', user_id=user.id) }}"
-                        class="btn btn-sm btn-primary w-100 mt-3">{{ _('View Profile') }}</a>
+                    <a href="{{ url_for('profile', user_id=user.id) }}" class="btn btn-sm btn-primary w-100 mt-3">{{
+                        _('View Profile') }}</a>
                 </div>
             </div>
         </div>

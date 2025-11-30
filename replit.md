@@ -9,6 +9,7 @@ Yalla is a restaurant discovery and review platform for Jeddah, Saudi Arabia. It
 - Preferred communication style: Simple, everyday language.
 - **Database Policy**: Do NOT reset/reseed the database during development. Data persistence is critical. Only run seed_data.py if explicitly requested or during initial setup.
 - **Admin Display Policy**: Admin users must be excluded from leaderboard and top community reviewers displays. Banned users must also be excluded.
+- **Badge System**: Badges auto-assign based on review count (not reputation). Updated after each review post.
 
 ## System Architecture
 
@@ -25,7 +26,7 @@ Yalla is a restaurant discovery and review platform for Jeddah, Saudi Arabia. It
 ### Core Features
 - **Restaurant Discovery**: Filter-based browsing (cuisine, price, rating) and text-based search.
 - **Review System**: 1-5 star ratings with detailed content, user comments, and photo uploads (Base64 storage).
-- **User Profiles**: Displays review history, badges, and reputation. Includes a follow/unfollow system.
+- **User Profiles**: Displays review history, badges (based on review count), and average rating. Includes a follow/unfollow system.
 - **Admin Dashboard**: Comprehensive dark mode styling, and feature toggle system to enable/disable core functionalities (e.g., adding restaurants, reviews, search, leaderboard, photo uploads, filtering).
 - **Localization**: Full bilingual support (English/Arabic) for all UI elements, forms, and messages, including RTL layout adjustments.
 - **Google Maps Integration**: "Open in Google Maps" link on restaurant detail pages.
@@ -53,3 +54,33 @@ Yalla is a restaurant discovery and review platform for Jeddah, Saudi Arabia. It
 ### Environment Configuration
 - **DATABASE_URL**: Database connection string
 - **SESSION_SECRET**: Secret key for session security
+## Recent Changes (Current Session)
+
+### Reputation Score System Removed - Review-Based Badges ✅
+**COMPLETE**: Removed reputation_score system entirely, badges now auto-assign based on review count.
+
+**Changes Made:**
+1. **models.py**: Updated `get_badge()` and `assign_auto_badges()` to use review count instead of reputation
+2. **Profile page**: Replaced "Reputation" with "Avg Rating" stat
+3. **Leaderboard**: Removed "Rep Score", now shows "Reviews" + "Avg Rating"
+4. **Admin dashboard**: Removed reputation score input/display
+5. **routes.py**: Sorted by review_count, removed reputation handling
+
+**Badge Thresholds (by review count):**
+- 🏆 Elite Foodie: 50+ reviews
+- 👑 Expert Reviewer: 30+ reviews
+- 🏅 Experienced Diner: 15+ reviews
+- 🚀 Rising Critic: 8+ reviews
+- 🌟 Food Explorer: 3+ reviews
+- 📝 Newcomer: 0-2 reviews
+
+### Google Maps Integration ✅
+- Added "Open in Google Maps" button in Location card header
+- Opens restaurant address in Google Maps (no API key needed)
+- Fully bilingual with RTL support
+
+### Complete Bilingual Translation System ✅
+- 187 translations each in en.json and ar.json
+- 180+ translation calls across all 15 templates
+- All pages fully translated and bilingual
+- Language switching with persistence

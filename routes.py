@@ -89,7 +89,7 @@ def index():
     top_reviewers = (User.query.filter(
         User.is_admin == False, User.is_banned == False).join(Review).group_by(
             User.id).having(func.count(Review.id) > 0).order_by(
-                User.reputation_score.desc()).limit(4).all())
+                func.count(Review.id).desc()).limit(4).all())
     return render_template('index.html',
                            promoted=promoted_restaurants,
                            restaurants=regular_restaurants,
@@ -704,7 +704,7 @@ def admin_api_data():
             'is_admin': u.is_admin,
             'is_banned': u.is_banned,
             'ban_reason': u.ban_reason,
-            'reputation_score': u.reputation_score or u.calculate_reputation(),
+            'review_count': u.review_count(),
             'review_count': u.review_count(),
             'created_at': u.created_at.strftime('%b %d, %Y')
         }
@@ -816,7 +816,7 @@ def leaderboard():
         User.is_admin == False, User.is_banned == False).join(Review).group_by(
             User.id).having(func.count(Review.id) > 0).all())
     all_users.sort(
-        key=lambda u: u.reputation_score or u.calculate_reputation(),
+        key=lambda u: u.review_count(),
         reverse=True)
     return render_template('leaderboard.html', users=all_users)
 
@@ -910,12 +910,6 @@ def manage_user(id):
                 flash('Password must be at least 6 characters.', 'danger')
                 return redirect(url_for('admin_dashboard', tab='users'))
             user.set_password(new_password)
-        
-        try:
-            user.reputation_score = int(
-                request.form.get('reputation_score', user.reputation_score))
-        except (ValueError, TypeError):
-            user.reputation_score = user.reputation_score
         flash(f'User has been updated.', 'success')
     db.session.commit()
     return redirect(url_for('admin_dashboard', tab='users'))

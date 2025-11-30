@@ -320,8 +320,6 @@ body.dark-mode a:hover {
                             <input type="email" class="form-control" id="editEmail" name="email" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Reputation Score</label>
-                            <input type="number" class="form-control" id="editReputation" name="reputation_score" required>
                         </div>
                         <hr>
                         <h6 class="fw-bold mb-3">Change Credentials</h6>
@@ -768,9 +766,6 @@ function attachEventListeners() {
             if (form) form.action = `{{ url_for('manage_user', id=0) }}`.replace('/0', `/${id}`);
             const uName = document.getElementById('editUsername');
             const uEmail = document.getElementById('editEmail');
-            const uRep = document.getElementById('editReputation');
-            if (uEmail) uEmail.value = email || '';
-            if (uRep) uRep.value = reputation || 0;
         });
     });
 
@@ -1146,7 +1141,7 @@ function renderUsersTab() {
         <div class="card-body">
             <div class="mb-3"><label class="form-check"><input type="checkbox" class="form-check-input" id="userSelectAll"> Select All</label>
             <button class="btn btn-sm btn-danger ms-2" id="userBulkDelete" style="display:none;">Delete Selected</button></div>
-            <div class="table-responsive"><table class="table table-hover"><thead><tr><th></th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Reputation</th><th>Reviews</th><th>Joined</th><th>Actions</th></tr></thead><tbody>
+            <div class="table-responsive"><table class="table table-hover"><thead><tr><th></th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Reviews</th><th>Joined</th><th>Actions</th></tr></thead><tbody>
             ${adminData.all_users.map(u=>`
                 <tr>
                     <td><input class="form-check-input user-checkbox" value="${u.id}" type="checkbox"></td>
@@ -1154,11 +1149,11 @@ function renderUsersTab() {
                     <td>${u.email}</td>
                     <td>${u.is_admin?'<span class="badge bg-danger">Admin</span>':'<span class="badge bg-secondary">User</span>'}</td>
                     <td>${u.is_banned?'<span class="badge bg-danger">🚫 Banned</span>':'<span class="badge bg-success">✓ Active</span>'}</td>
-                    <td><span class="badge bg-info">${u.reputation_score}</span></td>
+                    <td></td>
                     <td>${u.review_count}</td>
                     <td><small>${u.created_at}</small></td>
                     <td>
-                        <button class="btn btn-sm btn-info edit-user-btn" data-id="${u.id}" data-user-id="${u.id}" data-email="${u.email}" data-reputation="${u.reputation_score}" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
+                        <button class="btn btn-sm btn-info edit-user-btn" data-id="${u.id}" data-user-id="${u.id}" data-email="${u.email}" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
                         <form method="POST" action="{{ url_for('manage_user', id=0) }}" data-id="${u.id}" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="action" value="toggle_admin">

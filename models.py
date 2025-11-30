@@ -48,44 +48,44 @@ class User(UserMixin, db.Model):
         return int(rc * 10 + self.avg_rating_given() * 5)
 
     def get_badge(self):
-        reputation = self.reputation_score if self.reputation_score else self.calculate_reputation(
-        )
-        if reputation >= 100:
+        """Get badge based on review count"""
+        review_count = self.review_count()
+        if review_count >= 50:
             return 'Elite Foodie'
-        elif reputation >= 75:
+        elif review_count >= 30:
             return 'Expert Reviewer'
-        elif reputation >= 50:
+        elif review_count >= 15:
             return 'Experienced Diner'
-        elif reputation >= 25:
+        elif review_count >= 8:
             return 'Rising Critic'
-        elif reputation >= 10:
+        elif review_count >= 3:
             return 'Food Explorer'
         else:
             return 'Newcomer'
 
     def update_reputation(self):
-        self.reputation_score = self.calculate_reputation()
+        """Update badge based on review count"""
         self.badge = self.get_badge()
         self.assign_auto_badges()
 
     def assign_auto_badges(self):
-        """Automatically assign badges based on reputation"""
+        """Automatically assign badges based on review count"""
         from models import Badge, UserBadge
 
-        # Badge thresholds (reputation -> badge_name)
+        # Badge thresholds (review_count -> badge_name)
         badge_mappings = [
-            (100, 'Elite Foodie'),
-            (75, 'Expert Reviewer'),
-            (50, 'Experienced Diner'),
-            (25, 'Rising Critic'),
-            (10, 'Food Explorer'),
+            (50, 'Elite Foodie'),
+            (30, 'Expert Reviewer'),
+            (15, 'Experienced Diner'),
+            (8, 'Rising Critic'),
+            (3, 'Food Explorer'),
             (0, 'Newcomer'),
         ]
 
-        reputation = self.reputation_score or self.calculate_reputation()
+        review_count = self.review_count()
 
         for threshold, badge_name in badge_mappings:
-            if reputation >= threshold:
+            if review_count >= threshold:
                 # Find badge by name
                 badge = Badge.query.filter_by(name=badge_name).first()
                 if badge:

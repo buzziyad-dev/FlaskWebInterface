@@ -151,6 +151,14 @@ Admins can temporarily disable the following features via the Settings tab in th
 
 ## Recent Changes (Current Session)
 
+### Google Maps Integration
+- **Added "Open in Google Maps" link** next to address in restaurant detail page
+- Link opens restaurant location directly in Google Maps (no API key needed)
+- Uses URL-encoded address for accurate search: `https://www.google.com/maps/search/{address}`
+- Button styled with primary blue color matching the design
+- Fully bilingual: English "Open in Google Maps" & Arabic "فتح في خرائط Google"
+- Opens in new tab with `target="_blank"` for better UX
+
 ### Complete Bilingual Translation System (Final)
 - **180+ translations added** - All 15 templates now fully translated to Arabic & English
 - **Translation files**: `translations/en.json` (187 lines), `translations/ar.json` (187 lines)

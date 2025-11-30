@@ -1317,6 +1317,11 @@ def research():
     return render_template('research.html')
 
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template(

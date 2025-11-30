@@ -4,13 +4,13 @@
   "Leaderboard": "لوحة المتصدرين",
   "News": "الأخبار",
   "Add": "+ إضافة",
-  "Admin": "إدارة",
+  "Admin": "الإدارة",
   "Search...": "البحث...",
   "Go": "ابحث",
   "Profile": "الملف الشخصي",
   "Logout": "تسجيل الخروج",
   "Login": "تسجيل الدخول",
-  "Sign Up": "إنشاء حساب",
+  "Sign Up": "انضم معنا!",
   "Discover Jeddah's hidden culinary gems and support local businesses.": "اكتشف الجواهر الطهوية المخفية في جدة وادعم الشركات المحلية.",
   "Quick Links": "روابط سريعة",
   "Add Restaurant": "إضافة مطعم",
@@ -21,7 +21,7 @@
   "Explore authentic flavors and support local businesses": "استكشف النكهات الأصلية وادعم الشركات المحلية",
   "Search for restaurants...": "ابحث عن مطاعم...",
   "Search": "بحث",
-  "Promoted Restaurants": "مطاعم مختارة",
+  "Promoted Restaurants": "المطاعم المميزة",
   "View Details": "عرض التفاصيل",
   "Loading Yalla": "جاري التحميل في يلا",
   "Maintenance Mode Active": "وضع الصيانة نشط",
@@ -130,7 +130,6 @@
   "reviews": "تقييمات",
   "Try a different search term": "حاول مصطلح بحث مختلف",
   "Browse All Restaurants": "تصفح جميع المطاعم",
-  "Edit Profile": "تحرير الملف الشخصي",
   "Customize your Yalla profile": "خصص ملفك الشخصي في يلا",
   "Profile Picture": "صورة الملف الشخصي",
   "Recommended: Square image (PNG, JPG)": "موصى به: صورة مربعة (PNG, JPG)",
@@ -152,7 +151,6 @@
   "No reviews yet. Be the first to review this restaurant!": "لا توجد تقييمات حتى الآن. كن أول من يقيّم هذا المطعم!",
   "Information": "معلومات",
   "HOURS": "الساعات",
-  "PRICE RANGE": "نطاق السعر",
   "FOOD CATEGORIES": "فئات الطعام",
   "ADDRESS": "العنوان",
   "PHONE": "الهاتف",
@@ -162,24 +160,16 @@
   "Complete rankings of community members": "تصنيفات كاملة لأعضاء المجتمع",
   "Rank": "الترتيب",
   "User": "المستخدم",
-  "Reputation": "السمعة",
-  "Reviews": "التقييمات",
-  "Avg Rating": "متوسط التقييم",
   "Action": "الإجراء",
-  "Admin": "الإدارة",
-  "Profile": "الملف الشخصي",
   "🌟": "🌟",
   "No Reviewers Yet": "لا توجد مراجعات حتى الآن",
-  "Promoted Restaurants": "المطاعم المميزة",
   "Recently Added": "تمت إضافتها مؤخرًا",
-  "Browse All Restaurants": "تصفح جميع المطاعم",
   "Explore by Cuisine": "اكتشف حسب نوع الطعام",
   "Top Community Reviewers": "أفضل مراجعين المجتمع",
-  "View Profile": "عرض الملف الشخصي",
   "Join Our Community": "انضم إلى مجتمعنا",
   "Support local restaurants and discover amazing food": "ادعم المطاعم المحلية واكتشف طعامًا رائعًا",
-  "Add Restaurant": "إضافة مطعم",
   "Browse": "تصفح",
-  "Sign Up": "انضم معنا!",
-  "OIGP": "فتح في خرائط Google"
+  "OIGP": "فتح في خرائط Google",
+  "About Us": "من نحن",
+  "Placeholder: About Us content will be added here.": "عنصر نائب: سيتم إضافة محتوى من نحن هنا."
 }

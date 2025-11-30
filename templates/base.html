@@ -57,6 +57,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('restaurants') }}">{{ _('Restaurants') }}</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('leaderboard') }}">{{ _('Leaderboard') }}</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('news') }}">{{ _('News') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">{{ _('About Us') }}</a></li>
                     {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('add_restaurant') }}">+ {{ _('Add') }}</a></li>
                     {% if current_user.is_admin %}<li class="nav-item"><a class="nav-link text-warning fw-bold"

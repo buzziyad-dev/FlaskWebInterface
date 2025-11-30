@@ -2550,6 +2550,7 @@ body.dark-mode blockquote {
     display: none !important;
     /* keeps marker shadow hidden */
 }
+
 /* === RTL (Right-to-Left) Support for Arabic === */
 html[dir="rtl"] {
     direction: rtl;
@@ -2656,4 +2657,8 @@ html[dir="rtl"] .input-group .form-control {
 
 html[dir="rtl"] .input-group .btn {
     border-radius: 50px 0 0 50px !important;
+}
+
+div[class="container h-100 d-flex align-items-end animate-slide-up"] {
+    background-color: rgb(0, 0, 0, 0.5) !important;
 }

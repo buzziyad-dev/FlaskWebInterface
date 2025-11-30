@@ -82,6 +82,34 @@
     body.dark-mode .about-content {
         background-color: #2a2a2a;
     }
+
+    /* RTL Support for Arabic */
+    [dir="rtl"] .about-section h2 {
+        border-bottom: 3px solid #667eea;
+        display: inline-block;
+    }
+    
+    [dir="rtl"] .about-section ul,
+    [dir="rtl"] .about-section ol {
+        padding-right: 2rem;
+        padding-left: 0;
+    }
+
+    [dir="rtl"] .about-content {
+        text-align: right;
+        direction: rtl;
+    }
+
+    [dir="rtl"] .about-section p {
+        text-align: right;
+        direction: rtl;
+    }
+
+    [dir="rtl"] .about-hero h1,
+    [dir="rtl"] .about-hero p {
+        text-align: right;
+        direction: rtl;
+    }
 </style>
 
 <div class="about-hero">

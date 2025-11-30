@@ -952,6 +952,7 @@ footer a:hover {
     height: 100px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     position: relative;
+    bottom: 20px;
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
@@ -977,6 +978,8 @@ footer a:hover {
     border-radius: 50px;
     font-size: 0.9rem;
     font-weight: 700;
+    position: relative;
+    top: 20px;
 }
 
 .detail-card-body {

@@ -1312,6 +1312,11 @@ def edit_badge(id):
     return redirect(url_for('admin_dashboard', tab='badges'))
 
 
+@app.route('/research')
+def research():
+    return render_template('research.html')
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template(

@@ -755,6 +755,7 @@ def admin_api_data():
             r.content[:80] + '...' if len(r.content) > 80 else r.content,
             'is_approved': r.is_approved,
             'receipt_image': r.receipt_image,
+            'receipt_confirmed': r.receipt_confirmed,
             'created_at': r.created_at.strftime('%b %d, %Y')
         }
 
@@ -812,8 +813,7 @@ def approve_restaurant(id):
 @login_required
 def approve_review(id):
     if not current_user.is_admin:
-        flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('index'))
+        return jsonify({'error': 'Unauthorized'}), 403
     review = Review.query.get_or_404(id)
     review.is_approved = True
     review.approved_by_id = current_user.id
@@ -825,22 +825,30 @@ def approve_review(id):
         reviewer = User.query.get(review.user_id)
         if reviewer:
             reviewer.update_reputation()
-    flash('Review has been approved and author earned 5 points!', 'success')
-    return redirect(url_for('admin_dashboard', tab='reviews'))
+    return jsonify({'success': True, 'message': 'Review approved! Author earned 5 points.'})
+
+
+@app.route('/admin/confirm-receipt/<int:id>', methods=['POST'])
+@login_required
+def confirm_receipt(id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    review = Review.query.get_or_404(id)
+    review.receipt_confirmed = True
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Receipt confirmed.'})
 
 
 @app.route('/admin/reject-review/<int:id>', methods=['POST'])
 @login_required
 def reject_review(id):
     if not current_user.is_admin:
-        flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('index'))
+        return jsonify({'error': 'Unauthorized'}), 403
     review = Review.query.get_or_404(id)
     restaurant_id = review.restaurant_id
     db.session.delete(review)
     db.session.commit()
-    flash('Review has been rejected and removed.', 'warning')
-    return redirect(url_for('admin_dashboard', tab='reviews'))
+    return jsonify({'success': True, 'message': 'Review rejected and removed.'})
 
 
 @app.route('/admin/reject/<int:id>', methods=['POST'])

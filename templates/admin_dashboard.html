@@ -970,6 +970,76 @@ function attachEventListeners() {
         }
     });
 
+    // Confirm receipt AJAX
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('confirm-receipt-btn')) {
+            const reviewId = e.target.dataset.id;
+            const csrf = e.target.dataset.csrf;
+            fetch(`{{ url_for('confirm_receipt', id=0) }}`.replace('/0', `/${reviewId}`), {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrf},
+                credentials: 'same-origin'
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
+                    if (row) {
+                        const badge = row.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = '✓ Confirmed';
+                            badge.className = 'badge bg-success';
+                        }
+                        e.target.style.display = 'none';
+                    }
+                    alert('Receipt confirmed!');
+                }
+            }).catch(err => alert('Error: ' + err.message));
+        }
+    });
+
+    // Approve review AJAX
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('approve-review-btn')) {
+            const reviewId = e.target.dataset.id;
+            const csrf = e.target.dataset.csrf;
+            fetch(`{{ url_for('approve_review', id=0) }}`.replace('/0', `/${reviewId}`), {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrf},
+                credentials: 'same-origin'
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
+                    if (row) {
+                        row.style.opacity = '0.5';
+                        row.style.textDecoration = 'line-through';
+                    }
+                    alert(data.message);
+                    loadAdminData();
+                }
+            }).catch(err => alert('Error: ' + err.message));
+        }
+    });
+
+    // Reject review AJAX
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('reject-review-btn')) {
+            const reviewId = e.target.dataset.id;
+            const csrf = e.target.dataset.csrf;
+            if (!confirm('Delete this review?')) return;
+            fetch(`{{ url_for('reject_review', id=0) }}`.replace('/0', `/${reviewId}`), {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrf},
+                credentials: 'same-origin'
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
+                    if (row) row.remove();
+                    alert(data.message);
+                    loadAdminData();
+                }
+            }).catch(err => alert('Error: ' + err.message));
+        }
+    });
+
     // Delegate assign badges button clicks and properly handle modal
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('assign-badges-btn')) {
@@ -1212,24 +1282,19 @@ function renderReviewsTab() {
                         <thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Receipt</th><th>Date</th><th>Actions</th></tr></thead>
                         <tbody>
                             ${pendingReviews.map(r => `
-                            <tr style="background-color: rgba(255,107,107,0.05);">
+                            <tr style="background-color: rgba(255,107,107,0.05);" data-review-id="${r.id}">
                                 <td><strong>${r.author_username}</strong></td>
                                 <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
                                 <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
                                 <td><small>${r.content}</small></td>
                                 <td>
-                                    ${r.receipt_image ? `<button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button>` : '<small class="text-muted">None</small>'}
+                                    ${r.receipt_image ? `<div style="display:flex;gap:4px;align-items:center;"><button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button><span class="badge ${r.receipt_confirmed ? 'bg-success' : 'bg-secondary'}">${r.receipt_confirmed ? '✓ Confirmed' : 'Pending'}</span></div>` : '<small class="text-muted">None</small>'}
                                 </td>
                                 <td><small>${r.created_at}</small></td>
                                 <td>
-                                    <form method="POST" action="{{ url_for('approve_review', id=0) }}" data-id="${r.id}" style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button class="btn btn-sm btn-success" type="submit">✓ Approve</button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('reject_review', id=0) }}" data-id="${r.id}" style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button class="btn btn-sm btn-warning" type="submit">✕ Reject</button>
-                                    </form>
+                                    ${r.receipt_image && !r.receipt_confirmed ? `<button class="btn btn-sm btn-outline-info confirm-receipt-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✓ Confirm</button> ` : ''}
+                                    <button class="btn btn-sm btn-success approve-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✓ Approve</button>
+                                    <button class="btn btn-sm btn-warning reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✕ Reject</button>
                                 </td>
                             </tr>
                             `).join('')}

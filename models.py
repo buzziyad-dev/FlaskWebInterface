@@ -202,6 +202,7 @@ class Review(db.Model):
     approved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
     receipt_image = db.Column(db.Text, nullable=True)  # Base64 encoded receipt photo
+    receipt_confirmed = db.Column(db.Boolean, default=False, index=True)  # Receipt verified by admin
 
     approver = db.relationship('User',
                                backref='approved_reviews',

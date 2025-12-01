@@ -28,6 +28,14 @@ class ReviewForm(FlaskForm):
     title = StringField('Review Title', validators=[Length(max=100)])
     content = TextAreaField('Your Review', validators=[DataRequired(), Length(min=10, max=1000)])
     food_category = SelectField('What did you try?', choices=[], render_kw={'data-placeholder': 'Optional - select a food category...'})
+    receipt_photo = FileField('Receipt Photo (Optional)', validators=[])
+    
+    def validate_receipt_photo(self, receipt_photo):
+        if receipt_photo.data and receipt_photo.data.filename:
+            allowed_extensions = {'png', 'jpg', 'jpeg'}
+            filename = receipt_photo.data.filename.lower()
+            if not any(filename.endswith('.' + ext) for ext in allowed_extensions):
+                raise ValidationError('Only PNG and JPG files are allowed for receipt photos.')
 
 class RestaurantForm(FlaskForm):
     name = StringField('Restaurant Name', validators=[DataRequired(), Length(max=100)])

@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, login_manager
 from models import User, Restaurant, Review, Cuisine, News, FoodCategory, FeatureToggle, ReviewComment
 from forms import RegistrationForm, LoginForm, ReviewForm, RestaurantForm, PhotoUploadForm, NewsForm, ProfileEditForm, ReviewCommentForm, AdminChangePasswordForm, AdminChangeUsernameForm
+from reputation import award_review_points, award_restaurant_points
 import base64
 import os
 
@@ -342,9 +343,10 @@ def add_review(id):
                         user_id=current_user.id,
                         restaurant_id=id)
         db.session.add(review)
-        current_user.update_reputation()
         db.session.commit()
-        flash('Your review has been posted!', 'success')
+        award_review_points(current_user.id)
+        current_user.update_reputation()
+        flash('Your review has been posted! You earned 5 reputation points.', 'success')
         return redirect(url_for('restaurant_detail', id=id))
     return render_template('add_review.html', form=form, restaurant=restaurant)
 
@@ -773,7 +775,9 @@ def approve_restaurant(id):
     restaurant = Restaurant.query.get_or_404(id)
     restaurant.is_approved = True
     db.session.commit()
-    flash(f'{restaurant.name} has been approved!', 'success')
+    if restaurant.user_id:
+        award_restaurant_points(restaurant.user_id)
+    flash(f'{restaurant.name} has been approved! The submitter earned 10 reputation points.', 'success')
     return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 
@@ -811,13 +815,10 @@ def leaderboard():
     if not FeatureToggle.get_feature_status('leaderboard_enabled'):
         flash('Leaderboard is temporarily disabled.', 'warning')
         return redirect(url_for('index'))
-    from sqlalchemy import func
     all_users = (User.query.filter(
-        User.is_admin == False, User.is_banned == False).join(Review).group_by(
-            User.id).having(func.count(Review.id) > 0).all())
-    all_users.sort(
-        key=lambda u: u.review_count(),
-        reverse=True)
+        User.is_admin == False, User.is_banned == False).order_by(
+            User.reputation_score.desc()).all())
+    all_users = [u for u in all_users if (u.reputation_score or 0) > 0]
     return render_template('leaderboard.html', users=all_users)
 
 

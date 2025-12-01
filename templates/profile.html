@@ -31,6 +31,10 @@
         <!-- Stats -->
         <div class="profile-stats">
             <div class="stat-card animate-slide-up">
+                <div class="h3 fw-bold mb-1">{{ user.reputation_score or 0 }}</div>
+                <div class="text-white-50">{{ _('Reputation') }}</div>
+            </div>
+            <div class="stat-card animate-slide-up">
                 <div class="h3 fw-bold mb-1">{{ user.review_count() }}</div>
                 <div class="text-white-50">{{ _('Reviews') }}</div>
             </div>

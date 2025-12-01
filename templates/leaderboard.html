@@ -84,6 +84,10 @@
 
                     <div class="detail-stats">
                         <div class="detail-stat">
+                            <div class="detail-stat-value">{{ user.reputation_score or 0 }}</div>
+                            <div class="detail-stat-label">{{ _('Reputation') }}</div>
+                        </div>
+                        <div class="detail-stat">
                             <div class="detail-stat-value">{{ user.review_count() }}</div>
                             <div class="detail-stat-label">{{ _('Reviews') }}</div>
                         </div>

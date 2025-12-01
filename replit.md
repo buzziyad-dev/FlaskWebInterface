@@ -56,6 +56,26 @@ Yalla is a restaurant discovery and review platform for Jeddah, Saudi Arabia. It
 - **SESSION_SECRET**: Secret key for session security
 ## Recent Changes (Current Session)
 
+### Reputation System Implemented ✅
+**COMPLETE**: New reputation system rewards user contributions with reputation points.
+
+**Point System:**
+- 5 points for posting a review
+- 10 points for adding a restaurant with approved status
+
+**Implementation:**
+- Created `reputation.py` module with award functions
+- Routes updated to award points automatically
+- Leaderboard now ranks users by reputation_score (primary sort)
+- Profile pages display reputation stat
+- Flash messages inform users of earned points
+
+**Key Files:**
+- `reputation.py`: Centralized reputation management module
+- `routes.py`: Integrated point awards in add_review() and approve_restaurant()
+- `templates/leaderboard.html`: Shows reputation in both top 3 and full rankings
+- `templates/profile.html`: Added reputation stat to profile display
+
 ### Reputation Score System Removed - Review-Based Badges ✅
 **COMPLETE**: Removed reputation_score system entirely, badges now auto-assign based on review count.
 

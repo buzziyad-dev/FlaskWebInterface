@@ -196,6 +196,16 @@ class Review(db.Model):
                               db.ForeignKey('restaurant.id'),
                               nullable=False,
                               index=True)
+    
+    # Review approval fields
+    is_approved = db.Column(db.Boolean, default=False, index=True)
+    approved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    approved_at = db.Column(db.DateTime, nullable=True)
+    receipt_image = db.Column(db.Text, nullable=True)  # Base64 encoded receipt photo
+
+    approver = db.relationship('User',
+                               backref='approved_reviews',
+                               foreign_keys=[approved_by_id])
 
     def formatted_date(self):
         return self.created_at.strftime('%B %d, %Y')

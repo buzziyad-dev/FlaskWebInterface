@@ -347,7 +347,7 @@ def add_review(id):
         db.session.commit()
         award_review_points(current_user.id)
         current_user.update_reputation()
-        flash('Your review has been posted! You earned 5 reputation points.', 'success')
+        flash('Your review has been posted!', 'success')
         return redirect(url_for('restaurant_detail', id=id))
     return render_template('add_review.html', form=form, restaurant=restaurant)
 
@@ -780,7 +780,7 @@ def approve_restaurant(id):
     db.session.commit()
     if restaurant.user_id:
         award_restaurant_points(restaurant.user_id)
-    flash(f'{restaurant.name} has been approved! The submitter earned 10 reputation points.', 'success')
+    flash(f'{restaurant.name} has been approved!', 'success')
     return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 

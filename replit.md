@@ -56,6 +56,24 @@ Yalla is a restaurant discovery and review platform for Jeddah, Saudi Arabia. It
 - **SESSION_SECRET**: Secret key for session security
 ## Recent Changes (Current Session)
 
+### Submission & Approval Tracking ✅
+**COMPLETE**: Restaurants now display who submitted and approved them.
+
+**Implementation:**
+- Added `approved_by_id` (foreign key) and `approved_at` (timestamp) to Restaurant model
+- Created `approver` relationship to track admin who approved
+- Updated approve_restaurant() to capture approver ID and timestamp
+- Added "Metadata" section to restaurant detail page showing:
+  - Submitted by [username] (linked to profile)
+  - Approved by [username] (linked to profile)
+- Added translations for METADATA, "Submitted by", "Approved by"
+
+**Key Files:**
+- `models.py`: Added approval tracking fields and relationships
+- `routes.py`: Modified approve_restaurant() to set approver info
+- `templates/restaurant_detail.html`: Added metadata display card in sidebar
+- `translations/en.json` & `ar.json`: Added 3 new translation keys
+
 ### Reputation System Implemented ✅
 **COMPLETE**: New reputation system rewards user contributions with reputation points.
 

@@ -774,6 +774,8 @@ def approve_restaurant(id):
         return redirect(url_for('index'))
     restaurant = Restaurant.query.get_or_404(id)
     restaurant.is_approved = True
+    restaurant.approved_by_id = current_user.id
+    restaurant.approved_at = datetime.utcnow()
     db.session.commit()
     if restaurant.user_id:
         award_restaurant_points(restaurant.user_id)

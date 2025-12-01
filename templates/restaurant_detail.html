@@ -237,6 +237,26 @@
                         <h6 class="fw-bold text-muted small mb-1">{{ _('PHONE') }}</h6>
                         <p class="mb-0" style="font-size: 0.95rem;">📞 {{ restaurant.phone }}</p>
                     </div>
+
+                    <hr>
+
+                    {% if restaurant.submitter or restaurant.approver %}
+                    <div class="mb-0">
+                        <h6 class="fw-bold text-muted small mb-2">{{ _('METADATA') }}</h6>
+                        {% if restaurant.submitter %}
+                        <div class="mb-2" style="font-size: 0.9rem;">
+                            <strong>{{ _('Submitted by') }}:</strong>
+                            <a href="{{ url_for('profile', user_id=restaurant.submitter.id) }}" class="text-decoration-none">{{ restaurant.submitter.username }}</a>
+                        </div>
+                        {% endif %}
+                        {% if restaurant.approver %}
+                        <div style="font-size: 0.9rem;">
+                            <strong>{{ _('Approved by') }}:</strong>
+                            <a href="{{ url_for('profile', user_id=restaurant.approver.id) }}" class="text-decoration-none">{{ restaurant.approver.username }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

@@ -146,10 +146,15 @@ class Restaurant(db.Model):
     photos = db.Column(db.JSON, default=list)
     location_latitude = db.Column(db.Float)
     location_longitude = db.Column(db.Float)
+    approved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    approved_at = db.Column(db.DateTime, nullable=True)
 
     submitter = db.relationship('User',
                                 backref='submitted_restaurants',
                                 foreign_keys=[user_id])
+    approver = db.relationship('User',
+                               backref='approved_restaurants',
+                               foreign_keys=[approved_by_id])
     reviews = db.relationship('Review',
                               backref='restaurant',
                               lazy='dynamic',

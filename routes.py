@@ -754,6 +754,7 @@ def admin_api_data():
             'content':
             r.content[:80] + '...' if len(r.content) > 80 else r.content,
             'is_approved': r.is_approved,
+            'receipt_image': r.receipt_image,
             'created_at': r.created_at.strftime('%b %d, %Y')
         }
 

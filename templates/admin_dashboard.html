@@ -377,6 +377,21 @@ body.dark-mode a:hover {
         </div>
     </div>
 
+    <!-- View Receipt Modal -->
+    <div class="modal fade" id="viewReceiptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📸 Review Receipt</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="receiptImagePreview" src="" style="max-width: 100%; max-height: 500px; border-radius: 8px;" alt="Receipt">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Assign Badges Modal -->
     <div class="modal fade" id="assignBadgesModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -944,6 +959,17 @@ function attachEventListeners() {
         });
     }
 
+    // View receipt image button click
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('view-receipt-btn')) {
+            const receipt = e.target.dataset.receipt;
+            const previewImg = document.getElementById('receiptImagePreview');
+            if (previewImg && receipt) {
+                previewImg.src = receipt;
+            }
+        }
+    });
+
     // Delegate assign badges button clicks and properly handle modal
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('assign-badges-btn')) {
@@ -1183,7 +1209,7 @@ function renderReviewsTab() {
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">
-                        <thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Date</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Receipt</th><th>Date</th><th>Actions</th></tr></thead>
                         <tbody>
                             ${pendingReviews.map(r => `
                             <tr style="background-color: rgba(255,107,107,0.05);">
@@ -1191,6 +1217,9 @@ function renderReviewsTab() {
                                 <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
                                 <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
                                 <td><small>${r.content}</small></td>
+                                <td>
+                                    ${r.receipt_image ? `<button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button>` : '<small class="text-muted">None</small>'}
+                                </td>
                                 <td><small>${r.created_at}</small></td>
                                 <td>
                                     <form method="POST" action="{{ url_for('approve_review', id=0) }}" data-id="${r.id}" style="display:inline;">

@@ -753,6 +753,7 @@ def admin_api_data():
             'title': r.title,
             'content':
             r.content[:80] + '...' if len(r.content) > 80 else r.content,
+            'is_approved': r.is_approved,
             'created_at': r.created_at.strftime('%b %d, %Y')
         }
 
@@ -777,6 +778,7 @@ def admin_api_data():
         'all_users':
         [format_user(u, include_badges=False) for u in data['all_users']],
         'all_reviews': [format_review(r) for r in data['all_reviews']],
+        'pending_reviews': [format_review(r) for r in data['pending_reviews']],
         'all_cuisines': [format_cuisine(c) for c in data['all_cuisines']],
         'all_badges': [format_badge(b) for b in all_badges],
         'total_users':
@@ -823,7 +825,21 @@ def approve_review(id):
         if reviewer:
             reviewer.update_reputation()
     flash('Review has been approved and author earned 5 points!', 'success')
-    return redirect(url_for('restaurant_detail', id=review.restaurant_id))
+    return redirect(url_for('admin_dashboard', tab='reviews'))
+
+
+@app.route('/admin/reject-review/<int:id>', methods=['POST'])
+@login_required
+def reject_review(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    review = Review.query.get_or_404(id)
+    restaurant_id = review.restaurant_id
+    db.session.delete(review)
+    db.session.commit()
+    flash('Review has been rejected and removed.', 'warning')
+    return redirect(url_for('admin_dashboard', tab='reviews'))
 
 
 @app.route('/admin/reject/<int:id>', methods=['POST'])

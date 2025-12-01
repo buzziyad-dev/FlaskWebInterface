@@ -1170,10 +1170,54 @@ function renderUsersTab() {
 }
 
 function renderReviewsTab() {
-    if (!adminData.all_reviews || adminData.all_reviews.length === 0) return '<p class="text-center text-muted py-4">No reviews yet.</p>';
-    return `
+    const pendingReviews = (adminData.pending_reviews || []).filter(r => !r.is_approved);
+    const approvedReviews = (adminData.all_reviews || []).filter(r => r.is_approved);
+    
+    let html = '';
+    
+    // Pending reviews section
+    if (pendingReviews.length > 0) {
+        html += `
+        <div class="card shadow-sm mb-4" style="border-left: 4px solid #ff6b6b;">
+            <div class="card-header bg-danger text-white"><h5 class="mb-0 fw-bold">🔔 Pending Approval (${pendingReviews.length})</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Date</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${pendingReviews.map(r => `
+                            <tr style="background-color: rgba(255,107,107,0.05);">
+                                <td><strong>${r.author_username}</strong></td>
+                                <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
+                                <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
+                                <td><small>${r.content}</small></td>
+                                <td><small>${r.created_at}</small></td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('approve_review', id=0) }}" data-id="${r.id}" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button class="btn btn-sm btn-success" type="submit">✓ Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('reject_review', id=0) }}" data-id="${r.id}" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button class="btn btn-sm btn-warning" type="submit">✕ Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+    
+    // All reviews section
+    if (!adminData.all_reviews || adminData.all_reviews.length === 0) return html + '<p class="text-center text-muted py-4">No reviews yet.</p>';
+    
+    html += `
     <div class="card shadow-sm">
-        <div class="card-header bg-white"><h4 class="mb-0 fw-bold">⭐ Manage Reviews</h4></div>
+        <div class="card-header bg-white"><h4 class="mb-0 fw-bold">⭐ All Reviews</h4></div>
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-check"><input type="checkbox" class="form-check-input" id="reviewSelectAll"> Select All</label>
@@ -1188,6 +1232,7 @@ function renderReviewsTab() {
                             <th>Restaurant</th>
                             <th>Rating</th>
                             <th>Content</th>
+                            <th>Status</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -1200,6 +1245,7 @@ function renderReviewsTab() {
                             <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
                             <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
                             <td><small>${r.content}</small></td>
+                            <td><span class="badge ${r.is_approved ? 'bg-success' : 'bg-warning'}">${r.is_approved ? '✓ Approved' : 'Pending'}</span></td>
                             <td><small>${r.created_at}</small></td>
                             <td>
                                 <form method="POST" action="{{ url_for('delete_review', id=0) }}" data-id="${r.id}" style="display:inline;">
@@ -1214,6 +1260,8 @@ function renderReviewsTab() {
             </div>
         </div>
     </div>`;
+    
+    return html;
 }
 
 function renderCuisinesTab() {

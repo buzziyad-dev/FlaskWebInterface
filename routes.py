@@ -563,6 +563,8 @@ def get_admin_data():
         is_approved=True).order_by(Restaurant.created_at.desc()).all()
     all_users = User.query.all()
     all_reviews = Review.query.order_by(Review.created_at.desc()).all()
+    pending_reviews = Review.query.filter_by(
+        is_approved=False).order_by(Review.created_at.desc()).all()
     all_cuisines = Cuisine.query.all()
     feature_toggles = FeatureToggle.query.all()
     toggle_dict = {
@@ -606,6 +608,7 @@ def get_admin_data():
         'approved': approved_restaurants,
         'all_users': all_users,
         'all_reviews': all_reviews,
+        'pending_reviews': pending_reviews,
         'all_cuisines': all_cuisines,
         'total_users': len(all_users),
         'total_reviews': len(all_reviews),
@@ -675,6 +678,7 @@ def admin_dashboard():
                            approved=data['approved'],
                            all_users=data['all_users'],
                            all_reviews=data['all_reviews'],
+                           pending_reviews=data['pending_reviews'],
                            all_cuisines=data['all_cuisines'],
                            total_users=data['total_users'],
                            total_reviews=data['total_reviews'])

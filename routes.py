@@ -89,7 +89,7 @@ def index():
         is_approved=True).order_by(Restaurant.created_at.desc()).all()
     cuisines = Cuisine.query.all()
     top_reviewers = (User.query.filter(
-        User.is_admin == False, User.is_banned == False).join(Review).group_by(
+        User.is_admin == False, User.is_banned == False).join(Review, Review.user_id == User.id).group_by(
             User.id).having(func.count(Review.id) > 0).order_by(
                 func.count(Review.id).desc()).limit(4).all())
     return render_template('index.html',

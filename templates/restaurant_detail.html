@@ -92,14 +92,14 @@
                                             <a href="{{ url_for('profile', user_id=review.author.id) }}"
                                                 class="text-decoration-none" style="color: inherit;">{{
                                                 review.author.username }}</a>
-                                            
+
                                             {% if review.is_approved %}
                                             <span class="badge bg-success ms-2" data-bs-toggle="tooltip"
                                                 data-bs-title="{% if review.approver %}{{ _('Approved by') }} {{ review.approver.username }}{% endif %}">
-                                                🛡️ {{ _('Approved') }}
+                                                ✔️
                                             </span>
                                             {% endif %}
-                                            
+
                                             {% set highest_badge = review.author.get_highest_hierarchy_badge() %}
                                             {% if highest_badge %}
                                             <span class="badge small ms-2"
@@ -254,13 +254,15 @@
                         {% if restaurant.submitter %}
                         <div class="mb-2" style="font-size: 0.9rem;">
                             <strong>{{ _('Submitted by') }}:</strong>
-                            <a href="{{ url_for('profile', user_id=restaurant.submitter.id) }}" class="text-decoration-none">{{ restaurant.submitter.username }}</a>
+                            <a href="{{ url_for('profile', user_id=restaurant.submitter.id) }}"
+                                class="text-decoration-none">{{ restaurant.submitter.username }}</a>
                         </div>
                         {% endif %}
                         {% if restaurant.approver %}
                         <div style="font-size: 0.9rem;">
                             <strong>{{ _('Approved by') }}:</strong>
-                            <a href="{{ url_for('profile', user_id=restaurant.approver.id) }}" class="text-decoration-none">{{ restaurant.approver.username }}</a>
+                            <a href="{{ url_for('profile', user_id=restaurant.approver.id) }}"
+                                class="text-decoration-none">{{ restaurant.approver.username }}</a>
                         </div>
                         {% endif %}
                     </div>

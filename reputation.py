@@ -3,7 +3,7 @@ Reputation System for Yalla
 Manages reputation points earned by users for various actions.
 
 Point System:
-- 5 points for posting a review
+- 5 points for posting a review that is approved/confirmed by admin
 - 10 points for adding a restaurant with approved status
 """
 
@@ -12,7 +12,7 @@ from models import User
 
 
 def award_review_points(user_id):
-    """Award 5 points to user for posting a review"""
+    """Award 5 points to user for having a review approved/confirmed by admin"""
     if not user_id:
         return False
     

@@ -364,9 +364,7 @@ def add_review(id):
                         is_approved=False)
         db.session.add(review)
         db.session.commit()
-        award_review_points(current_user.id)
-        current_user.update_reputation()
-        flash('Your review has been posted and is pending admin approval!', 'success')
+        flash('Your review has been posted and is pending admin approval to earn points!', 'success')
         return redirect(url_for('restaurant_detail', id=id))
     return render_template('add_review.html', form=form, restaurant=restaurant)
 
@@ -814,7 +812,13 @@ def approve_review(id):
     review.approved_by_id = current_user.id
     review.approved_at = datetime.utcnow()
     db.session.commit()
-    flash('Review has been approved!', 'success')
+    # Award points to reviewer for having their review approved
+    if review.user_id:
+        award_review_points(review.user_id)
+        reviewer = User.query.get(review.user_id)
+        if reviewer:
+            reviewer.update_reputation()
+    flash('Review has been approved and author earned 5 points!', 'success')
     return redirect(url_for('restaurant_detail', id=review.restaurant_id))
 
 

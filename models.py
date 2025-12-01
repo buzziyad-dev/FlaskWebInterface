@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):
     dark_mode = db.Column(db.Boolean, default=False)
     language = db.Column(db.String(10), default='en')
 
-    reviews = db.relationship('Review', backref='author', lazy='dynamic')
+    reviews = db.relationship('Review', foreign_keys='Review.user_id', backref='author', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

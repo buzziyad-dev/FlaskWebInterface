@@ -81,6 +81,20 @@
                         </div>
                         {% endif %}
 
+                        <!-- Receipt Photo (Optional) -->
+                        <div class="mb-4">
+                            <label for="receipt_photo" class="form-label fw-bold">{{ _('Receipt Photo (Optional)') }}</label>
+                            <small class="d-block text-muted mb-2">{{ _('Upload a photo of your receipt to verify your review') }}</small>
+                            {{ form.receipt_photo(class="form-control form-control-lg", accept=".png,.jpg,.jpeg") }}
+                            {% if form.receipt_photo.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.receipt_photo.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
                         <!-- Buttons -->
                         <div class="d-flex gap-3 mt-5">
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">

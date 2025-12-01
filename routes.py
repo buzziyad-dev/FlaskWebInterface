@@ -336,18 +336,37 @@ def add_review(id):
     else:
         form.food_category.choices = [('', 'No food categories available')]
     if form.validate_on_submit():
+        receipt_image = None
+        if form.receipt_photo.data:
+            file = form.receipt_photo.data
+            if file.filename:
+                from PIL import Image
+                from io import BytesIO
+                try:
+                    img = Image.open(file)
+                    img.thumbnail((400, 300), Image.Resampling.LANCZOS)
+                    img_io = BytesIO()
+                    img.save(img_io, 'PNG')
+                    img_io.seek(0)
+                    receipt_data = base64.b64encode(img_io.getvalue()).decode('utf-8')
+                    receipt_image = receipt_data
+                except Exception as e:
+                    flash('Error processing receipt image. Continuing without it.', 'warning')
+        
         review = Review(rating=form.rating.data,
                         title=form.title.data,
                         content=form.content.data,
                         food_category=form.food_category.data
                         if form.food_category.data else None,
                         user_id=current_user.id,
-                        restaurant_id=id)
+                        restaurant_id=id,
+                        receipt_image=receipt_image,
+                        is_approved=False)
         db.session.add(review)
         db.session.commit()
         award_review_points(current_user.id)
         current_user.update_reputation()
-        flash('Your review has been posted!', 'success')
+        flash('Your review has been posted and is pending admin approval!', 'success')
         return redirect(url_for('restaurant_detail', id=id))
     return render_template('add_review.html', form=form, restaurant=restaurant)
 
@@ -782,6 +801,21 @@ def approve_restaurant(id):
         award_restaurant_points(restaurant.user_id)
     flash(f'{restaurant.name} has been approved!', 'success')
     return redirect(url_for('admin_dashboard', tab='restaurants'))
+
+
+@app.route('/admin/approve-review/<int:id>', methods=['POST'])
+@login_required
+def approve_review(id):
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    review = Review.query.get_or_404(id)
+    review.is_approved = True
+    review.approved_by_id = current_user.id
+    review.approved_at = datetime.utcnow()
+    db.session.commit()
+    flash('Review has been approved!', 'success')
+    return redirect(url_for('restaurant_detail', id=review.restaurant_id))
 
 
 @app.route('/admin/reject/<int:id>', methods=['POST'])

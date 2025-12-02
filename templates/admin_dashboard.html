@@ -842,15 +842,15 @@ function attachEventListeners() {
                     headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
                     credentials: 'same-origin'
                 });
-                if (res.ok) {
-                    alert('Hierarchy updated!');
+if (res.ok) {
+                    showNotification('Hierarchy updated!', 'success');
                     loadAdminData();
                 } else {
-                    alert('Error updating hierarchy');
+                    showNotification('Error updating hierarchy', 'danger');
                 }
             } catch(err) {
                 console.error('Error:', err);
-                alert('Error: ' + err.message);
+                showNotification('Error: ' + err.message, 'danger');
             }
         });
     });
@@ -981,10 +981,10 @@ function attachEventListeners() {
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    showNotification(data.message, 'success');
                     loadAdminData(); // Reload the entire reviews tab to show updated status
                 }
-            }).catch(err => alert('Error: ' + err.message));
+            }).catch(err => showNotification('Error: ' + err.message, 'danger'));
         }
     });
 
@@ -999,14 +999,14 @@ function attachEventListeners() {
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    loadAdminData(); // Reload the entire reviews tab to show updated status
+                    showNotification(data.message, 'success');
+                    loadAdminData(); // Reload entire reviews tab to show updated status
                 }
-            }).catch(err => alert('Error: ' + err.message));
+            }).catch(err => showNotification('Error: ' + err.message, 'danger'));
         }
     });
 
-    // Reject review AJAX
+// Reject review AJAX
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('reject-review-btn')) {
             const reviewId = e.target.dataset.id;
@@ -1020,10 +1020,10 @@ function attachEventListeners() {
                 if (data.success) {
                     const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
                     if (row) row.remove();
-                    alert(data.message);
+                    showNotification(data.message, 'warning');
                     loadAdminData();
                 }
-            }).catch(err => alert('Error: ' + err.message));
+            }).catch(err => showNotification('Error: ' + err.message, 'danger'));
         }
     });
 
@@ -1089,25 +1089,25 @@ function attachEventListeners() {
             });
             const data = await res.json();
             
-            if (res.ok && data.success) {
+if (res.ok && data.success) {
                 if (btnElement) {
                     btnElement.dataset.assigned = assign;
                     btnElement.style.opacity = assign ? '1' : '0.5';
                     btnElement.textContent = btnElement.textContent.replace(' ✓', '') + (assign ? ' ✓' : '');
                 }
             } else {
-                alert('Error: ' + (data.error || 'Failed to toggle badge'));
+                showNotification('Error: ' + (data.error || 'Failed to toggle badge'), 'danger');
             }
         } catch (err) {
             console.error('Error toggling badge:', err);
-            alert('Error: ' + err.message);
+            showNotification('Error: ' + err.message, 'danger');
         }
     }
 }
 
 // Tab renderers return HTML strings; keep them simple and consistent
 function renderTab(tab) {
-    currentTab = tab;
+    currentTab = tab; // Update currentTab variable
     document.querySelectorAll('#adminTabs button').forEach(b => b.classList.remove('active'));
     const activeBtn = document.getElementById(`${tab}-tab`);
     if (activeBtn) activeBtn.classList.add('active');
@@ -1521,13 +1521,41 @@ async function toggleFeature(featureName) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         const res = await fetch(url, { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrfToken }, credentials: 'same-origin' });
         const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || 'Toggle failed');
+if (!res.ok || !data.success) throw new Error(data.error || 'Toggle failed');
         await loadAdminData();
         renderTab('settings');
     } catch (err) {
         console.error('Error toggling feature:', err);
-        alert('Error toggling feature: ' + (err.message || err));
+        showNotification('Error toggling feature: ' + (err.message || err), 'danger');
     }
+}
+
+// Show notification using website's flash system
+function showNotification(message, type = 'info') {
+    // Create a temporary notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    `;
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification && notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
 }
 
 // Show submission details (used by Overview)

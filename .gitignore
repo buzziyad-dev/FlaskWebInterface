@@ -2,6 +2,7 @@
 .replit
 uv.lock
 opencode.exe
+attached_assets/
 
 # Python
 __pycache__/

@@ -72,11 +72,10 @@ def add_cache_control(response):
     # Add proper caching headers for static files
     if response.content_type:
         if 'text/css' in response.content_type:
-            # Cache CSS for 1 hour with ETag validation
+            # Cache CSS for 1 hour
             response.cache_control.max_age = 3600
             response.cache_control.public = True
             response.cache_control.must_revalidate = True
-            response.headers['ETag'] = f'"{hash(response.data)}"'
         elif 'application/javascript' in response.content_type:
             # Cache JS for 1 hour
             response.cache_control.max_age = 3600

@@ -15,9 +15,13 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False, index=True)
-    is_banned = db.Column(db.Boolean, default=False)
+is_banned = db.Column(db.Boolean, default=False, index=True)
     ban_reason = db.Column(db.Text)
     reputation_score = db.Column(db.Integer, default=0, index=True)
+    
+    __table_args__ = (
+        db.Index('idx_user_admin_banned_reputation', 'is_admin', 'is_banned', 'reputation_score'),
+    )
     badge = db.Column(db.String(50))
     bio = db.Column(db.Text, default='')
     profile_picture = db.Column(db.LargeBinary)
@@ -140,8 +144,13 @@ class Restaurant(db.Model):
     image_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     is_small_business = db.Column(db.Boolean, default=False)
-    is_approved = db.Column(db.Boolean, default=True, index=True)
+is_approved = db.Column(db.Boolean, default=True, index=True)
     is_promoted = db.Column(db.Boolean, default=False, index=True)
+    
+    __table_args__ = (
+        db.Index('idx_restaurant_approval_promotion', 'is_approved', 'is_promoted', 'created_at'),
+        db.Index('idx_restaurant_cuisine_approval', 'cuisine_id', 'is_approved'),
+    )
     food_categories = db.Column(db.JSON, default=list)
     photos = db.Column(db.JSON, default=list)
     location_latitude = db.Column(db.Float)
@@ -170,11 +179,12 @@ class Restaurant(db.Model):
         except (json.JSONDecodeError, TypeError):
             return {}
 
-    def avg_rating(self):
-        reviews = self.reviews.all()
-        if not reviews:
-            return 0
-        return round(sum(r.rating for r in reviews) / len(reviews), 1)
+def avg_rating(self):
+        from sqlalchemy import func
+        from app import db
+        result = db.session.query(func.avg(Review.rating)).filter(
+            Review.restaurant_id == self.id).scalar()
+        return round(float(result), 1) if result else 0
 
     def review_count(self):
         return self.reviews.count()
@@ -202,7 +212,12 @@ class Review(db.Model):
     approved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
     receipt_image = db.Column(db.Text, nullable=True)  # Base64 encoded receipt photo
-    receipt_confirmed = db.Column(db.Boolean, default=False, index=True)  # Receipt verified by admin
+receipt_confirmed = db.Column(db.Boolean, default=False, index=True)  # Receipt verified by admin
+
+    __table_args__ = (
+        db.Index('idx_review_user_approval', 'user_id', 'is_approved', 'created_at'),
+        db.Index('idx_review_restaurant_rating', 'restaurant_id', 'rating'),
+    )
 
     approver = db.relationship('User',
                                backref='approved_reviews',

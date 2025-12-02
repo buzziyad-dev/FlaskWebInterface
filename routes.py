@@ -7,6 +7,31 @@ from reputation import award_review_points, award_restaurant_points
 from datetime import datetime
 import base64
 import os
+from PIL import Image
+from io import BytesIO
+
+# Image processing constants
+ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+def process_image_upload(file, max_size=(400, 300)):
+    """Process and validate image upload, return base64 encoded data"""
+    if file.content_type not in ALLOWED_MIME_TYPES:
+        raise ValueError(f'Only {", ".join(ALLOWED_MIME_TYPES)} images are allowed')
+    
+    photo_data = file.read()
+    if len(photo_data) > MAX_FILE_SIZE:
+        raise ValueError('File size exceeds 5MB limit')
+    
+    # Resize image if needed
+    img = Image.open(BytesIO(photo_data))
+    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+    
+    # Convert to base64
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return base64.b64encode(img_io.getvalue()).decode('utf-8')
 
 
 @login_manager.user_loader
@@ -16,12 +41,10 @@ def load_user(user_id):
 
 @app.before_request
 def check_banned_user():
-    if current_user.is_authenticated:
-        user = User.query.get(current_user.id)
-        if user and user.is_banned:
-            logout_user()
-            flash('Your account has been banned.', 'danger')
-            return redirect(url_for('banned', username=user.username))
+    if current_user.is_authenticated and current_user.is_banned:
+        logout_user()
+        flash('Your account has been banned.', 'danger')
+        return redirect(url_for('banned', username=current_user.username))
 
 
 def get_client_ip():
@@ -74,9 +97,12 @@ def check_maintenance_mode():
 def refresh_user_dark_mode():
     """Refresh user dark mode preference from database on each request"""
     if current_user.is_authenticated:
-        user = User.query.get(current_user.id)
-        if user:
-            current_user.dark_mode = user.dark_mode
+        # Only refresh if session dark mode differs from database
+        if not hasattr(current_user, '_dark_mode_synced') or not current_user._dark_mode_synced:
+            user = User.query.get(current_user.id)
+            if user:
+                current_user.dark_mode = user.dark_mode
+                current_user._dark_mode_synced = True
 
 
 @app.route('/')
@@ -237,11 +263,18 @@ def restaurants():
         query = query.filter_by(price_range=price_filter)
     if search_query:
         query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
+if rating_filter:
+        # Move rating filter to database level using subquery
+        from sqlalchemy import func, text
+        avg_rating_subquery = db.session.query(
+            Review.restaurant_id,
+            func.avg(Review.rating).label('avg_rating')
+        ).filter(Review.is_approved == True).group_by(Review.restaurant_id).subquery()
+        
+        query = query.outerjoin(avg_rating_subquery, Restaurant.id == avg_rating_subquery.c.restaurant_id)
+        query = query.filter(text('COALESCE(avg_rating, 0) >= :rating_filter')).params(rating_filter=rating_filter)
+    
     all_restaurants = query.all()
-    if rating_filter:
-        all_restaurants = [
-            r for r in all_restaurants if r.avg_rating() >= rating_filter
-        ]
     cuisines = Cuisine.query.all()
     return render_template('restaurants.html',
                            restaurants=all_restaurants,
@@ -254,8 +287,9 @@ def restaurants():
 
 @app.route('/restaurant/<int:id>')
 def restaurant_detail(id):
+    from sqlalchemy.orm import joinedload
     restaurant = Restaurant.query.get_or_404(id)
-    reviews = restaurant.reviews.all()
+    reviews = restaurant.reviews.options(joinedload(Review.author)).all()
     reviews = sorted(
         reviews,
         key=lambda r:
@@ -284,19 +318,9 @@ def upload_restaurant_photo(id):
     if file.filename == '':
         flash('No selected file', 'danger')
         return redirect(url_for('restaurant_detail', id=id))
-    ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
-    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-    if file and file.filename:
-        if file.content_type not in ALLOWED_MIME_TYPES:
-            flash('Only JPEG, PNG, GIF, and WebP images are allowed', 'danger')
-        else:
-            try:
-                photo_data = file.read()
-                if len(photo_data) > MAX_FILE_SIZE:
-                    flash('File size exceeds 5MB limit', 'danger')
-                else:
-                    encoded_photo = base64.b64encode(photo_data).decode(
-                        'utf-8')
+if file and file.filename:
+        try:
+            encoded_photo = process_image_upload(file)
                     if restaurant.photos is None:
                         restaurant.photos = []
                     new_photo = {
@@ -309,7 +333,11 @@ def upload_restaurant_photo(id):
                     from sqlalchemy.orm.attributes import flag_modified
                     flag_modified(restaurant, 'photos')
                     db.session.commit()
-                    flash('Photo uploaded successfully!', 'success')
+flash('Photo uploaded successfully!', 'success')
+            except ValueError as e:
+                flash(str(e), 'danger')
+            except IOError as e:
+                flash('Error processing image file. Please try a different file.', 'danger')
             except Exception as e:
                 flash('Error uploading photo. Please try again.', 'danger')
     else:
@@ -336,21 +364,15 @@ def add_review(id):
     else:
         form.food_category.choices = [('', 'No food categories available')]
     if form.validate_on_submit():
-        receipt_image = None
+receipt_image = None
         if form.receipt_photo.data:
             file = form.receipt_photo.data
             if file.filename:
-                from PIL import Image
-                from io import BytesIO
                 try:
-                    img = Image.open(file)
-                    img.thumbnail((400, 300), Image.Resampling.LANCZOS)
-                    img_io = BytesIO()
-                    img.save(img_io, 'PNG')
-                    img_io.seek(0)
-                    receipt_data = base64.b64encode(img_io.getvalue()).decode('utf-8')
-                    receipt_image = receipt_data
-                except Exception as e:
+                    receipt_image = process_image_upload(file)
+                except ValueError as e:
+                    flash(f'Receipt image error: {str(e)}. Continuing without it.', 'warning')
+                except IOError as e:
                     flash('Error processing receipt image. Continuing without it.', 'warning')
         
         review = Review(rating=form.rating.data,

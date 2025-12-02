@@ -69,11 +69,26 @@ def b64encode_filter(data):
 
 @app.after_request
 def add_cache_control(response):
-    if response.content_type and 'text/css' in response.content_type:
-        response.cache_control.no_cache = True
-        response.cache_control.no_store = True
-        response.cache_control.must_revalidate = True
-        response.headers['Pragma'] = 'no-cache'
+    # Add proper caching headers for static files
+    if response.content_type:
+        if 'text/css' in response.content_type:
+            # Cache CSS for 1 hour with ETag validation
+            response.cache_control.max_age = 3600
+            response.cache_control.public = True
+            response.cache_control.must_revalidate = True
+            response.headers['ETag'] = f'"{hash(response.data)}"'
+        elif 'application/javascript' in response.content_type:
+            # Cache JS for 1 hour
+            response.cache_control.max_age = 3600
+            response.cache_control.public = True
+        elif 'image/' in response.content_type:
+            # Cache images for 1 day
+            response.cache_control.max_age = 86400
+            response.cache_control.public = True
+        elif 'text/html' not in response.content_type:
+            # Cache other static assets for 30 minutes
+            response.cache_control.max_age = 1800
+            response.cache_control.public = True
     return response
 
 with app.app_context():

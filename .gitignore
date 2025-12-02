@@ -1,6 +1,7 @@
 # Replit specific
 .replit
 uv.lock
+opencode.exe
 
 # Python
 __pycache__/

@@ -13,8 +13,8 @@ class User(UserMixin, db.Model):
                          index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-is_admin = db.Column(db.Boolean, default=False, index=True)
+created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False, index=True)
     is_banned = db.Column(db.Boolean, default=False, index=True)
     ban_reason = db.Column(db.Text)
     reputation_score = db.Column(db.Integer, default=0, index=True)
@@ -143,7 +143,7 @@ class Restaurant(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     image_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-is_small_business = db.Column(db.Boolean, default=False)
+    is_small_business = db.Column(db.Boolean, default=False)
     is_approved = db.Column(db.Boolean, default=True, index=True)
     is_promoted = db.Column(db.Boolean, default=False, index=True)
     
@@ -179,7 +179,7 @@ is_small_business = db.Column(db.Boolean, default=False)
         except (json.JSONDecodeError, TypeError):
             return {}
 
-def avg_rating(self):
+    def avg_rating(self):
         from sqlalchemy import func
         from app import db
         result = db.session.query(func.avg(Review.rating)).filter(

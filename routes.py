@@ -321,9 +321,9 @@ def upload_restaurant_photo(id):
 if file and file.filename:
         try:
             encoded_photo = process_image_upload(file)
-            if restaurant.photos is None:
-                        restaurant.photos = []
-                    new_photo = {
+if restaurant.photos is None:
+                restaurant.photos = []
+                new_photo = {
                         'data': encoded_photo,
                         'content_type': file.content_type,
                         'uploaded_by': current_user.username,
@@ -333,7 +333,7 @@ if file and file.filename:
                     from sqlalchemy.orm.attributes import flag_modified
                     flag_modified(restaurant, 'photos')
                     db.session.commit()
-flash('Photo uploaded successfully!', 'success')
+                flash('Photo uploaded successfully!', 'success')
         except ValueError as e:
                 flash(str(e), 'danger')
             except IOError as e:
@@ -1041,7 +1041,7 @@ def edit_restaurant(id):
         
         if 'restaurant_image' in request.files:
             file = request.files['restaurant_image']
-            if file and file.filename:
+    if file and file.filename:
                 from PIL import Image
                 from io import BytesIO
                 import base64

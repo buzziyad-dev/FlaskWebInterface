@@ -974,9 +974,9 @@ if (res.ok) {
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('confirm-receipt-btn')) {
             const reviewId = e.target.dataset.id;
-            const csrf = e.target.dataset.csrf;
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             console.log('Confirming receipt for review:', reviewId); // Debug log
-            
+
             fetch(`{{ url_for('confirm_receipt', id=0) }}`.replace('/0', `/${reviewId}`), {
                 method: 'POST',
                 headers: {'X-CSRFToken': csrf},
@@ -1003,9 +1003,9 @@ if (res.ok) {
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('approve-review-btn')) {
             const reviewId = e.target.dataset.id;
-            const csrf = e.target.dataset.csrf;
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             console.log('Approving review:', reviewId); // Debug log
-            
+
             fetch(`{{ url_for('approve_review', id=0) }}`.replace('/0', `/${reviewId}`), {
                 method: 'POST',
                 headers: {'X-CSRFToken': csrf},
@@ -1032,7 +1032,7 @@ if (res.ok) {
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('reject-review-btn')) {
             const reviewId = e.target.dataset.id;
-            const csrf = e.target.dataset.csrf;
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             if (!confirm('Delete this review?')) return;
             fetch(`{{ url_for('reject_review', id=0) }}`.replace('/0', `/${reviewId}`), {
                 method: 'POST',
@@ -1328,8 +1328,8 @@ function renderReviewsTab() {
                                 </td>
                                 <td><small>${r.created_at}</small></td>
                                 <td>
-                                    <button class="btn btn-sm btn-success approve-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Approve this review to publish it">✓ Approve</button>
-                                    <button class="btn btn-sm btn-danger reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Reject and delete this review">✕ Reject</button>
+                                    <button class="btn btn-sm btn-success approve-review-btn" data-id="${r.id}" title="Approve this review to publish it">✓ Approve</button>
+                                    <button class="btn btn-sm btn-danger reject-review-btn" data-id="${r.id}" title="Reject and delete this review">✕ Reject</button>
                                 </td>
                             </tr>
                             `).join('')}
@@ -1377,8 +1377,8 @@ function renderReviewsTab() {
                                 </td>
                                 <td><small>${r.created_at}</small></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success confirm-receipt-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Confirm this receipt as trustworthy">✓ Confirm Receipt</button>
-                                    <button class="btn btn-sm btn-warning reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Reject and delete this review">✕ Reject</button>
+                                    <button class="btn btn-sm btn-outline-success confirm-receipt-btn" data-id="${r.id}" title="Confirm this receipt as trustworthy">✓ Confirm Receipt</button>
+                                    <button class="btn btn-sm btn-warning reject-review-btn" data-id="${r.id}" title="Reject and delete this review">✕ Reject</button>
                                 </td>
                             </tr>
                             `).join('')}

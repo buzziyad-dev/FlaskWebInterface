@@ -506,8 +506,14 @@ def profile(user_id):
         flash('User profiles are temporarily disabled.', 'warning')
         return redirect(url_for('index'))
     user = User.query.get_or_404(user_id)
-    reviews = user.reviews.order_by(Review.created_at.desc()).all()
     is_own_profile = current_user.is_authenticated and current_user.id == user.id
+    # Only show approved reviews unless viewing own profile or admin
+    if current_user.is_authenticated and current_user.is_admin:
+        reviews = user.reviews.order_by(Review.created_at.desc()).all()
+    elif is_own_profile:
+        reviews = user.reviews.order_by(Review.created_at.desc()).all()
+    else:
+        reviews = user.reviews.filter(Review.is_approved == True).order_by(Review.created_at.desc()).all()
     return render_template('profile.html',
                            user=user,
                            reviews=reviews,

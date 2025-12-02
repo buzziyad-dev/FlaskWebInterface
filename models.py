@@ -37,10 +37,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def review_count(self):
-        return self.reviews.count()
+        return self.reviews.filter(Review.is_approved == True).count()
 
     def avg_rating_given(self):
-        reviews = self.reviews.all()
+        reviews = self.reviews.filter(Review.is_approved == True).all()
         if not reviews:
             return 0
         return sum(r.rating for r in reviews) / len(reviews)
@@ -183,11 +183,11 @@ class Restaurant(db.Model):
         from sqlalchemy import func
         from app import db
         result = db.session.query(func.avg(Review.rating)).filter(
-            Review.restaurant_id == self.id).scalar()
+            Review.restaurant_id == self.id, Review.is_approved == True).scalar()
         return round(float(result), 1) if result else 0
 
     def review_count(self):
-        return self.reviews.count()
+        return self.reviews.filter(Review.is_approved == True).count()
 
 
 class Review(db.Model):

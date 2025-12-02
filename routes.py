@@ -262,8 +262,8 @@ def restaurants():
     if price_filter:
         query = query.filter_by(price_range=price_filter)
     if search_query:
-        query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
-if rating_filter:
+query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
+    if rating_filter:
         # Move rating filter to database level using subquery
         from sqlalchemy import func, text
         avg_rating_subquery = db.session.query(
@@ -321,7 +321,7 @@ def upload_restaurant_photo(id):
 if file and file.filename:
         try:
             encoded_photo = process_image_upload(file)
-                    if restaurant.photos is None:
+            if restaurant.photos is None:
                         restaurant.photos = []
                     new_photo = {
                         'data': encoded_photo,
@@ -334,7 +334,7 @@ if file and file.filename:
                     flag_modified(restaurant, 'photos')
                     db.session.commit()
 flash('Photo uploaded successfully!', 'success')
-            except ValueError as e:
+        except ValueError as e:
                 flash(str(e), 'danger')
             except IOError as e:
                 flash('Error processing image file. Please try a different file.', 'danger')
@@ -363,8 +363,8 @@ def add_review(id):
                                       for tag in restaurant.food_categories]
     else:
         form.food_category.choices = [('', 'No food categories available')]
-    if form.validate_on_submit():
-receipt_image = None
+if form.validate_on_submit():
+        receipt_image = None
         if form.receipt_photo.data:
             file = form.receipt_photo.data
             if file.filename:

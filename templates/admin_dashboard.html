@@ -758,7 +758,7 @@ function attachEventListeners() {
         form.addEventListener('submit', function(e) {
             if (!this.action) return;
             if (this.action.includes('/0')) {
-                this.action = this.action.replace(/\/0(\/|$)/, `/${id}$1`);
+                this.action = this.action.replace(/\/0(\/|$)/, `/${id}`);
             }
         });
     });

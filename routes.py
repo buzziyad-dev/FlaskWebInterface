@@ -262,7 +262,7 @@ def restaurants():
     if price_filter:
         query = query.filter_by(price_range=price_filter)
     if search_query:
-query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
+        query = query.filter(Restaurant.name.ilike(f'%{search_query}%'))
     if rating_filter:
         # Move rating filter to database level using subquery
         from sqlalchemy import func, text
@@ -318,28 +318,28 @@ def upload_restaurant_photo(id):
     if file.filename == '':
         flash('No selected file', 'danger')
         return redirect(url_for('restaurant_detail', id=id))
-if file and file.filename:
+    if file and file.filename:
         try:
             encoded_photo = process_image_upload(file)
-if restaurant.photos is None:
+            if restaurant.photos is None:
                 restaurant.photos = []
                 new_photo = {
-                        'data': encoded_photo,
-                        'content_type': file.content_type,
-                        'uploaded_by': current_user.username,
-                        'uploaded_at': datetime.utcnow().isoformat()
-                    }
-                    restaurant.photos = restaurant.photos + [new_photo]
-                    from sqlalchemy.orm.attributes import flag_modified
-                    flag_modified(restaurant, 'photos')
-                    db.session.commit()
+                    'data': encoded_photo,
+                    'content_type': file.content_type,
+                    'uploaded_by': current_user.username,
+                    'uploaded_at': datetime.utcnow().isoformat()
+                }
+                restaurant.photos = restaurant.photos + [new_photo]
+                from sqlalchemy.orm.attributes import flag_modified
+                flag_modified(restaurant, 'photos')
+                db.session.commit()
                 flash('Photo uploaded successfully!', 'success')
         except ValueError as e:
-                flash(str(e), 'danger')
-            except IOError as e:
-                flash('Error processing image file. Please try a different file.', 'danger')
-            except Exception as e:
-                flash('Error uploading photo. Please try again.', 'danger')
+            flash(str(e), 'danger')
+        except IOError as e:
+            flash('Error processing image file. Please try a different file.', 'danger')
+        except Exception as e:
+            flash('Error uploading photo. Please try again.', 'danger')
     else:
         flash('Please select a file to upload', 'danger')
     return redirect(url_for('restaurant_detail', id=id))
@@ -363,7 +363,7 @@ def add_review(id):
                                       for tag in restaurant.food_categories]
     else:
         form.food_category.choices = [('', 'No food categories available')]
-if form.validate_on_submit():
+    if form.validate_on_submit():
         receipt_image = None
         if form.receipt_photo.data:
             file = form.receipt_photo.data
@@ -1015,76 +1015,76 @@ def edit_restaurant(id):
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
     restaurant = Restaurant.query.get_or_404(id)
-    try:
-        restaurant.name = request.form.get(
-            'name', restaurant.name).strip()[:100] or restaurant.name
-        restaurant.description = request.form.get(
+    restaurant.name = request.form.get(
+        'name', restaurant.name).strip()[:100] or restaurant.name
+    restaurant.description = request.form.get(
             'description',
             restaurant.description).strip()[:1000] or restaurant.description
-        restaurant.address = request.form.get(
+    restaurant.address = request.form.get(
             'address', restaurant.address).strip()[:300] or restaurant.address
-        restaurant.phone = request.form.get(
+    restaurant.phone = request.form.get(
             'phone', restaurant.phone).strip()[:50] or restaurant.phone
-        restaurant.working_hours = request.form.get(
+    restaurant.working_hours = request.form.get(
             'working_hours',
-            restaurant.working_hours).strip()[:500] or restaurant.working_hours
+    restaurant.working_hours).strip()[:500] or restaurant.working_hours
         
         # Handle location coordinates
-        try:
-            lat = request.form.get('location_latitude', '').strip()
-            lon = request.form.get('location_longitude', '').strip()
-            if lat and lon:
-                restaurant.location_latitude = float(lat)
-                restaurant.location_longitude = float(lon)
-        except (ValueError, TypeError):
-            pass
+    try:
+        lat = request.form.get('location_latitude', '').strip()
+        lon = request.form.get('location_longitude', '').strip()
+        if lat and lon:
+            restaurant.location_latitude = float(lat)
+            restaurant.location_longitude = float(lon)
+    except (ValueError, TypeError):
+        pass
         
         if 'restaurant_image' in request.files:
             file = request.files['restaurant_image']
     if file and file.filename:
-                from PIL import Image
-                from io import BytesIO
-                import base64
-                allowed_extensions = {'png', 'jpg', 'jpeg'}
-                filename = file.filename.lower()
-                if any(
-                        filename.endswith('.' + ext)
-                        for ext in allowed_extensions):
-                    try:
-                        img = Image.open(file)
-                        img.thumbnail((400, 300), Image.Resampling.LANCZOS)
-                        img_io = BytesIO()
-                        img.save(img_io, 'PNG')
-                        img_io.seek(0)
-                        image_data = base64.b64encode(
-                            img_io.getvalue()).decode('utf-8')
-                        restaurant.image_url = f"data:image/png;base64,{image_data}"
-                    except Exception as e:
-                        pass
-        cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
-        if not Cuisine.query.get(cuisine_id):
-            flash('Invalid cuisine selected.', 'danger')
-            return redirect(url_for('admin_dashboard', tab='restaurants'))
-        restaurant.cuisine_id = cuisine_id
-        price_range = int(
-            request.form.get('price_range', restaurant.price_range))
-        if price_range not in [1, 2, 3, 4]:
-            price_range = restaurant.price_range
-        restaurant.price_range = price_range
-        restaurant.is_small_business = request.form.get(
-            'is_small_business') == 'on'
-        restaurant.is_approved = request.form.get('is_approved') == 'on'
-        restaurant.is_promoted = request.form.get('is_promoted') == 'on'
-        food_categories_input = request.form.get('food_categories', '').strip()
-        restaurant.food_categories = [
-            tag.strip() for tag in food_categories_input.split(',')
-            if tag.strip()
-        ] if food_categories_input else []
-        db.session.commit()
-        flash(f'{restaurant.name} has been updated.', 'success')
-    except (ValueError, TypeError) as e:
-        flash('Error updating restaurant. Please check your input.', 'danger')
-    return redirect(url_for('admin_dashboard', tab='restaurants'))
+        try:
+            from PIL import Image
+            from io import BytesIO
+            import base64
+            allowed_extensions = {'png', 'jpg', 'jpeg'}
+            filename = file.filename.lower()
+            if any(
+                filename.endswith('.' + ext)
+                for ext in allowed_extensions):
+                try:
+                    img = Image.open(file)
+                    img.thumbnail((400, 300), Image.Resampling.LANCZOS)
+                    img_io = BytesIO()
+                    img.save(img_io, 'PNG')
+                    img_io.seek(0)
+                    image_data = base64.b64encode(
+                    img_io.getvalue()).decode('utf-8')
+                    restaurant.image_url = f"data:image/png;base64,{image_data}"
+                except Exception as e:
+                    pass
+            cuisine_id = int(request.form.get('cuisine_id', restaurant.cuisine_id))
+            if not Cuisine.query.get(cuisine_id):
+                flash('Invalid cuisine selected.', 'danger')
+                return redirect(url_for('admin_dashboard', tab='restaurants'))
+            restaurant.cuisine_id = cuisine_id
+            price_range = int(
+                request.form.get('price_range', restaurant.price_range))
+            if price_range not in [1, 2, 3, 4]:
+                price_range = restaurant.price_range
+            restaurant.price_range = price_range
+            restaurant.is_small_business = request.form.get(
+                'is_small_business') == 'on'
+            restaurant.is_approved = request.form.get('is_approved') == 'on'
+            restaurant.is_promoted = request.form.get('is_promoted') == 'on'
+            food_categories_input = request.form.get('food_categories', '').strip()
+            restaurant.food_categories = [
+                tag.strip() for tag in food_categories_input.split(',')
+                if tag.strip()
+            ] if food_categories_input else []
+            db.session.commit()
+            flash(f'{restaurant.name} has been updated.', 'success')
+        except (ValueError, TypeError) as e:
+            flash('Error updating restaurant. Please check your input.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='restaurants'))
 
 
 @app.route('/admin/bulk-delete', methods=['POST'])

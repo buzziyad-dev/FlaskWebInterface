@@ -970,7 +970,7 @@ function attachEventListeners() {
         }
     });
 
-    // Confirm receipt AJAX
+// Confirm receipt AJAX
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('confirm-receipt-btn')) {
             const reviewId = e.target.dataset.id;
@@ -981,22 +981,14 @@ function attachEventListeners() {
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 if (data.success) {
-                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
-                    if (row) {
-                        const badge = row.querySelector('.badge');
-                        if (badge) {
-                            badge.textContent = '✓ Confirmed';
-                            badge.className = 'badge bg-success';
-                        }
-                        e.target.style.display = 'none';
-                    }
-                    alert('Receipt confirmed!');
+                    alert(data.message);
+                    loadAdminData(); // Reload the entire reviews tab to show updated status
                 }
             }).catch(err => alert('Error: ' + err.message));
         }
     });
 
-    // Approve review AJAX
+// Approve review AJAX
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('approve-review-btn')) {
             const reviewId = e.target.dataset.id;
@@ -1007,13 +999,8 @@ function attachEventListeners() {
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 if (data.success) {
-                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
-                    if (row) {
-                        row.style.opacity = '0.5';
-                        row.style.textDecoration = 'line-through';
-                    }
                     alert(data.message);
-                    loadAdminData();
+                    loadAdminData(); // Reload the entire reviews tab to show updated status
                 }
             }).catch(err => alert('Error: ' + err.message));
         }
@@ -1266,92 +1253,170 @@ function renderUsersTab() {
 }
 
 function renderReviewsTab() {
-    const pendingReviews = (adminData.pending_reviews || []).filter(r => !r.is_approved);
-    const approvedReviews = (adminData.all_reviews || []).filter(r => r.is_approved);
+    const allReviews = adminData.all_reviews || [];
+    
+    // Separate reviews into two categories
+    const toApprove = allReviews.filter(r => !r.is_approved);
+    const toConfirm = allReviews.filter(r => r.is_approved && r.receipt_image && !r.receipt_confirmed);
     
     let html = '';
     
-    // Pending reviews section
-    if (pendingReviews.length > 0) {
-        html += `
-        <div class="card shadow-sm mb-4" style="border-left: 4px solid #ff6b6b;">
-            <div class="card-header bg-danger text-white"><h5 class="mb-0 fw-bold">🔔 Pending Approval (${pendingReviews.length})</h5></div>
-            <div class="card-body">
+    // Reviews to Approve section
+    html += `
+    <div class="card shadow-sm mb-4" style="border-left: 4px solid #ff6b6b;">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0 fw-bold">📋 Reviews to Approve (${toApprove.length})</h5>
+            <small class="text-white-50">Reviews waiting for admin approval to be published</small>
+        </div>
+        <div class="card-body">
+            ${toApprove.length > 0 ? `
                 <div class="table-responsive">
                     <table class="table table-hover">
-                        <thead><tr><th>Author</th><th>Restaurant</th><th>Rating</th><th>Content</th><th>Receipt</th><th>Date</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Author</th>
+                                <th>Restaurant</th>
+                                <th>Rating</th>
+                                <th>Content</th>
+                                <th>Receipt</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            ${pendingReviews.map(r => `
-                            <tr style="background-color: rgba(255,107,107,0.05);" data-review-id="${r.id}">
+                            ${toApprove.map(r => `
+                            <tr style="background-color: rgba(255,193,7,0.05);" data-review-id="${r.id}">
                                 <td><strong>${r.author_username}</strong></td>
                                 <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
                                 <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
                                 <td><small>${r.content}</small></td>
                                 <td>
-                                    ${r.receipt_image ? `<div style="display:flex;gap:4px;align-items:center;"><button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button><span class="badge ${r.receipt_confirmed ? 'bg-success' : 'bg-secondary'}">${r.receipt_confirmed ? '✓ Confirmed' : 'Pending'}</span></div>` : '<small class="text-muted">None</small>'}
+                                    ${r.receipt_image ? `
+                                        <div style="display:flex;gap:8px;align-items:center;">
+                                            <button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button>
+                                            <span class="badge bg-info">Has Receipt</span>
+                                        </div>
+                                    ` : '<small class="text-muted">No receipt</small>'}
                                 </td>
                                 <td><small>${r.created_at}</small></td>
                                 <td>
-                                    ${r.receipt_image && !r.receipt_confirmed ? `<button class="btn btn-sm btn-outline-info confirm-receipt-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✓ Confirm</button> ` : ''}
-                                    <button class="btn btn-sm btn-success approve-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✓ Approve</button>
-                                    <button class="btn btn-sm btn-warning reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}">✕ Reject</button>
+                                    <button class="btn btn-sm btn-success approve-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Approve this review to publish it">✓ Approve</button>
+                                    <button class="btn btn-sm btn-danger reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Reject and delete this review">✕ Reject</button>
                                 </td>
                             </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
-            </div>
+            ` : '<p class="text-center text-muted py-4">No reviews waiting for approval.</p>'}
         </div>
-        `;
-    }
+    </div>`;
     
-    // All reviews section
-    if (!adminData.all_reviews || adminData.all_reviews.length === 0) return html + '<p class="text-center text-muted py-4">No reviews yet.</p>';
+    // Reviews to Confirm section
+    html += `
+    <div class="card shadow-sm mb-4" style="border-left: 4px solid #17a2b8;">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0 fw-bold">📸 Reviews to Confirm (${toConfirm.length})</h5>
+            <small class="text-white-50">Approved reviews with receipts that need verification</small>
+        </div>
+        <div class="card-body">
+            ${toConfirm.length > 0 ? `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Author</th>
+                                <th>Restaurant</th>
+                                <th>Rating</th>
+                                <th>Content</th>
+                                <th>Receipt</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${toConfirm.map(r => `
+                            <tr style="background-color: rgba(23,162,184,0.05);" data-review-id="${r.id}">
+                                <td><strong>${r.author_username}</strong></td>
+                                <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
+                                <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
+                                <td><small>${r.content}</small></td>
+                                <td>
+                                    <div style="display:flex;gap:8px;align-items:center;">
+                                        <button class="btn btn-sm btn-info view-receipt-btn" data-receipt="${r.receipt_image}" data-bs-toggle="modal" data-bs-target="#viewReceiptModal" title="View receipt">📸 View</button>
+                                        <span class="badge bg-warning">⏳ Pending Confirmation</span>
+                                    </div>
+                                </td>
+                                <td><small>${r.created_at}</small></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success confirm-receipt-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Confirm this receipt as trustworthy">✓ Confirm Receipt</button>
+                                    <button class="btn btn-sm btn-warning reject-review-btn" data-id="${r.id}" data-csrf="{{ csrf_token() }}" title="Reject and delete this review">✕ Reject</button>
+                                </td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : '<p class="text-center text-muted py-4">No reviews waiting for receipt confirmation.</p>'}
+        </div>
+    </div>`;
     
+    // All Approved Reviews section
+    const approvedAndConfirmed = allReviews.filter(r => r.is_approved);
     html += `
     <div class="card shadow-sm">
-        <div class="card-header bg-white"><h4 class="mb-0 fw-bold">⭐ All Reviews</h4></div>
+        <div class="card-header bg-white">
+            <h4 class="mb-0 fw-bold">✅ All Approved Reviews (${approvedAndConfirmed.length})</h4>
+            <small class="text-muted">Reviews that have been approved and are published</small>
+        </div>
         <div class="card-body">
-            <div class="mb-3">
-                <label class="form-check"><input type="checkbox" class="form-check-input" id="reviewSelectAll"> Select All</label>
-                <button class="btn btn-sm btn-danger ms-2" id="reviewBulkDelete" style="display:none;">Delete Selected</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;"></th>
-                            <th>Author</th>
-                            <th>Restaurant</th>
-                            <th>Rating</th>
-                            <th>Content</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${adminData.all_reviews.map(r => `
-                        <tr>
-                            <td><input type="checkbox" class="form-check-input review-checkbox" value="${r.id}"></td>
-                            <td>${r.author_username}</td>
-                            <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
-                            <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
-                            <td><small>${r.content}</small></td>
-                            <td><span class="badge ${r.is_approved ? 'bg-success' : 'bg-warning'}">${r.is_approved ? '✓ Approved' : 'Pending'}</span></td>
-                            <td><small>${r.created_at}</small></td>
-                            <td>
-                                <form method="POST" action="{{ url_for('delete_review', id=0) }}" data-id="${r.id}" style="display:inline;">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
+            ${approvedAndConfirmed.length > 0 ? `
+                <div class="mb-3">
+                    <label class="form-check"><input type="checkbox" class="form-check-input" id="reviewSelectAll"> Select All</label>
+                    <button class="btn btn-sm btn-danger ms-2" id="reviewBulkDelete" style="display:none;">Delete Selected</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Author</th>
+                                <th>Restaurant</th>
+                                <th>Rating</th>
+                                <th>Content</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${approvedAndConfirmed.map(r => `
+                            <tr>
+                                <td><input type="checkbox" class="form-check-input review-checkbox" value="${r.id}"></td>
+                                <td>${r.author_username}</td>
+                                <td><a href="#" data-restaurant-id="${r.restaurant_id}" class="text-decoration-none">${r.restaurant_name}</a></td>
+                                <td>${[...Array(5)].map((_, i) => `<span ${i < r.rating ? 'style="color:gold"' : ''}>★</span>`).join('')}</td>
+                                <td><small>${r.content}</small></td>
+                                <td>
+                                    <div style="display:flex;gap:4px;align-items:center;">
+                                        <span class="badge ${r.is_approved ? 'bg-success' : 'bg-warning'}">${r.is_approved ? '✓ Approved' : 'Pending'}</span>
+                                        ${r.receipt_confirmed ? '<span class="badge bg-primary">📸 Confirmed</span>' : ''}
+                                        ${r.receipt_image && !r.receipt_confirmed ? '<span class="badge bg-secondary">Receipt Pending</span>' : ''}
+                                    </div>
+                                </td>
+                                <td><small>${r.created_at}</small></td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('delete_review', id=0) }}" data-id="${r.id}" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : '<p class="text-center text-muted py-4">No approved reviews yet.</p>'}
         </div>
     </div>`;
     

@@ -847,7 +847,14 @@ def approve_review(id):
         reviewer = User.query.get(review.user_id)
         if reviewer:
             reviewer.update_reputation()
-    return jsonify({'success': True, 'message': 'Review approved! Author earned 5 points.'})
+    
+    # Customize message based on whether review has receipt
+    if review.receipt_image and not review.receipt_confirmed:
+        message = 'Review approved! Consider confirming the receipt for additional trust verification.'
+    else:
+        message = 'Review approved! Author earned 5 points.'
+    
+    return jsonify({'success': True, 'message': message})
 
 
 @app.route('/admin/confirm-receipt/<int:id>', methods=['POST'])
@@ -856,9 +863,24 @@ def confirm_receipt(id):
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
     review = Review.query.get_or_404(id)
+    
+    # Auto-approve the review if it's not already approved
+    was_not_approved = not review.is_approved
+    review.is_approved = True
     review.receipt_confirmed = True
+    review.approved_by_id = current_user.id
+    review.approved_at = datetime.utcnow()
     db.session.commit()
-    return jsonify({'success': True, 'message': 'Receipt confirmed.'})
+    
+    # Award points to reviewer if this is the first approval
+    if was_not_approved and review.user_id:
+        award_review_points(review.user_id)
+        reviewer = User.query.get(review.user_id)
+        if reviewer:
+            reviewer.update_reputation()
+    
+    message = 'Receipt confirmed and review approved!' if was_not_approved else 'Receipt confirmed.'
+    return jsonify({'success': True, 'message': message})
 
 
 @app.route('/admin/reject-review/<int:id>', methods=['POST'])

@@ -1275,6 +1275,11 @@ function renderUsersTab() {
 }
 
 function renderReviewsTab() {
+    // Safety check - if adminData is null, return loading message
+    if (!adminData || !adminData.all_reviews) {
+        return '<p class="text-center text-muted py-4">Loading reviews...</p>';
+    }
+    
     const allReviews = adminData.all_reviews || [];
     
     // Separate reviews into two categories

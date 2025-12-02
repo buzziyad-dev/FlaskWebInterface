@@ -1040,10 +1040,11 @@ if (res.ok) {
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 if (data.success) {
-                    const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
-                    if (row) row.remove();
-                    // No notification for rejection - just remove silently
+                    // Show notification and refresh data instead of removing row immediately
+                    showNotification('Review rejected and removed.', 'info');
                     loadAdminData();
+                } else {
+                    showNotification(data.error || 'Failed to reject review', 'danger');
                 }
             }).catch(err => showNotification('Error: ' + err.message, 'danger'));
         }
@@ -1605,7 +1606,13 @@ function showSubmissionDetails(id) {
 // Initialization
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#adminTabs button').forEach(btn => {
-        btn.addEventListener('click', () => renderTab(btn.dataset.tab));
+        btn.addEventListener('click', async () => {
+            const tab = btn.dataset.tab;
+            if (tab === 'reviews') {
+                await loadAdminData(); // Always refresh data when switching to reviews tab
+            }
+            renderTab(tab);
+        });
     });
     const autoRefreshToggle = document.getElementById('autoRefreshToggle');
     if (autoRefreshToggle) {

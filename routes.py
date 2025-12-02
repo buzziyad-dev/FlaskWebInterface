@@ -289,7 +289,12 @@ def restaurants():
 def restaurant_detail(id):
     from sqlalchemy.orm import joinedload
     restaurant = Restaurant.query.get_or_404(id)
-    reviews = restaurant.reviews.options(joinedload(Review.author)).all()
+    # Only show approved reviews to non-admin users
+    if current_user.is_authenticated and current_user.is_admin:
+        reviews = restaurant.reviews.options(joinedload(Review.author)).all()
+    else:
+        reviews = restaurant.reviews.options(joinedload(Review.author)).filter(Review.is_approved == True).all()
+    
     reviews = sorted(
         reviews,
         key=lambda r:
